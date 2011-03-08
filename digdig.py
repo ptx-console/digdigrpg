@@ -134,7 +134,15 @@ def RenderImg(texID, texupx, texupy, x, y, w, h):
     glEnd()
 
 
-class SpawnerGUI(object):
+class SpawnerGUI(object): # XXX: 스포너를 이용해 건물을 복사하는 기능을 넣자! 스포너 2개로 min,max바운딩 박스 또는 스포너 2개로 x,z의 min max그리고 높이값으로
+    # 정해서 최대 128x128x128크기의 오브젝트를 저장하고 다른곳에 복사할 수 있는 기능을 넣자.
+    # 스포너 2개로 x,z값을 정하고 그 위치부터 위쪽으로 Y값 몇칸, 아래쪽으로 Y값 몇칸을 정하는게 가장 현실적일 것 같다.
+    # 아니면...스포너 2개로 min/max를 정하고 Y값은 그냥 무한으로 0~128까지를 다 저장하도록 만들던지. 선택적으로 일부분만 할 수도 있게 하자. 오버행
+    # 같은게 걸리면 골치아프니까.
+    # 저장하면 건물 스포너라는 아이템으로 불러올 수 있다.
+    # 또한 개인 소유지를 만들 수 있게 하는데 2개 스포너로 x,z를 minmax정하고 위아래로 Y값을 모두 자기 개인 소유지로 정한다.
+    # 넓이가 넓을수록 많은 돈이 필요.
+    # 개인 소유지에서만 땅을 파서 광물을 얻을 수 있도록 해보자.
     def __init__(self, x,y,w,h, letterW, color=(0,0,0)):
         self.text = ''
         self.rect = x,y,w,h
@@ -153,12 +161,15 @@ class SpawnerGUI(object):
             if InRect(x,y,30,30, m.x,m.y):
                 if self.text:
                     self.func(self.text)
+                AppSt.gui.toolMode = TM_TOOL
                 AppSt.gui.ShowInventory(False)
                 AppSt.guiMode = False
             if InRect(x+30,y,30,30, m.x,m.y):
+                AppSt.gui.toolMode = TM_TOOL
                 AppSt.gui.ShowInventory(False)
                 AppSt.guiMode = False
             if InRect(x+60,y,30,30, m.x,m.y):
+                AppSt.gui.toolMode = TM_TOOL
                 AppSt.gui.ShowInventory(False)
                 AppSt.guiMode = False
                 self.destroyFunc()
@@ -187,19 +198,20 @@ class SpawnerGUI(object):
 
     def Render(self):
         # 선택한 텍스트는 하이라이트 DrawQuad로
-        DrawQuad(*self.rect+((40,40,40,220), (40,40,40,220)))
-        x,y,w,h = self.rect
-        DrawQuad(x,y+30,w,h-30,(230,230,230,220), (230,230,230,220))
+        if AppSt.gui.invShown and AppSt.gui.toolMode == TM_SPAWN:
+            DrawQuad(*self.rect+((40,40,40,220), (40,40,40,220)))
+            x,y,w,h = self.rect
+            DrawQuad(x,y+30,w,h-30,(230,230,230,220), (230,230,230,220))
 
-        texupx = (3*30.0) / 512.0
-        texupy = (11*30.0) / 512.0
-        RenderImg(AppSt.gui.tooltex, texupx, texupy, x+0, y, 30, 30)
-        texupx = (3*30.0) / 512.0
-        texupy = (12*30.0) / 512.0
-        RenderImg(AppSt.gui.tooltex, texupx, texupy, x+30, y, 30, 30)
-        texupx = (3*30.0) / 512.0
-        texupy = (13*30.0) / 512.0
-        RenderImg(AppSt.gui.tooltex, texupx, texupy, x+60, y, 30, 30)
+            texupx = (3*30.0) / 512.0
+            texupy = (11*30.0) / 512.0
+            RenderImg(AppSt.gui.tooltex, texupx, texupy, x+0, y, 30, 30)
+            texupx = (3*30.0) / 512.0
+            texupy = (12*30.0) / 512.0
+            RenderImg(AppSt.gui.tooltex, texupx, texupy, x+30, y, 30, 30)
+            texupx = (3*30.0) / 512.0
+            texupy = (13*30.0) / 512.0
+            RenderImg(AppSt.gui.tooltex, texupx, texupy, x+60, y, 30, 30)
 
         # ok버튼을 넣고 스포너에 이름을 붙일 수 있도록 한다.
         # 스포너를 좌측 버튼으로 hit 하면 OnSpawnerHit이벤트가 발생하고
@@ -263,12 +275,15 @@ class FileSelector(object):
                     self.pageIdx = 0
                 elif InRect(x+90,y,30,30,m.x,m.y): # ok
                     self.func(self.selectedFileName)
+                    AppSt.gui.toolMode = TM_TOOL
                     AppSt.gui.ShowInventory(False)
                     AppSt.guiMode = False
                 elif InRect(x+120,y,30,30,m.x,m.y): # cancel
+                    AppSt.gui.toolMode = TM_TOOL
                     AppSt.gui.ShowInventory(False)
                     AppSt.guiMode = False
                 elif InRect(x+150,y,30,30,m.x,m.y): # destroy
+                    AppSt.gui.toolMode = TM_TOOL
                     AppSt.gui.ShowInventory(False)
                     AppSt.guiMode = False
                     self.destroyFunc()
@@ -727,9 +742,9 @@ class DigDigGUI(object):
 
         self.invShown = False
         self.toolMode = TM_TOOL # 장비창이냐 제작창이냐 상자창이냐 등등
-        self.font = pygame.font.Font("./fonts/NanumGothicBold.ttf", 15)
-        self.font2 = pygame.font.Font("./fonts/NanumGothicBold.ttf", 12)
-        self.font3 = pygame.font.Font("./fonts/NanumGothicBold.ttf", 14)
+        self.font = pygame.font.Font("./fonts/Fanwood.ttf", 18)
+        self.font2 = pygame.font.Font("./fonts/FanwoodText-Italic.ttf", 13)
+        self.font3 = pygame.font.Font("./fonts/Fanwood.ttf", 14)
         self.textRenderer = StaticTextRenderer(self.font)
         self.textRendererSmall = StaticTextRenderer(self.font2)
         self.textRendererArea = DynamicTextRenderer(self.font3)
@@ -738,7 +753,7 @@ class DigDigGUI(object):
         self.testEdit = SpawnerGUI((SW-400)/2,(SH-50)/2,400,50,14)
         #self.testText.SetText(u"asdhoihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhrrㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱrrㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ가가가가\nadsasd")
         self.prevAreaT = 0
-        self.areaDelay = 200
+        self.areaDelay = 500
         self.numbers = [self.textRenderer.NewTextObject(`i`, (255,255,255), True, (0,0,0)) for i in range(10)]
 
 
@@ -807,26 +822,26 @@ class DigDigGUI(object):
 
 
         self.makes = [ITEM_NONE for i in range(60)]
-        self.makes[0] = MakeTool(u"나무", u"나무 블럭입니다.", (116,100,46), [(BLOCK_LOG, 1, TYPE_BLOCK)], (BLOCK_WOOD, [], [], 4, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
-        self.makes[1] = MakeTool(u"막대기", u"아이템의 재료로 쓰입니다.", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_STICK, [], [], 4, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[2] = MakeTool(u"숯", u"연료나 아이템의 재료로\n쓰입니다.", (60,60,60), [(BLOCK_LOG, 1, TYPE_BLOCK)], (ITEM_CHARCOAL, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[3] = MakeTool(u"유리", u"투명한 건축자재입니다.", (60,60,60), [(BLOCK_SAND, 1, TYPE_BLOCK)], (BLOCK_GLASS, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
-        self.makes[20] = MakeTool(u"나무 곡괭이", u"나무로 만들어진 곡괭이.\n돌이나 광물을 캐는데 쓰입니다.", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_PICKAXE, [30,], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[0] = MakeTool(u"Wood", u"A wood block.", (116,100,46), [(BLOCK_LOG, 1, TYPE_BLOCK)], (BLOCK_WOOD, [], [], 4, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes[1] = MakeTool(u"Stick", u"Multi purpose stick", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_STICK, [], [], 4, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[2] = MakeTool(u"Charcoal", u"A charcoal", (60,60,60), [(BLOCK_LOG, 1, TYPE_BLOCK)], (ITEM_CHARCOAL, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[3] = MakeTool(u"Glass", u"A glass", (60,60,60), [(BLOCK_SAND, 1, TYPE_BLOCK)], (BLOCK_GLASS, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes[20] = MakeTool(u"Wooden pickaxe", u"Used to pick stones, ores", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_PICKAXE, [30,], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         # returns: 아이템, 체력깎는 정도, 못파는 광물목록
-        self.makes[21] = MakeTool(u"나무 도끼", u"나무로 만들어진 도끼.\n나무를 베는데 쓰입니다.", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_AXE, [30], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[22] = MakeTool(u"나무 삽", u"나무로 만들어진 삽.\n흙이나 모래를 파는데 쓰입니다.", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_SHOVEL, [30,], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[23] = MakeTool(u"돌 곡괭이", u"돌로 만들어진 곡괭이.\n돌이나 광물을 캐는데 쓰입니다.", (47,43,43), [(BLOCK_COBBLESTONE, 5, TYPE_BLOCK)], (ITEM_PICKAXE, [30,], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[21] = MakeTool(u"Wooden axe", u"Wood cutting wooden axe", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_AXE, [30], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[22] = MakeTool(u"Shovel", u"Digs up dirts or sands", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_SHOVEL, [30,], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[23] = MakeTool(u"Stone pickaxe", u"Used to pick stones, ores", (47,43,43), [(BLOCK_COBBLESTONE, 5, TYPE_BLOCK)], (ITEM_PICKAXE, [30,], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         # returns: 아이템, 체력깎는 정도, 못파는 광물목록
-        self.makes[24] = MakeTool(u"돌 도끼", u"돌로 만들어진 도끼.\n나무를 베는데 쓰입니다.", (47,43,43), [(BLOCK_COBBLESTONE, 5, TYPE_BLOCK)], (ITEM_AXE, [30], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[25] = MakeTool(u"돌 삽", u"돌로 만들어진 삽.\n흙이나 모래를 파는데 쓰입니다.", (47,43,43), [(BLOCK_COBBLESTONE, 5, TYPE_BLOCK)], (ITEM_SHOVEL, [30,], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[10] = MakeTool(u"횃불(숯)", u"어두운 곳을 밝혀줍니다.", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_CHARCOAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[11] = MakeTool(u"횃불(석탄)", u"어두운 곳을 밝혀줍니다.", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[12] = MakeTool(u"상자", u"아이템이나 블럭을\n보관할 수 있습니다.", (255,255,255), [(BLOCK_WOOD, 8, TYPE_BLOCK, (255,255,255))], (ITEM_CHEST, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[30] = MakeTool(u"코드", u"코드를 저장하고\n기계와 연결하여\n기계를 작동시킵니다.", (255,255,255), [(ITEM_GOLD, 4, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 4, TYPE_ITEM, (201,201,201))], (BLOCK_CODE, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes[24] = MakeTool(u"Stone axe", u"Used to cut trees", (47,43,43), [(BLOCK_COBBLESTONE, 5, TYPE_BLOCK)], (ITEM_AXE, [30], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[25] = MakeTool(u"Stone shovel", u"Digs up dirts or sands", (47,43,43), [(BLOCK_COBBLESTONE, 5, TYPE_BLOCK)], (ITEM_SHOVEL, [30,], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[10] = MakeTool(u"Torch(Charcoal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_CHARCOAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[11] = MakeTool(u"Torch(Coal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[12] = MakeTool(u"Chest", u"Can hold items and blocks", (255,255,255), [(BLOCK_WOOD, 8, TYPE_BLOCK, (255,255,255))], (ITEM_CHEST, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[30] = MakeTool(u"Code", u"Runs python code.\nUsed to launch commands\nor spawn an object\n(Put scripts in scripts directory)", (255,255,255), [(ITEM_GOLD, 4, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 4, TYPE_ITEM, (201,201,201))], (BLOCK_CODE, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         #self.makes[32] = MakeTool(u"전기선(일자)", u"코드와 기계를\n연결합니다.", (255,255,255), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (ITEM_LINE, [], [], 10, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         #self.makes[33] = MakeTool(u"전기선(기역자)", u"코드와 기계를\n연결합니다.", (255,255,255), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (ITEM_LINEL, [], [], 10, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[31] = MakeTool(u"생성기", u"몹, 아이템등을 생성합니다.\n- 기계 -", (255,255,255), [(ITEM_GOLD, 4, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 4, TYPE_ITEM, (201,201,201))], (BLOCK_SPAWNER, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
-        self.recipeTextID = self.textRenderer.NewTextObject(u"재료:", (0,0,0))
+        self.makes[31] = MakeTool(u"Spawner", u"Spawning spot\n- Machine -", (255,255,255), [(ITEM_GOLD, 4, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 4, TYPE_ITEM, (201,201,201))], (BLOCK_SPAWNER, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.recipeTextID = self.textRenderer.NewTextObject(u"Recipe:", (0,0,0))
 
         self.invSlotPos = []
         invX, invY = self.invRealPos
@@ -2554,11 +2569,11 @@ def GUIDrawMode():
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
 
-G_FAR = 300.0
+G_FAR = 20.0
 def GameDrawMode():
     glEnable(GL_CULL_FACE)
     glEnable(GL_DEPTH_TEST)
-    glDepthFunc(GL_LESS)
+    glDepthFunc(GL_LEQUAL)
     h = SH
     if SH == 0: h = 1
     aspect = float(SW) / float(h)
@@ -3566,7 +3581,7 @@ class MobGL(object):
 
     def SetAnimState(self, s):
         self.animstate = s
-    def Render(self, nameRenderer, cam, t):
+    def Render2(self, nameRenderer, cam, t):
         if not self.genDone or AppSt.regenTex:
             self.dList = [glGenLists(1) for i in range(6)]
         glBindTexture(GL_TEXTURE_2D, AppSt.mobtex)
@@ -3698,6 +3713,138 @@ class MobGL(object):
         self.t = t
 
         glPopMatrix()
+    def Render(self, nameRenderer, cam, t):
+        if not self.genDone or AppSt.regenTex:
+            self.dList = [glGenLists(1) for i in range(6)]
+        glBindTexture(GL_TEXTURE_2D, AppSt.mobtex)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
+
+
+
+        x,y,z = self.pos
+        y -= self.bound[1]
+        w,h,l = self.bound
+
+        factor = self.animIdx/self.animMax
+        glPushMatrix()
+        glTranslatef(x,y,z)
+        glRotatef(-self.angle+90, 0.0, 1.0, 0.0)
+
+        tex1,tex2,tex3,tex4,tex5,tex6 = self.skin[0]
+        glPushMatrix()
+        h = 1.5
+        top = h-(0.25)+0.5
+        if not self.genDone or AppSt.regenTex:
+            glNewList(self.dList[0], GL_COMPILE)
+            glTranslatef(0,top,0)
+            if self.animstate == ANIM_HIT:
+                glRotatef(-30, 1.0, 0.0, 0.0)
+            DrawCube((0,0,0), (0.25, 0.25, 0.15), self.color, tex1,tex2,tex3,tex4,tex5,tex6, AppSt.mobtex) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+            glEndList()
+        else:
+            glCallList(self.dList[0])
+        glPopMatrix()
+
+        tex1,tex2,tex3,tex4,tex5,tex6 = self.skin[1]
+        glPushMatrix()
+        mid = h-(0.25)+0.25/2-(0.5)+0.5
+        if not self.genDone or AppSt.regenTex:
+            glNewList(self.dList[1], GL_COMPILE)
+            glTranslatef(0,0+mid,0)
+            glRotatef(0, 0.0, 1.0, 0.0)
+            DrawCube((0,0,0),(0.4, 0.5, 0.25), self.color, tex1,tex2,tex3,tex4,tex5,tex6, AppSt.mobtex) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+            glEndList()
+        else:
+            glCallList(self.dList[1])
+
+        glPopMatrix()
+
+        tex1,tex2,tex3,tex4,tex5,tex6 = self.skin[2]
+        glPushMatrix()
+        if not self.genDone or AppSt.regenTex:
+            glNewList(self.dList[2], GL_COMPILE)
+            glTranslatef(0-0.25,0+mid+0.25,0)
+            if self.animstate == ANIM_WALK:
+                glRotatef(factor*45, 1.0, 0.0, 0.0)
+            elif self.animstate == ANIM_IDLE:
+                pass
+            elif self.animstate == ANIM_ATTACK:
+                glRotatef(-90, 1.0, 0.0, 0.0)
+                glRotatef(factor*45, 1.0, 0.0, 0.0)
+                glRotatef(factor*45, 0.0, 0.0, 1.0)
+            elif self.animstate == ANIM_HIT:
+                glRotatef(-30, 1.0, 0.0, 0.0)
+
+            DrawCubeArm((0,0,0),(0.1, 0.5, 0.1), self.color, tex1,tex2,tex3,tex4,tex5,tex6, AppSt.mobtex) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+            glEndList()
+        else:
+            glCallList(self.dList[2])
+        glPopMatrix() # 오른팔
+
+        tex1,tex2,tex3,tex4,tex5,tex6 = self.skin[3]
+        glPushMatrix()
+        if not self.genDone or AppSt.regenTex:
+            glNewList(self.dList[3], GL_COMPILE)
+            glTranslatef(0+0.25,0+mid+0.25,0)
+            if self.animstate == ANIM_WALK:
+                glRotatef(-factor*45, 1.0, 0.0, 0.0)
+            elif self.animstate == ANIM_IDLE:
+                pass
+            elif self.animstate == ANIM_HIT:
+                glRotatef(-30, 1.0, 0.0, 0.0)
+            DrawCubeArm((0,0,0),(0.1, 0.5, 0.1), self.color, tex1,tex2,tex3,tex4,tex5,tex6, AppSt.mobtex) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+            glEndList()
+        else:
+            glCallList(self.dList[3])
+        glPopMatrix() # 왼팔
+
+        tex1,tex2,tex3,tex4,tex5,tex6 = self.skin[4]
+        glPushMatrix()
+        if not self.genDone or AppSt.regenTex:
+            glNewList(self.dList[4], GL_COMPILE)
+            glTranslatef(0-0.075,0+mid-0.5+0.25,0)
+            if self.animstate == ANIM_WALK:
+                glRotatef(-factor*45, 1.0, 0.0, 0.0)
+            elif self.animstate == ANIM_IDLE:
+                pass
+            DrawCubeArm((0,0,0),(0.15, 0.5, 0.15), self.color, tex1,tex2,tex3,tex4,tex5,tex6, AppSt.mobtex) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+            glEndList()
+        else:
+            glCallList(self.dList[4])
+        glPopMatrix() # 오른발
+
+        tex1,tex2,tex3,tex4,tex5,tex6 = self.skin[5]
+        glPushMatrix()
+        if not self.genDone or AppSt.regenTex:
+            glNewList(self.dList[5], GL_COMPILE)
+            glTranslatef(0+0.075,0+mid-0.5+0.25,0)
+            if self.animstate == ANIM_WALK:
+                glRotatef(factor*45, 1.0, 0.0, 0.0)
+            elif self.animstate == ANIM_IDLE:
+                pass
+            DrawCubeArm((0,0,0),(0.15, 0.5, 0.15), self.color, tex1,tex2,tex3,tex4,tex5,tex6, AppSt.mobtex, True) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+            glEndList()
+        else:
+            glCallList(self.dList[5])
+        glPopMatrix() # 왼발
+
+
+        self.genDone = True
+        if self.t and self.flip:
+            self.animIdx -= (t-self.t)/float(self.fps)
+        elif self.t:
+            self.animIdx += (t-self.t)/float(self.fps)
+        if self.animIdx > self.animMax:
+            self.animIdx = self.animMax
+            self.flip = True
+        elif self.animIdx < -self.animMax:
+            self.animIdx = -self.animMax
+            self.flip = False
+        self.t = t
+
+        glPopMatrix()
 
 class FightingElements(object):
     def __init__(self, id_, name, pos, params):
@@ -3769,8 +3916,50 @@ class DigDigScript(object):
     def __init__(self):
         pass
 
+    def SaveRegion(self, name, min, max, ymin, ymax):
+        assert type(min) in [str, unicode]
+        assert type(max) in [str, unicode]
+        spawners = {}
+        for coord in AppSt.gui.spawns:
+            name = AppSt.gui.spawns[coord]
+            spawners[name] = coord
+        min, max = spawners[min], spawners[max]
+        min = list(min)
+        max = list(max)
+        if min[0] > max[0]:
+            max[0], min[0] = min[0], max[0]
+        if min[2] > max[2]:
+            max[2], min[2] = min[2], max[2]
+        if ymin > ymax:
+            ymax, ymin = ymin, ymax
+        AppSt.chunks.SaveRegion(name, (min[0], ymin, min[2]), (max[0], ymax, max[2]))
+
+    def LoadRegion(self, name, pos):
+        assert type(pos) in [str, unicode]
+        spawners = {}
+        for coord in AppSt.gui.spawns:
+            name = AppSt.gui.spawns[coord]
+            spawners[name] = coord
+        pos = spawners[pos]
+        AppSt.chunks.LoadRegion(name, pos)
+        del AppSt.gui.spawns[pos]
+        # 스포너 뿐만이 아니라, 덮어씌울때 모든 아이템이나 상자등을 다 어떻게 처리한다? 아예, 그곳에 상자나 아이템이 있으면 로드하지 못하게
+        # 막아야 할 것 같다. XXX:
+        # 또한 복사할 때 스포너나 아이템이 복사되지 않도록 해야한다.(상자, 스포너, 코드블락)?
+        # 음......여러가지 장치를 해둔 경우 그것도 복사하고 싶겠지만 그건 걍 포기??
+        # 그것도 다 복사되게 해야하는 듯. 특히 복사하는 용도의 스포너는 복사하지 않고, 그 외의 스포너는 복사를 하되
+        # 만약 스포너의 이름이 중복되는 경....음.................
+        #
+        # 아예 어드민의 용도로만 사용하게 하도록 하자 그냥;;
+        # XXX: 이제 부수지 못하도록 스포너 2개로 Lockdown거는 것을 구현하자. 락다운을 걸면 땅의 주인만 락다운을 풀 수가 있음
+        # 땅의 소유지를 결정하는 것도 스포너 2개로.
     def SpawnMob(self, pos):
-        assert type(pos) is tuple and len(pos) == 3, "Wrong coordination data"
+        assert type(pos) in [str, unicode]
+        spawners = {}
+        for coord in AppSt.gui.spawns:
+            name = AppSt.gui.spawns[coord]
+            spawners[name] = coord
+        pos = spawners[pos]
         skin = [
             [(0*64.0/512.0, 1*64.0/512.0),
             (0*64.0/512.0, 1*64.0/512.0),
@@ -3826,7 +4015,7 @@ class ScriptLauncher(object):
                 return None
 
         def getmyattr(obj, name):
-            assert name in ["SpawnMob"], "Cannot access that attribute"
+            assert name in ["SpawnMob", "SaveRegion", "LoadRegion"], "Cannot access that attribute"
             return getattr(obj,name)
         self.r = dict(__builtins__ = {'digdig': DigDigScript(), 'None': None, 'True': True, 'False': False, '_getitem_':getmyitem, '_write_':full_write_guard, '_getattr_':getmyattr})
 
@@ -4031,6 +4220,7 @@ class DigDigApp(object):
                     block, items = self.chunks.DigBlock(x,y,z)
                     if block:
                         self.SpawnBlockItems(x,y,z, block)
+                    del self.gui.spawns[(x,y,z)]
 
                 def SetName(name):
                     if name not in self.gui.spawns.values():
@@ -4049,6 +4239,7 @@ class DigDigApp(object):
                     block, items = self.chunks.DigBlock(x,y,z)
                     if block:
                         self.SpawnBlockItems(x,y,z, block)
+                    del self.gui.codes[(x,y,z)]
                 def SetCode(fileN):
                     self.gui.codes[(x,y,z)] = fileN
                     self.scripts[(x,y,z)] = ScriptLauncher((x,y,z))
@@ -4211,8 +4402,8 @@ class DigDigApp(object):
         glDisable(GL_TEXTURE_2D)
         glDisable(GL_CULL_FACE)
         glLineWidth(2.0)
-        w = 30.0
-        h = 30.0
+        w = 15.0
+        h = 15.0
         x = float((SW-w)/2.0)
         y = float((SH-h)/2.0)
         glBegin(GL_QUADS)
@@ -4736,7 +4927,7 @@ class DigDigApp(object):
                     updateFrame = False
                 for mob in self.mobs:
                     if self.chunks.SphereInFrustumPy(*(mob.pos+(0.5,frustum))):
-                        mob.Render(None, self.cam1, t) # 이것도 C로 옮기면 빨라질지도 모른다네
+                        mob.Render2(None, self.cam1, t) # 이것도 C로 옮기면 빨라질지도 모른다네
                         # 오픈GL을 이용하는 것보다 CPU를 이용하여 트랜슬레이트하고 한번에 그리는게 빠른가 경험상 그런듯
                         # 하지만 귀찮으니 놔두자...XXX: 나중에.
 
@@ -4986,11 +5177,11 @@ class DigDigApp(object):
         self.show = not self.show
         self.housing.Show(self.show)
     def OpenInventory(self, t, m, k):
-        if k.pressedKey == K_i:
+        if k.pressedKey == K_i and not self.guiMode:
             self.guiMode = not self.guiMode
             self.gui.toolMode = TM_TOOL
             self.gui.ShowInventory(self.guiMode)
-        elif k.pressedKey == K_e:
+        elif k.pressedKey == K_e and not self.guiMode:
             self.guiMode = not self.guiMode
             self.gui.toolMode = TM_EQ
             self.gui.ShowInventory(self.guiMode)
@@ -5122,8 +5313,13 @@ class DigDigApp(object):
             (1*64.0/512.0, 1*64.0/512.0)]]
 
 
+        """
         entity = FightingEntity(self.GenId(), "Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
+        """
+        entity = FightingEntity(self.GenId(), "Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
+        self.mobs = []
+        #self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         
         pygame.mouse.set_visible(False)
 
@@ -5200,6 +5396,7 @@ class DigDigApp(object):
             mob.pos = p.x+idx*1.0, p.y, (-p.z)
             idx += 1
         
+        self.chunks.SaveRegion("test", (64,0,64), (127+64,127,127+64))
         while not done:
             fps.Start()
             for e in pygame.event.get():
@@ -5616,4 +5813,64 @@ Q를 누르고 1~0을 누르면 퀵바가 바뀐다.
 하여간에... 적은 정보와 알맞는 연출로 상상하기가 쉽도록 만들어주는 게 중요한 듯.
 ----------
 스포너나 코드는 오른쪽 메뉴에서 파괴 버튼을 눌러야 파괴되도록 한다.
+--------------
+기본 게임 틀을 만들고, 유져가 게임 자체를 제작해서 다른사람이 플레이할 수 있게 유저 스스로 퀘스트나 아이템 등을 만들 수 있도록 한다.
+admin모드로 들어가면 누구나 수정 가능하고 뭐 그런식.
+멀티플레이어 가능하게 하면 진짜 좋을 거 같긴 하다.
+------
+self.mobs가 출현하는게 8군데 있다.(AppSt.mobs 이걸 그냥 그..... 딕셔너리 기반으로 해서 그.....
+현재 청크 주변에 있는 딕셔너리에 있는 몹들만 표시되도록. 몹이 이동할 때마다 아...그 네트워크 게임에서도 비슷하게 했었지.
+-----
+이제 미니맵과 북쪽표시하기.
+원형으로 해서 회전도 시켜야함
+가장 높은 y청크를 얻어서 이미지로 C에서 만든 다음에 파이썬스트링으로 만들어서 파이썬으로 전달하면 여기서 텍스쳐 생성/리젠할때쓰면 됨
+---------
+왜 전투하는걸 못만드는지 알았다. RPG게임에서 전투는 가장 하기 싫은 "일"이다. 일거리를 만들려니 하기가 힘든 것.
+-------
+        # 스포너 뿐만이 아니라, 덮어씌울때 모든 아이템이나 상자등을 다 어떻게 처리한다? 아예, 그곳에 상자나 아이템이 있으면 로드하지 못하게
+        # 막아야 할 것 같다. XXX:
+        # 또한 복사할 때 스포너나 아이템이 복사되지 않도록 해야한다.(상자, 스포너, 코드블락)?
+        # 음......여러가지 장치를 해둔 경우 그것도 복사하고 싶겠지만 그건 걍 포기??
+        # 그것도 다 복사되게 해야하는 듯. 특히 복사하는 용도의 스포너는 복사하지 않고, 그 외의 스포너는 복사를 하되
+        # 만약 스포너의 이름이 중복되는 경....음.................
+        #
+        # 아예 어드민의 용도로만 사용하게 하도록 하자 그냥;;
+        # XXX: 이제 부수지 못하도록 스포너 2개로 Lockdown거는 것을 구현하자. 락다운을 걸면 땅의 주인만 락다운을 풀 수가 있음
+        # 땅의 소유지를 결정하는 것도 스포너 2개로.
+------------------------------
+게임을 만드는 게임. 게임을 만드는 것 자체가 재미있으니까 게임을 만드는 게임. (....)
+------------------------------
+이제 계단을 만들어 보자.
+그냥 Move함수에서 그리고 FallOrJump함수에서 조금씩 올라가거나 조금씩 내려가도록 boundy+위치y를 기반으로 검사해서 올려주거나 내려주면 된다.
+----------
+결국엔 몹이라던가 이런거 전부 C로 옮겨야 하겠지만 일단 여기서 계단을 만들어 보자.
+-----------
+GUI를 안그리면 30FPS가 나온다. 즉, 전부 C로 옮기고 vertexpointer를 쓰면 빠르지 않을까 싶다.
+vertexpointer를 64번에 나눠 쓰는 것보다 한번에 쓰는것 역시 더 빨라지지 않을까? 메모리 복사가 가끔 일어나겠지만 말이다.
+
+메모리 복사가 안일어나려면 그냥 음....여러번에 그리는 게 더 나을까?
+------------
+GUI를 일단 리스트에 버텍스, texit, texcoord, color, line인지 quad인지 여부를 다 저장해두고
+업데이트가 한개라도 되었으면 rebuildvertexpointer로 전달해서 새로 만들고
+업뎃이 안된 경우 그냥 전달해서 그린다.
+아마 픽셀을 그리는 게 느린 경우일 수도 있다고 생각하지만 맵을 그리는 것도 빠른데 설마 그게 느려서 그런 건 아닌 것 같고
+glbegin이 심각하게 느린걸로 생각된다. 그게 안느리다면 displaylist도 필요 없겠지.
+
+아 그럼 gui를 디스플레이 리스트로 그리고 드래깅 중인 아이템만 그냥 그리고
+나머지는 업뎃 될 때마다 디스플레이 리스트로 하고
+게다가 뭐랄까 몹 애니메이션은...... 버텍스 애니메이션을 할까 스켈레탈 애니메이션 말고??
+버텍스 숫자도 별로 안되는데 스켈레탈을 할 필요가 없는 듯?
+
+버텍스 애니메이션은 매트릭스 트랜스폼이 없어서 더 빠른가? 한번 일단 테스트를
+
+확실히 translation이 없으니까 훨씬... 빠르다.
+하긴 translation이 있어도 빠르면 버텍스 애니메이션을 쓸 필요가 없었겠지
+glGetMatrix?그걸로 로테이션 매트릭스를 가져와서 직접 변경시키고
+각 프레임을 디스플레이 리스트로 만들어서 쓴다.
+push하고 loadidentity부르고 로컬 회전/트랜슬레이션을 마친 후에 modelviewmatrix를 가져오면 될 듯 하다.
+그리고 글로벌 트랜슬레이션/회전 한 번으로 한개의 몹을 그린다.
+-----------------------
+음 이제 큐브 인 프러스텀으로 했더니 G_FAR를 줄이면 좀 빨라진다.
+-----------
+태양광 계산도 버텍스 수준에서 하면 더 부드럽다.
 """
