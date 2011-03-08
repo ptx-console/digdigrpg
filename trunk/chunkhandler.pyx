@@ -789,6 +789,12 @@ def dot(x,y,z,x2,y2,z2):
 cdef class Chunks:
     cdef Chunk **chunks
     cdef Octree **octrees
+    
+   # cdef float quads[32768*4*3]
+   # cdef float texs[32768*4*2]
+   # cdef float normals[32768*4*3]
+   # cdef unsigned char colors[32768*4*3]
+   # cdef int curIdx
     cdef float *tV[64]
     cdef float *tT[64]
     cdef float *tN[64] # terrain
@@ -2888,6 +2894,204 @@ cdef class Chunks:
         mu2 = (-b - cmath.sqrt(bb4ac)) / (2 * a)
 
         return True
+    def LoadRegion(self, name, dstpos):
+
+        #f = open("%d_%d_%d", "rb")
+        cdef:
+            char fbuffer[256]
+            char *path = "./map/%s.region"
+            char *path2 = "./map/%s.len"
+            stdio.FILE *fp
+            char *nameStr = name
+            int whl[3]
+
+        stdio.sprintf(fbuffer, path2, nameStr)
+        fp = stdio.fopen(fbuffer, "rb")
+        if fp != NULL:
+            stdio.fread(whl, sizeof(int), 3, fp);
+            stdio.fclose(fp)
+        else:
+            return
+        w,h,l = whl[0],whl[1],whl[2]
+        cdef unsigned char *buffer
+        buffer = <unsigned char*>malloc(sizeof(unsigned char)*w*h*l)
+
+        stdio.sprintf(fbuffer, path, nameStr)
+        fp = stdio.fopen(fbuffer, "rb")
+        if fp != NULL:
+            stdio.fread(buffer, sizeof(unsigned char), w*h*l, fp);
+            stdio.fclose(fp)
+        else:
+            return
+
+        cdef Octree * octrees[9]
+        cdef Chunk * outchunks[9]
+        cdef int pos[9][3]
+        x,y,z = dstpos
+        xx,yy,zz = x+w,y+h,z+l
+        if yy-y > 128:
+            yy -= yy-y-128
+        if y < 0:
+            y = 0
+        if y >= 128:
+            y = 127
+        if yy < 0:
+            yy = 0
+        if yy >= 128:
+            yy = 127
+
+        self.GetOctreesByViewpoint(pos, octrees, outchunks, x,y,z)
+        # 9개의 버퍼중 현재 좌표에 맞는 부분을 찾아야 한다.
+        # 최대 4개의 버퍼가 필요하므로 그 4개의 좌표를 찾는다.
+        x2 = xx-(xx%128)
+        z2 = zz-(zz%128)
+        w2 = xx-x2
+        l2 = zz-z2
+        if x-(x%128) == x2:
+            w2 = 0
+            w = xx-x
+        else:
+            w = x2-x
+
+        if z-(z%128) == z2:
+            l2 = 0
+            l = zz-z
+        else:
+            l = z2-z
+
+        for ii in range(9):
+            if pos[ii][0] == x-(x%128) and pos[ii][2] == z-(z%128):
+                for k in range(l):
+                    for j in range(h):
+                        memcpy(&outchunks[ii].chunk[(k+(z%128))*128*128+(y+j)*128+(x%128)], &buffer[k*h*(w+w2)+j*(w+w2)], w)
+
+                self.CalcFilled(outchunks[ii], octrees[ii])
+
+
+            elif pos[ii][0] == x-(x%128) and pos[ii][2] == z2:
+                if l2:
+                    for k in range(l2):
+                        for j in range(h):
+                            memcpy(&outchunks[ii].chunk[(k)*128*128+(y+j)*128+(x%128)], &buffer[(k+l)*h*(w+w2)+j*(w+w2)], w)
+                    self.CalcFilled(outchunks[ii], octrees[ii])
+            elif pos[ii][0] == x2 and pos[ii][2] == z-(z%128):
+                if w2:
+                    for k in range(l):
+                        for j in range(h):
+                            memcpy(&outchunks[ii].chunk[(k+(z%128))*128*128+(y+j)*128], &buffer[k*h*(w+w2)+j*(w+w2)+w], w2)
+                    self.CalcFilled(outchunks[ii], octrees[ii])
+            elif pos[ii][0] == x2 and pos[ii][2] == z2:
+                if w2 and l2:
+                    for k in range(l2):
+                        for j in range(h):
+                            memcpy(&outchunks[ii].chunk[(k)*128*128+(y+j)*128], &buffer[(k+l)*h*(w+w2)+j*(w+w2)+w],  w2)
+                    self.CalcFilled(outchunks[ii], octrees[ii])
+        for k in range(((l+l2)/32)+2):
+            for j in range(128/32):
+                for i in range(((w+w2)/32)+2):
+                    vx = x-(x%32)+i*32
+                    vy = j*32
+                    vz = z-(z%32)+k*32
+                    for iii in range(64):
+                        xxx,yyy,zzz = self.curDrawnCoords[0][iii]
+                        if xxx==vx and yyy==vy and zzz==vz:
+                            self.curDrawnCoords[0][iii] = (-1,-1,-1)
+
+
+        free(buffer)
+
+    def SaveRegion(self, name, min, max):
+        cdef Octree * octrees[9]
+        cdef Chunk * outchunks[9]
+        cdef int pos[9][3]
+        x,y,z = min
+        xx,yy,zz = max
+        if xx-x > 128:
+            xx -= xx-x-128
+        if yy-y > 128:
+            yy -= yy-y-128
+        if zz-z > 128:
+            zz -= zz-z-128
+        if y < 0:
+            y = 0
+        if y >= 128:
+            y = 127
+        if yy < 0:
+            yy = 0
+        if yy >= 128:
+            yy = 127
+        if xx-x == 0 or yy-y == 0 or zz-z == 0 or xx < x or yy < y or zz < z:
+            assert False, "Wrong min max"
+        w,h,l = xx-x, yy-y, zz-z
+        self.GetOctreesByViewpoint(pos, octrees, outchunks, x,y,z)
+        cdef unsigned char *buffer
+        buffer = <unsigned char*>malloc(sizeof(unsigned char)*w*h*l)
+        # 9개의 버퍼중 현재 좌표에 맞는 부분을 찾아야 한다.
+        # 최대 4개의 버퍼가 필요하므로 그 4개의 좌표를 찾는다.
+        x2 = xx-(xx%128)
+        z2 = zz-(zz%128)
+        w2 = xx-x2
+        l2 = zz-z2
+        if x-(x%128) == x2:
+            w2 = 0
+            w = xx-x
+        else:
+            w = x2-x
+
+        if z-(z%128) == z2:
+            l2 = 0
+            l = zz-z
+        else:
+            l = z2-z
+
+        # 제대로 안된다. 뭔가 점 이상하네여~~~~~~
+        for ii in range(9):
+            if pos[ii][0] == x-(x%128) and pos[ii][2] == z-(z%128):
+                for k in range(l):
+                    for j in range(h):
+                        memcpy(&buffer[k*h*(w+w2)+j*(w+w2)], &outchunks[ii].chunk[(k+(z%128))*128*128+(y+j)*128+(x%128)], w)
+            elif pos[ii][0] == x-(x%128) and pos[ii][2] == z2:
+                if l2:
+                    for k in range(l2):
+                        for j in range(h):
+                            memcpy(&buffer[(k+l)*h*(w+w2)+j*(w+w2)], &outchunks[ii].chunk[(k)*128*128+(y+j)*128+(x%128)], w)
+            elif pos[ii][0] == x2 and pos[ii][2] == z-(z%128):
+                if w2:
+                    for k in range(l):
+                        for j in range(h):
+                            memcpy(&buffer[k*h*(w+w2)+j*(w+w2)+w], &outchunks[ii].chunk[(k+(z%128))*128*128+(y+j)*128], w2)
+            elif pos[ii][0] == x2 and pos[ii][2] == z2:
+                if w2 and l2:
+                    for k in range(l2):
+                        for j in range(h):
+                            memcpy(&buffer[(k+l)*h*(w+w2)+j*(w+w2)+w], &outchunks[ii].chunk[(k)*128*128+(y+j)*128], w2)
+
+        cdef:
+            char fbuffer[256]
+            char *path = "./map/%s.region"
+            char *path2 = "./map/%s.len"
+            stdio.FILE *fp
+            char *nameStr = name
+            int whl[3]
+        whl[0] = w+w2
+        whl[1] = h
+        whl[2] = l+l2
+        try:
+            os.mkdir("./map")
+        except:
+            pass
+
+        stdio.sprintf(fbuffer, path, nameStr)
+        fp = stdio.fopen(fbuffer, "wb")
+        if fp != NULL:
+            stdio.fwrite(buffer, sizeof(unsigned char), (w+w2)*h*(l+l2), fp)
+            stdio.fclose(fp)
+
+        stdio.sprintf(fbuffer, path2, nameStr)
+        fp = stdio.fopen(fbuffer, "wb")
+        if fp != NULL:
+            stdio.fwrite(whl, sizeof(int), 3, fp)
+            stdio.fclose(fp)
 
     def GetNewPos(self, oldPos):
         newPos = oldPos
@@ -2915,11 +3119,11 @@ cdef class Chunks:
         vx,vy,vz = int(viewpoint[0]), int(viewpoint[1]), int(viewpoint[2])
         cdef Octree * octrees[9]
         cdef Chunk * outchunks[9]
+        cdef int pos[9][3]
+        cdef int cx,cy,cz
         # -x, +x, -y, +y, -z, +y 순서로 6면에 대한 정보
         # empty일 경우에 1 아닐 경우 0
         # 잠깐. 이 정보는 필요가 없다. empty일 경우 좌표와 함께 아....
-        cdef int pos[9][3]
-        cdef int cx,cy,cz
         cdef int indexLen=0
         self.GetOctreesByViewpoint(pos, octrees, outchunks, vx,64,vz)
         updated = False
@@ -2953,7 +3157,7 @@ cdef class Chunks:
                 if self.curDrawnCoords[0][i] in curToDrawList:
                         matchedCoords += [self.curDrawnCoords[0][i]]
 
-            rad = math.sqrt(16.0*16.0+16.0*16.0)+4.0
+            rad = 16.0#math.sqrt(16.0*16.0+16.0*16.0)+3.0
             if len(matchedCoords) != sightLen:
                 unmatchedIdx = []
                 for i in range(sightLen):
@@ -2974,7 +3178,7 @@ cdef class Chunks:
                 for i in range(sightLen):
                     if i in unmatchedIdx:
                         curx,cury,curz = updatedDrawList[idx]
-                        if self.SphereInFrustum(curx+16.0,cury+16.0,curz+16.0, rad, frustumC):
+                        if self.CubeInFrustum(curx+16.0,cury+16.0,curz+16.0, rad, frustumC):
                             self.updateCoords[i*3+0] = updatedDrawList[idx][0]
                             self.updateCoords[i*3+1] = updatedDrawList[idx][1]
                             self.updateCoords[i*3+2] = updatedDrawList[idx][2]
@@ -3023,7 +3227,7 @@ cdef class Chunks:
             # 앞면검사만 좀 더 빠르다면...... 인덱스 생성.
             for i in range(64):
                 curx,cury,curz = self.curDrawnCoords[0][i]
-                if self.tIdx[i] != 0 and self.SphereInFrustum(curx+16.0,cury+16.0,curz+16.0, rad, frustumC):
+                if self.tIdx[i] != 0 and self.CubeInFrustum(curx+16.0,cury+16.0,curz+16.0, rad, frustumC):
                     indexLen = 0
                     GenIndexList(self.indexList, &indexLen, self.tV[i], self.tIdx[i], viewpoint[0], viewpoint[1], viewpoint[2])
                     glVertexPointer( 3, GL.GL_FLOAT, 0, <void*>self.tV[i]) 
@@ -3031,6 +3235,26 @@ cdef class Chunks:
                     glNormalPointer(GL.GL_FLOAT, 0, <void*>self.tN[i]) 
                     #glDrawArrays(GL.GL_QUADS, 0, self.tIdx[i]*4)
                     glDrawElements(GL.GL_QUADS, indexLen, GL.GL_UNSIGNED_INT, self.indexList)
+
+            """
+            self.curIdx = 0
+            for i in range(64):
+                curx,cury,curz = self.curDrawnCoords[0][i]
+                if self.tIdx[i] != 0 and self.CubeInFrustum(curx+16.0,cury+16.0,curz+16.0, rad, frustumC):
+                    if self.curIdx+self.tIdx[i] < 32768:
+                        memcpy(&self.quads[self.curIdx*4*3], self.tV[i], sizeof(float)*self.tIdx[i]*4*3)
+                        memcpy(&self.texs[self.curIdx*4*2], self.tT[i], sizeof(float)*self.tIdx[i]*4*2)
+                        memcpy(&self.normals[self.curIdx*4*3], self.tN[i], sizeof(float)*self.tIdx[i]*4*3)
+                        self.curIdx += self.tIdx[i]
+
+            indexLen = 0
+            GenIndexList(self.indexList, &indexLen, self.quads, self.curIdx, viewpoint[0], viewpoint[1], viewpoint[2])
+            glVertexPointer( 3, GL.GL_FLOAT, 0, <void*>self.quads) 
+            glTexCoordPointer( 2, GL.GL_FLOAT, 0, <void*>self.texs) 
+            glNormalPointer(GL.GL_FLOAT, 0, <void*>self.normals) 
+            #glDrawArrays(GL.GL_QUADS, 0, self.tIdx[i]*4)
+            glDrawElements(GL.GL_QUADS, indexLen, GL.GL_UNSIGNED_INT, self.indexList)
+            """
 
             GL.glDisable(GL.GL_LIGHTING)
             GL.glDisable(GL.GL_LIGHT0)
@@ -3046,7 +3270,7 @@ cdef class Chunks:
 
             for i in range(64):
                 curx,cury,curz = self.curDrawnCoords[0][i]
-                if self.iIdx[i] != 0 and self.SphereInFrustum(curx+16.0,cury+16.0,curz+16.0, rad, frustumC):
+                if self.iIdx[i] != 0 and self.CubeInFrustum(curx+16.0,cury+16.0,curz+16.0, rad, frustumC):
                     indexLen = 0
                     GenIndexList(self.indexList, &indexLen, self.iV[i], self.iIdx[i], viewpoint[0], viewpoint[1], viewpoint[2])
                     glVertexPointer( 3, GL.GL_FLOAT, 0, <void*>self.iV[i]) 
@@ -3064,7 +3288,7 @@ cdef class Chunks:
 
             for i in range(64):
                 curx,cury,curz = self.curDrawnCoords[0][i]
-                if self.nsIdx[i] != 0 and self.SphereInFrustum(curx+16.0,cury+16.0,curz+16.0, rad, frustumC):
+                if self.nsIdx[i] != 0 and self.CubeInFrustum(curx+16.0,cury+16.0,curz+16.0, rad, frustumC):
                     indexLen = 0
                     GenIndexList(self.indexList, &indexLen, self.nsV[i], self.nsIdx[i], viewpoint[0], viewpoint[1], viewpoint[2])
                     glVertexPointer( 3, GL.GL_FLOAT, 0, <void*>self.nsV[i]) 
@@ -3079,7 +3303,7 @@ cdef class Chunks:
 
             for i in range(64):
                 curx,cury,curz = self.curDrawnCoords[0][i]
-                if self.aIdx[i] != 0 and self.SphereInFrustum(curx+16.0,cury+16.0,curz+16.0, rad, frustumC):
+                if self.aIdx[i] != 0 and self.CubeInFrustum(curx+16.0,cury+16.0,curz+16.0, rad, frustumC):
                     indexLen = 0
                     GenIndexList(self.indexList, &indexLen, self.aV[i], self.aIdx[i], viewpoint[0], viewpoint[1], viewpoint[2])
                     glVertexPointer( 3, GL.GL_FLOAT, 0, <void*>self.aV[i]) 
