@@ -654,8 +654,8 @@ ITEM_GOLD = GenId()
 ITEM_SILVER = GenId()
 ITEM_IRON = GenId()
 ITEM_DIAMOND = GenId()
-ITEM_LINE = GenId()
-ITEM_LINEL = GenId()
+ITEM_STAIR = GenId()
+ITEM_WOODENSTAIR = GenId()
 ITEM_NONE = 0
 TOOL_TEX_COORDS = [
         0,0,
@@ -671,7 +671,7 @@ TOOL_TEX_COORDS = [
         6,0,
         6,0,
         4,1,
-        4,2,
+        4,1,
         ]
 
 TYPE_BLOCK = "Block"
@@ -825,7 +825,9 @@ class DigDigGUI(object):
         self.makes[0] = MakeTool(u"Wood", u"A wood block.", (116,100,46), [(BLOCK_LOG, 1, TYPE_BLOCK)], (BLOCK_WOOD, [], [], 4, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         self.makes[1] = MakeTool(u"Stick", u"Multi purpose stick", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_STICK, [], [], 4, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[2] = MakeTool(u"Charcoal", u"A charcoal", (60,60,60), [(BLOCK_LOG, 1, TYPE_BLOCK)], (ITEM_CHARCOAL, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[3] = MakeTool(u"Glass", u"A glass", (60,60,60), [(BLOCK_SAND, 1, TYPE_BLOCK)], (BLOCK_GLASS, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes[3] = MakeTool(u"Glass", u"A glass", (255,255,255), [(BLOCK_SAND, 1, TYPE_BLOCK)], (BLOCK_GLASS, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes[4] = MakeTool(u"Stair", u"A stair", (30,30,30), [(BLOCK_STONE, 1, TYPE_BLOCK)], (ITEM_STAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[5] = MakeTool(u"Wooden stair", u"A wooden stair", (116,100,46), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_WOODENSTAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[20] = MakeTool(u"Wooden pickaxe", u"Used to pick stones, ores", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_PICKAXE, [30,], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         # returns: 아이템, 체력깎는 정도, 못파는 광물목록
         self.makes[21] = MakeTool(u"Wooden axe", u"Wood cutting wooden axe", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_AXE, [30], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
@@ -897,6 +899,12 @@ class DigDigGUI(object):
         self.PutItemInInventory(Block(BLOCK_CPU, 64))
         self.PutItemInInventory(Block(BLOCK_ENERGY, 64))
         """
+        self.PutItemInInventory(Block(BLOCK_WOOD, 64))
+        self.PutItemInInventory(Block(BLOCK_WOOD, 64))
+        self.PutItemInInventory(Block(BLOCK_WOOD, 64))
+        self.PutItemInInventory(Block(BLOCK_WOOD, 64))
+        self.PutItemInInventory(Block(BLOCK_WOOD, 64))
+        self.PutItemInInventory(Block(BLOCK_WOOD, 64))
 
 
         # 여기서 텍스쳐를 생성한다.
@@ -3275,6 +3283,106 @@ def DrawCubeArm(pos,bound, color, tex1,tex2,tex3,tex4,tex5,tex6, texid, flipX = 
         glVertex( v[v1] )
         glEnd()
         glEnable(GL_TEXTURE_2D)
+def DrawCubeStair(pos,bound, color, tex1,tex2,tex3,tex4,tex5,tex6, texid, flipX = False, offset=32.0): # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+    x,y,z = pos
+    w,h,j = bound
+    vidx = [ 
+            (4, 5, 1, 0),  # bottom    
+            (6,7,3, 2),  # top
+            (3, 7, 4, 0),  # left
+            (6,2,1, 5),  # right
+            (7,6,5, 4),  # back
+            (2,3,0, 1),  # front
+            ]
+
+    v = [   (0.0+x, 0.0+y, j+z),
+            (w+x, 0.0+y, j+z),
+            (w+x, h+y, j+z),
+            (0.0+x, h+y, j+z),
+            (0.0+x, 0.0+y, 0.0+z),
+            (w+x, 0.0+y, 0.0+z),
+            (w+x, h+y, 0.0+z),
+            (0.0+x, h+y, 0.0+z) ]
+
+    offset = offset/512.0
+    for face in range(6):
+        if face == 0:
+            texc = [
+                    (tex1[0]+offset, tex1[1]),
+                    (tex1[0], tex1[1]),
+                    (tex1[0], tex1[1]+offset),
+                    (tex1[0]+offset, tex1[1]+offset),
+                    ]
+        elif face == 1:
+            texc = [
+                    (tex2[0]+offset, tex2[1]),
+                    (tex2[0], tex2[1]),
+                    (tex2[0], tex2[1]+offset),
+                    (tex2[0]+offset, tex2[1]+offset),
+                    ]
+
+        elif face == 2:
+            texc = [
+                    (tex3[0]+offset, tex3[1]),
+                    (tex3[0], tex3[1]),
+                    (tex3[0], tex3[1]+offset),
+                    (tex3[0]+offset, tex3[1]+offset),
+                    ]
+
+        elif face == 3:
+            texc = [
+                    (tex4[0]+offset, tex4[1]),
+                    (tex4[0], tex4[1]),
+                    (tex4[0], tex4[1]+offset),
+                    (tex4[0]+offset, tex4[1]+offset),
+                    ]
+
+        elif face == 4:
+            if flipX:
+                texc = [
+                        (tex5[0], tex5[1]),
+                        (tex5[0]+offset, tex5[1]),
+                        (tex5[0]+offset, tex5[1]+offset),
+                        (tex5[0], tex5[1]+offset),
+                        ]
+
+            else:
+                texc = [
+                        (tex5[0]+offset, tex5[1]),
+                        (tex5[0], tex5[1]),
+                        (tex5[0], tex5[1]+offset),
+                        (tex5[0]+offset, tex5[1]+offset),
+                        ]
+
+        elif face == 5:
+            if flipX:
+                texc = [
+                        (tex6[0], tex6[1]),
+                        (tex6[0]+offset, tex6[1]),
+                        (tex6[0]+offset, tex6[1]+offset),
+                        (tex6[0], tex6[1]+offset),
+                        ]
+
+            else:
+                texc = [
+                        (tex6[0]+offset, tex6[1]),
+                        (tex6[0], tex6[1]),
+                        (tex6[0], tex6[1]+offset),
+                        (tex6[0]+offset, tex6[1]+offset),
+                        ]
+
+        v1, v2, v3, v4 = vidx[face]
+        glBegin(GL_QUADS)
+        glColor4ub(*color)
+        glTexCoord2f(*texc[0])
+        glVertex( v[v1] )
+        glTexCoord2f(*texc[1])
+        glVertex( v[v2] )
+        glTexCoord2f(*texc[2])
+        glVertex( v[v3] )
+        glTexCoord2f(*texc[3])
+        glVertex( v[v4] )            
+        glEnd()
 def DrawCube(pos,bound, color, tex1,tex2,tex3,tex4,tex5,tex6, texid, flipX = False, offset=64.0): # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
     x,y,z = pos
     w,h,j = bound
@@ -3534,7 +3642,7 @@ class MobGL(object):
 
 
     def CheckJump(self, y):
-        if self.prevY - 0.05 <= y <= self.prevY + 0.05:
+        if self.prevY - 0.15 <= y <= self.prevY + 0.15:
             self.canJump = True
         else:
             self.canJump = False
@@ -4141,10 +4249,91 @@ class DigDigApp(object):
                     x,y,z = self.chunks.FixPos(Vector(x,y,z), Vector(x,y-(self.speed),z), self.bound)
                     factor -= 1.0
                 x,y,z = self.chunks.FixPos(Vector(x,y,z), Vector(x,y-(self.speed*factor),z), self.bound)
+
+                # 여기서 계단위에 있으면 그만큼 좌표를 올려준다.
+                xx,yy,zz = int(x),int(y-1.19),int(z)
+                xxx = xx-(xx%32)
+                yyy = yy-(yy%32)
+                zzz = zz-(zz%32)
+                if (xxx,yyy,zzz) in self.stairs:
+                    for stair in self.stairs[(xxx,yyy,zzz)]:
+                        x1,y1,z1,f,b = stair
+                        if x1 <= x <= x1+1.0 and z1 <= z <= z1+1.0 and y1+1.19 <= y <= y1+2.20:
+                            plus = 0
+                            if f == 2:
+                                plus = 1.0-(abs(x)-int(abs(x)))
+                            if f == 3:
+                                plus = abs(x)-int(abs(x))
+                            if f == 4:
+                                plus = 1.0-(abs(z)-int(abs(z)))
+                            if f == 5:
+                                plus = abs(z)-int(abs(z))
+                            plus *= 2
+                            if plus > 1.0:
+                                plus = 1.0
+                            x,y,z = self.chunks.FixPos(Vector(x,y,z), Vector(x,float(y1)+1.20+plus,z), self.bound)
+
                 self.cam1.pos = Vector(x,y,-z)
+
                 self.CheckJump(y)
             self.prevFall = t
 
+    def RenderStairs(self, frustum):
+        for xyz in self.stairs:
+            stairs = self.stairs[xyz]
+            if xyz not in self.stairsDL:
+                self.stairsDL[xyz] = {}
+            for stair in stairs:
+                x,y,z,f,b = stair
+                if (x,y,z) not in self.stairsDL[xyz] or self.regenTex:
+
+                    self.stairsDL[xyz][(x,y,z)] = dList = glGenLists(1)
+                    glNewList(dList, GL_COMPILE)
+                    if b == ITEM_STAIR:
+                        b = BLOCK_STONE
+                    elif b == ITEM_WOODENSTAIR:
+                        b = BLOCK_WOOD
+
+                    texupx = (BLOCK_TEX_COORDS[b*2*3 + 0]*32.0) / 512.0
+                    texupy = (BLOCK_TEX_COORDS[b*2*3 + 1]*32.0) / 512.0
+                    texmidx = (BLOCK_TEX_COORDS[b*2*3 + 2]*32.0) / 512.0
+                    texmidy = (BLOCK_TEX_COORDS[b*2*3 + 3]*32.0) / 512.0
+                    texbotx = (BLOCK_TEX_COORDS[b*2*3 + 4]*32.0) / 512.0
+                    texboty = (BLOCK_TEX_COORDS[b*2*3 + 5]*32.0) / 512.0
+
+                    tex1 = texupx,texupy
+                    tex2 = texbotx,texboty
+                    tex3 = texmidx,texmidy
+                    tex4 = texmidx,texmidy
+                    tex5 = texmidx,texmidy
+                    tex6 = texmidx,texmidy
+                    if f == 2: # 왼쪽을 향한 계단
+                        DrawCubeStair((x,y,z), (1.0,0.33,1.0), (255,255,255,255), tex1,tex2,tex3,tex4,tex5,tex6, AppSt.tex)
+                        DrawCubeStair((x+0.33,y+0.33,z), (0.66,0.33,1.0), (255,255,255,255), tex1,tex2,tex3,tex4,tex5,tex6, AppSt.tex)
+                        DrawCubeStair((x+0.66,y+0.66,z), (0.33,0.33,1.0), (255,255,255,255), tex1,tex2,tex3,tex4,tex5,tex6, AppSt.tex)
+                    elif f == 3:
+                        DrawCubeStair((x,y,z), (1.0,0.33,1.0), (255,255,255,255), tex1,tex2,tex3,tex4,tex5,tex6, AppSt.tex)
+                        DrawCubeStair((x,y+0.33,z), (0.66,0.33,1.0), (255,255,255,255), tex1,tex2,tex3,tex4,tex5,tex6, AppSt.tex)
+                        DrawCubeStair((x,y+0.66,z), (0.33,0.33,1.0), (255,255,255,255), tex1,tex2,tex3,tex4,tex5,tex6, AppSt.tex)
+                    elif f == 4:
+                        DrawCubeStair((x,y,z), (1.0,0.33,1.0), (255,255,255,255), tex1,tex2,tex3,tex4,tex5,tex6, AppSt.tex)
+                        DrawCubeStair((x,y+0.33,z+0.33), (1.0,0.33,0.66), (255,255,255,255), tex1,tex2,tex3,tex4,tex5,tex6, AppSt.tex)
+                        DrawCubeStair((x,y+0.66,z+0.66), (1.0,0.33,0.33), (255,255,255,255), tex1,tex2,tex3,tex4,tex5,tex6, AppSt.tex)
+                    elif f == 5:
+                        DrawCubeStair((x,y,z), (1.0,0.33,1.0), (255,255,255,255), tex1,tex2,tex3,tex4,tex5,tex6, AppSt.tex)
+                        DrawCubeStair((x,y+0.33,z), (1.0,0.33,0.66), (255,255,255,255), tex1,tex2,tex3,tex4,tex5,tex6, AppSt.tex)
+                        DrawCubeStair((x,y+0.66,z), (1.0,0.33,0.33), (255,255,255,255), tex1,tex2,tex3,tex4,tex5,tex6, AppSt.tex)
+                    glEndList()
+
+
+                if self.chunks.CubeInFrustumPy(x+0.5,y+0.5,z+0.5,0.5,frustum):
+                    glBindTexture(GL_TEXTURE_2D, self.tex)
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+                    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
+                    glCallList(self.stairsDL[xyz][(x,y,z)])
+
+                # 큐브 3개로 계단을 만든다. 스톤 텍스쳐를 이용하면 된다.
     def DoMove(self, t, m, k):
         if not self.guiMode:
             pressed = pygame.key.get_pressed()
@@ -4344,6 +4533,47 @@ class DigDigApp(object):
                     item.count -= 1
                     if item.count == 0:
                         self.gui.qbar[self.gui.selectedItem] = ITEM_NONE
+                if item.type_ in [ITEM_STAIR, ITEM_WOODENSTAIR]:
+                    dirV = self.cam1.GetDirV()
+                    dx,dz = dirV.x,-dirV.z
+                    if abs(dx) > abs(dz):
+                        if dx < 0:
+                            facing = 3
+                        else:
+                            facing = 2
+                    else:
+                        if dz < 0:
+                            facing = 5
+                        else:
+                            facing = 4
+
+                    if f == 0:
+                        return
+                    elif f == 1:
+                        xyz = x,y+1,z
+                    elif f == 2:
+                        xyz = x-1,y,z
+                    elif f == 3:
+                        xyz = x+1,y,z
+                    elif f == 4:
+                        xyz = x,y,z-1
+                    elif f == 5:
+                        xyz = x,y,z+1
+
+                    xx = xyz[0]-(xyz[0]%32)
+                    yy = xyz[1]-(xyz[1]%32)
+                    zz = xyz[2]-(xyz[2]%32)
+                    if (xx,yy,zz) not in self.stairs:
+                        self.stairs[(xx,yy,zz)] = []
+                    if xyz+(facing,ITEM_STAIR) in self.stairs[(xx,yy,zz)] or xyz+(facing,ITEM_WOODENSTAIR) in self.stairs[(xx,yy,zz)]:
+                        return
+                    else:
+                        self.stairs[(xx,yy,zz)] += [xyz+(facing,item.type_)]
+                        item.count -= 1
+                        if item.count == 0:
+                            self.gui.qbar[self.gui.selectedItem] = ITEM_NONE
+
+                        
 
         pos = self.cam1.pos
         x,y,z = pos.x, pos.y, -pos.z
@@ -4597,6 +4827,9 @@ class DigDigApp(object):
         # XXX 여기서 마법 또는 상점 인터랙션?
         pass
 
+    def GetStair(self):
+        pass
+
     def LPressing(self, t, m, k):
         if not self.gui.invShown:
             mob = self.GetMob()
@@ -4604,6 +4837,12 @@ class DigDigApp(object):
                 self.OnMobHit(mob, t)
                 self.chColor = self.RED_CH
                 return
+
+            stair = self.GetStair()
+            if stair:
+                # XXX HP를 깎고 스테어를 지운다.
+                pass
+                #self.DestroyStair()
 
         self.digging = False
         item = self.gui.qbar[self.gui.selectedItem]
@@ -4926,7 +5165,7 @@ class DigDigApp(object):
                 else:
                     updateFrame = False
                 for mob in self.mobs:
-                    if self.chunks.SphereInFrustumPy(*(mob.pos+(0.5,frustum))):
+                    if self.chunks.CubeInFrustumPy(*(mob.pos+(0.5,frustum))):
                         mob.Render2(None, self.cam1, t) # 이것도 C로 옮기면 빨라질지도 모른다네
                         # 오픈GL을 이용하는 것보다 CPU를 이용하여 트랜슬레이트하고 한번에 그리는게 빠른가 경험상 그런듯
                         # 하지만 귀찮으니 놔두자...XXX: 나중에.
@@ -4938,6 +5177,7 @@ class DigDigApp(object):
 
                 glEnable(GL_LIGHTING)
                 self.chunks.GenVerts(frustum, (self.cam1.pos.x, self.cam1.pos.y, -self.cam1.pos.z), updateFrame, self.gui.tooltex, self.tex)
+                self.RenderStairs(frustum)
                 updateFrameCounter += 0
                 updateFrameCounter %= 1 # 화면이 좀 깨지기는 하지만 프레임률이 4번에 1번 하면 2배로 올라가는?
                 # 8번에 1번 하면 뭐 무슨 3배로 올라가겠네 우왕 빠르당 ㅠㅠ 이걸로 가자.
@@ -5008,7 +5248,7 @@ class DigDigApp(object):
                     glCallList(dList)
                     glPopMatrix()
                 idx += 1
-            glEnable(GL_DEPTH_TEST)
+
 
             pos = self.cam1.pos
             pos = Vector(pos.x, pos.y, -pos.z)
@@ -5320,6 +5560,11 @@ class DigDigApp(object):
         entity = FightingEntity(self.GenId(), "Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
         self.mobs = []
         #self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
+        try:
+            self.stairs = pickle.load(open("./map/stairs.pkl", "r"))
+        except:
+            self.stairs = {} # 32x32x32의 청크수준의 좌표를 담음
+        self.stairsDL = {}
         
         pygame.mouse.set_visible(False)
 
@@ -5428,6 +5673,7 @@ class DigDigApp(object):
         pickle.dump(self.gui.codes, open("./map/codes.pkl", "w"))
         pickle.dump(self.gui.spawns, open("./map/spawns.pkl", "w"))
         pickle.dump(self.gui.eqs, open("./map/eqs.pkl", "w"))
+        pickle.dump(self.stairs, open("./map/stairs.pkl", "w"))
 
 
 

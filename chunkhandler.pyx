@@ -3398,6 +3398,38 @@ cdef class Chunks:
                 return False
         return True
 
+    def CubeInFrustumPy(self, x, y, z, size, frustum):
+        cdef int p
+        cdef int c
+        cdef int c2
+        c2 = 0
+
+        for p in range(6):
+            c = 0
+            if (frustum[p][0] * (x - size) + frustum[p][1] * (y - size) + frustum[p][2] * (z - size) + frustum[p][3]) >= 0 :
+                c += 1
+            if (frustum[p][0] * (x + size) + frustum[p][1] * (y - size) + frustum[p][2] * (z - size) + frustum[p][3]) >= 0 :
+                c += 1
+            if (frustum[p][0] * (x - size) + frustum[p][1] * (y + size) + frustum[p][2] * (z - size) + frustum[p][3]) >= 0 :
+                c += 1
+            if (frustum[p][0] * (x + size) + frustum[p][1] * (y + size) + frustum[p][2] * (z - size) + frustum[p][3]) >= 0 :
+                c += 1
+            if (frustum[p][0] * (x - size) + frustum[p][1] * (y - size) + frustum[p][2] * (z + size) + frustum[p][3]) >= 0 :
+                c += 1
+            if (frustum[p][0] * (x + size) + frustum[p][1] * (y - size) + frustum[p][2] * (z + size) + frustum[p][3]) >= 0 :
+                c += 1
+            if (frustum[p][0] * (x - size) + frustum[p][1] * (y + size) + frustum[p][2] * (z + size) + frustum[p][3]) >= 0 :
+                c += 1
+            if (frustum[p][0] * (x + size) + frustum[p][1] * (y + size) + frustum[p][2] * (z + size) + frustum[p][3]) >= 0 :
+                c += 1
+            if c == 0:
+                return 0
+            if c == 8:
+                c2 += 1
+        if c2 == 6:
+            return 2
+        else:
+            return 1
     cdef int CubeInFrustum(self, float x, float y, float z, double size, double frustum[6][4]):
         cdef int p
         cdef int c
