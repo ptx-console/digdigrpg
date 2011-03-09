@@ -4259,7 +4259,7 @@ class DigDigScript(object):
     def __init__(self):
         pass
 
-    def SaveRegion(self, name, min, max, ymin, ymax):
+    def SaveRegion(self, name_, min, max, ymin, ymax):
         assert type(min) in [str, unicode]
         assert type(max) in [str, unicode]
         spawners = {}
@@ -4275,16 +4275,16 @@ class DigDigScript(object):
             max[2], min[2] = min[2], max[2]
         if ymin > ymax:
             ymax, ymin = ymin, ymax
-        AppSt.chunks.SaveRegion(name, (min[0], ymin, min[2]), (max[0], ymax, max[2]))
+        AppSt.chunks.SaveRegion(name_, (min[0], ymin, min[2]), (max[0], ymax, max[2]))
 
-    def LoadRegion(self, name, pos):
+    def LoadRegion(self, name_, pos):
         assert type(pos) in [str, unicode]
         spawners = {}
         for coord in AppSt.gui.spawns:
             name = AppSt.gui.spawns[coord]
             spawners[name] = coord
         pos = spawners[pos]
-        AppSt.chunks.LoadRegion(name, pos)
+        AppSt.chunks.LoadRegion(name_, pos)
         del AppSt.gui.spawns[pos]
         # 스포너 뿐만이 아니라, 덮어씌울때 모든 아이템이나 상자등을 다 어떻게 처리한다? 아예, 그곳에 상자나 아이템이 있으면 로드하지 못하게
         # 막아야 할 것 같다. XXX:
