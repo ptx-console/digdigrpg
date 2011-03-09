@@ -974,6 +974,11 @@ class DigDigGUI(object):
         self.PutItemInInventory(Item(ITEM_SILVER, 64, color = (201,201,201), stackable=True))
         self.PutItemInInventory(Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True))
         """
+        self.PutItemInInventory(Block(BLOCK_LOG, 64))
+        self.PutItemInInventory(Item(ITEM_IRON, 64, color = (107,107,107), stackable=True))
+        self.PutItemInInventory(Item(ITEM_GOLD, 64, color = (207,207,101), stackable=True))
+        self.PutItemInInventory(Item(ITEM_SILVER, 64, color = (201,201,201), stackable=True))
+        self.PutItemInInventory(Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True))
 
 
         # 여기서 텍스쳐를 생성한다.
@@ -4429,6 +4434,7 @@ class DigDigApp(object):
         self.prevBlock = None
         self.lastBlock = None
         self.blockHP = -1
+        self.maxBlockHP = -1
         self.blockItems = []
         self.digging = False
         
@@ -4496,13 +4502,13 @@ class DigDigApp(object):
                         if x1 <= x <= x1+1.0 and z1 <= z <= z1+1.0 and y1+1.19 <= y <= y1+2.20:
                             plus = 0
                             if f == 2:
-                                plus = 1.0-(abs(x)-int(abs(x)))
+                                plus = abs((x)-int((x)))
                             if f == 3:
-                                plus = abs(x)-int(abs(x))
+                                plus = 1.0-abs((x)-int((x)))
                             if f == 4:
-                                plus = 1.0-(abs(z)-int(abs(z)))
+                                plus = int((z)-(abs(z)))
                             if f == 5:
-                                plus = abs(z)-int(abs(z))
+                                plus = 1.0-abs(abs(z)-int(abs(z)))
                             plus *= 2
                             if plus > 1.0:
                                 plus = 1.0
