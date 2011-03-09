@@ -5114,7 +5114,7 @@ class DigDigApp(object):
                 else:
                     self.sounds["Dig"].play()
 
-                if block in [BLOCK_CODE, BLOCK_SPAWNER]:
+                if block in [BLOCK_CODE, BLOCK_SPAWNER] and (block in self.gui.spawns or block in self.gui.codes):
                     return
                 x2,y2,z2,face2,block2 = self.prevBlock
                 if x==x2 and y==y2 and z==z2 and block == block2 and block != BLOCK_WATER:
@@ -5181,9 +5181,11 @@ class DigDigApp(object):
                             self.sounds["DigDone"].play()
 
                         if block == BLOCK_SPAWNER:
-                            del self.gui.spawns[(x,y,z)]
+                            if (x,y,z) in self.gui.spawns:
+                                del self.gui.spawns[(x,y,z)]
                         if block == BLOCK_CODE:
-                            del self.gui.codes[(x,y,z)]
+                            if (x,y,z) in self.gui.codes:
+                                del self.gui.codes[(x,y,z)]
                         if block == BLOCK_GRASS:
                             block = BLOCK_DIRT
                         if block not in [BLOCK_CHEST, BLOCK_IRONORE, BLOCK_COALORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE]:
