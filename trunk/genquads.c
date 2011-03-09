@@ -1060,7 +1060,6 @@ void FillSea(unsigned char *chunkData, int *points, int len, int ox, int oy, int
         }
         for(z=0;z<(highestZ-lowestZ+1);++z)
         { // 패턴깎기
-            // z 깎는거 z축 따라가면서 x하듯 해야한다 XXX:
             count = 0;
             for(x=0;x<(highestX-lowestX+1);++x)
             {
@@ -1087,7 +1086,6 @@ void FillSea(unsigned char *chunkData, int *points, int len, int ox, int oy, int
 
         for(x=0;x<(highestX-lowestX+1);++x)
         { // 패턴깎기
-            // z 깎는거 z축 따라가면서 x하듯 해야한다 XXX:
             count = 0;
             for(z=0;z<(highestZ-lowestZ+1);++z)
             {
@@ -1218,7 +1216,6 @@ void FillTerrain(unsigned char *chunkData, int *points, int len, int ox, int oy,
         }
         for(z=0;z<(highestZ-lowestZ+1);++z)
         { // 패턴깎기
-            // z 깎는거 z축 따라가면서 x하듯 해야한다 XXX:
             count = 0;
             for(x=0;x<(highestX-lowestX+1);++x)
             {
@@ -1245,7 +1242,6 @@ void FillTerrain(unsigned char *chunkData, int *points, int len, int ox, int oy,
 
         for(x=0;x<(highestX-lowestX+1);++x)
         { // 패턴깎기
-            // z 깎는거 z축 따라가면서 x하듯 해야한다 XXX:
             count = 0;
             for(z=0;z<(highestZ-lowestZ+1);++z)
             {
@@ -2312,33 +2308,33 @@ void FillColor(int x, int y, int z, int face, unsigned char *out, float sunStr[9
         quadBuffer[0*3+0] = (float)x; // 왼쪽
         quadBuffer[0*3+1] = (float)y; // 아래
         quadBuffer[0*3+2] = (float)z; // 뒷쪽(화면 깊은쪽)
-        sunStrs[0] = (sunStr[0]+sunStr[1]+sunStr[2]+sunStr[4])/5.0f;
+        sunStrs[0] = (sunStr[0]+sunStr[1]+sunStr[2]+sunStr[4])/4.0001f;
 
         quadBuffer[1*3+0] = (float)x+1.0f; // 오른쪽
         quadBuffer[1*3+1] = (float)y;
         quadBuffer[1*3+2] = (float)z; // 뒷쪽
-        sunStrs[1] = (sunStr[0]+sunStr[2]+sunStr[3]+sunStr[5])/5.0f;
+        sunStrs[1] = (sunStr[0]+sunStr[2]+sunStr[3]+sunStr[5])/4.0001f;
 
         quadBuffer[2*3+0] = (float)x+1.0f; // 오른쪽
         quadBuffer[2*3+1] = (float)y;
         quadBuffer[2*3+2] = (float)z+1.0f; // 앞쪽
-        sunStrs[2] = (sunStr[0]+sunStr[7]+sunStr[8]+sunStr[5])/5.0f;
+        sunStrs[2] = (sunStr[0]+sunStr[7]+sunStr[8]+sunStr[5])/4.0001f;
 
         quadBuffer[3*3+0] = (float)x; // 왼쪽
         quadBuffer[3*3+1] = (float)y;
         quadBuffer[3*3+2] = (float)z+1.0f; // 앞쪽
-        sunStrs[3] = (sunStr[0]+sunStr[6]+sunStr[7]+sunStr[4])/5.0f;
+        sunStrs[3] = (sunStr[0]+sunStr[6]+sunStr[7]+sunStr[4])/4.0001f;
     }
     else if(face == 2) { // 왼쪽면, 왼쪽에서 봤을 때 반시계방향으로 그린다.
         quadBuffer[0*3+0] = (float)x; // 왼쪽
         quadBuffer[0*3+1] = (float)y; // 아래
         quadBuffer[0*3+2] = (float)z; // 뒷쪽(화면 깊은쪽)
-        sunStrs[0] = (sunStr[0]+sunStr[1]+sunStr[2]+sunStr[4])/5.0f;
+        sunStrs[0] = (sunStr[0]+sunStr[1]+sunStr[2]+sunStr[4])/4.0001f;
 
         quadBuffer[1*3+0] = (float)x; //
         quadBuffer[1*3+1] = (float)y; //
         quadBuffer[1*3+2] = (float)z+1.0f; // 앞쪽
-        sunStrs[1] = (sunStr[0]+sunStr[6]+sunStr[7]+sunStr[4])/5.0f;
+        sunStrs[1] = (sunStr[0]+sunStr[6]+sunStr[7]+sunStr[4])/4.0001f;
 
         quadBuffer[2*3+0] = (float)x; //
         quadBuffer[2*3+1] = (float)y+1.0f; //
@@ -2354,7 +2350,7 @@ void FillColor(int x, int y, int z, int face, unsigned char *out, float sunStr[9
         quadBuffer[0*3+0] = (float)x+1.0f; // 오른쪽
         quadBuffer[0*3+1] = (float)y; // 아래
         quadBuffer[0*3+2] = (float)z; // 뒷쪽(화면 깊은쪽)
-        sunStrs[0] = (sunStr[0]+sunStr[2]+sunStr[3]+sunStr[5])/5.0f;
+        sunStrs[0] = (sunStr[0]+sunStr[2]+sunStr[3]+sunStr[5])/4.0001f;
 
         quadBuffer[1*3+0] = (float)x+1.0f; //
         quadBuffer[1*3+1] = (float)y+1.0f; //
@@ -2369,13 +2365,13 @@ void FillColor(int x, int y, int z, int face, unsigned char *out, float sunStr[9
         quadBuffer[3*3+0] = (float)x+1.0f; //
         quadBuffer[3*3+1] = (float)y; //
         quadBuffer[3*3+2] = (float)z+1.0f; //
-        sunStrs[3] = (sunStr[0]+sunStr[7]+sunStr[8]+sunStr[5])/5.0f;
+        sunStrs[3] = (sunStr[0]+sunStr[7]+sunStr[8]+sunStr[5])/4.0001f;
     }
     else if(face == 4) { // 뒷면, 뒷쪽에서 봤을 때 반시계방향으로 그린다. 앞에서 봤을 때 시계방향임
         quadBuffer[0*3+0] = (float)x; // 왼쪽
         quadBuffer[0*3+1] = (float)y; // 아래
         quadBuffer[0*3+2] = (float)z; // 뒷쪽(화면 깊은쪽)
-        sunStrs[0] = (sunStr[0]+sunStr[1]+sunStr[2]+sunStr[4])/5.0f;
+        sunStrs[0] = (sunStr[0]+sunStr[1]+sunStr[2]+sunStr[4])/4.0001f;
 
         quadBuffer[1*3+0] = (float)x; //
         quadBuffer[1*3+1] = (float)y+1.0f; //
@@ -2390,18 +2386,18 @@ void FillColor(int x, int y, int z, int face, unsigned char *out, float sunStr[9
         quadBuffer[3*3+0] = (float)x+1.0f; //
         quadBuffer[3*3+1] = (float)y; //
         quadBuffer[3*3+2] = (float)z; //
-        sunStrs[3] = (sunStr[0]+sunStr[2]+sunStr[3]+sunStr[5])/5.0f;
+        sunStrs[3] = (sunStr[0]+sunStr[2]+sunStr[3]+sunStr[5])/4.0001f;
     }
     else if(face == 5) { // 앞면, 앞쪽에서 봤을 때 반시계방향으로 그린다.
         quadBuffer[0*3+0] = (float)x; // 왼쪽
         quadBuffer[0*3+1] = (float)y; // 아래
         quadBuffer[0*3+2] = (float)z+1.0f; // 앞쪽(화면 얕은쪽)
-        sunStrs[0] = (sunStr[0]+sunStr[6]+sunStr[7]+sunStr[4])/5.0f;
+        sunStrs[0] = (sunStr[0]+sunStr[6]+sunStr[7]+sunStr[4])/4.0001f;
 
         quadBuffer[1*3+0] = (float)x+1.0f; //
         quadBuffer[1*3+1] = (float)y; //
         quadBuffer[1*3+2] = (float)z+1.0f; //
-        sunStrs[1] = (sunStr[0]+sunStr[7]+sunStr[8]+sunStr[5])/5.0f;
+        sunStrs[1] = (sunStr[0]+sunStr[7]+sunStr[8]+sunStr[5])/4.0001f;
 
         quadBuffer[2*3+0] = (float)x+1.0f; //
         quadBuffer[2*3+1] = (float)y+1.0f; //
@@ -2500,7 +2496,6 @@ void FillColor(int x, int y, int z, int face, unsigned char *out, float sunStr[9
 
 float SunLit(int place, int blockingBlocks, int curFaceOpen)
 {
-    // XXX: 이것도 버텍스마다 따로할 수 있다.
     float rad;
     if(place == 0 || place == 1)
         rad = 9.0f;
@@ -3743,6 +3738,10 @@ void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64],
                                     continue;
                             }
 
+                            
+                            // j값에 따라 위,오른쪽,앞면의 블럭을 가져와야할 수도 있으니 고친다
+                            if(chunk->colors[(zBz)*xzSize*3+(yBy)*128*3+(xBx*3)])
+                                ;
 
                             int ttt;
                             for(ttt=0; ttt<9;++ttt)
@@ -3751,6 +3750,16 @@ void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64],
                                 //XXX 또한 FillColor에서 토치와 현재 버텍스 사이에 블럭이 하나라도 있으면 빛을 받지 않도록 한다.
                                 //주변에 받는 빛이 반사되어 여기에 받을 수 있음.
                                 //이거만 잘해도 radiosity같은거 없이 멋진 라이팅 가능하다.
+                                //음...근데 느린데? 컬러 캐슁을 구현해야겠다. 블럭이 변경될 때에만 컬러를 바꾸는거.
+                                //블럭변경, 토치변경 등등에서 한다.
+                                //그리고 태양의 위치에 따라 빛의 방향도 바꿔줘야 한다.
+                                //전부 다 TODO...
+                                //일단 캐슁 먼저 그리고 26방향 먼저 구현함.
+                                //청크 하나당 약 12메가 정도 먹는다. 별것 아닌거같은데
+                                //아 아니지. 6면을 다 가질 필요 없이 3면만 가지면 되지 않나?
+                                //노멀을 쓰면 6면 다 필요함. 근데 밑면은 아래면의 윗면이고.....
+                                //그렇다면 음......x=0,y=0,z=0의 3면만 하도록 하자. 중요한 건, block이 BLOCK_EMPTY일 때에도 컬러를 가지는 것.
+                                //만약 컬러버퍼의 값이 0이라면 채우고, 최소값은 무조건 1이 되도록 하면 된다.
                             }
 
                             if(TestSunLit(xBx, yBy, zBz, chunk, chunks, pos, ox, oy, oz, 1, &sunstrength[0]))
@@ -4630,7 +4639,7 @@ int *GenMap()
     }
     // 이걸 float으로 만들어 fillmap에 전달하면 fillmap이 채우는 간단한코드
     //  이걸 C로 옮기면 땡 XX:
-    //  음 청크 리스트 역시 뭔가 쿼드트리로 바꿔줘야 하지 않을지. XXX:
+    //  음 청크 리스트 역시 뭔가 쿼드트리로 바꿔줘야 하지 않을지.
     //  너무 많이 로드하면 메모리 모자람 -_-;
     //  현재 한번에 3x3를 로드하는데 대충 4x4정도만 메모리에 가지고 있으면 됨. 더가면 어차피 로드
     //  돌아갈 가능성이 있으니 놔두고
