@@ -2281,115 +2281,137 @@ void FillHeights(Chunk *chunk)
     }
 }
 
-void FillColor(int x, int y, int z, int face, unsigned char *out, float sunStr, Extra *extras[27])
+void FillColor(int x, int y, int z, int face, unsigned char *out, float sunStr[9], Extra *extras[27])
 {
     // extras에서 토치를 읽어옴
     int i,j,k, face2;
-    float quadBuffer[12],xxx,yyy,zzz, nx,ny,nz,length, dot;
+    float quadBuffer[12],xxx,yyy,zzz, nx,ny,nz,length, dot, sunStrs[4];
     int colors[4];
-    for(i=0;i<4;++i)
-        colors[i] = (unsigned char)(255.0f*sunStr*0.6f);
     if(face == 1) { // 윗면, 위에서 봤을 때 반시계방향으로 그린다.
         quadBuffer[0*3+0] = (float)x; // 왼쪽
         quadBuffer[0*3+1] = (float)y+1.0f; // 위
         quadBuffer[0*3+2] = (float)z; // 뒷쪽(화면 깊은쪽)
+        sunStrs[0] = (sunStr[0]+sunStr[1]+sunStr[2]+sunStr[4])/4.0f;
 
         quadBuffer[1*3+0] = (float)x; // 왼쪽
         quadBuffer[1*3+1] = (float)y+1.0f;
         quadBuffer[1*3+2] = (float)z+1.0f; // 앞쪽
+        sunStrs[1] = (sunStr[0]+sunStr[6]+sunStr[7]+sunStr[4])/4.0f;
 
         quadBuffer[2*3+0] = (float)x+1.0f; // 오른쪽
         quadBuffer[2*3+1] = (float)y+1.0f;
         quadBuffer[2*3+2] = (float)z+1.0f; // 앞쪽
+        sunStrs[2] = (sunStr[0]+sunStr[7]+sunStr[8]+sunStr[5])/4.0f;
 
         quadBuffer[3*3+0] = (float)x+1.0f; // 오른쪽
         quadBuffer[3*3+1] = (float)y+1.0f;
         quadBuffer[3*3+2] = (float)z; // 뒷쪽
+        sunStrs[3] = (sunStr[0]+sunStr[2]+sunStr[3]+sunStr[5])/4.0f;
     }
     else if(face == 0) { // 아랫면, 아래에서 봤을 때 반시계방향으로 그린다.
         quadBuffer[0*3+0] = (float)x; // 왼쪽
         quadBuffer[0*3+1] = (float)y; // 아래
         quadBuffer[0*3+2] = (float)z; // 뒷쪽(화면 깊은쪽)
+        sunStrs[0] = (sunStr[0]+sunStr[1]+sunStr[2]+sunStr[4])/5.0f;
 
         quadBuffer[1*3+0] = (float)x+1.0f; // 오른쪽
         quadBuffer[1*3+1] = (float)y;
         quadBuffer[1*3+2] = (float)z; // 뒷쪽
+        sunStrs[1] = (sunStr[0]+sunStr[2]+sunStr[3]+sunStr[5])/5.0f;
 
         quadBuffer[2*3+0] = (float)x+1.0f; // 오른쪽
         quadBuffer[2*3+1] = (float)y;
         quadBuffer[2*3+2] = (float)z+1.0f; // 앞쪽
+        sunStrs[2] = (sunStr[0]+sunStr[7]+sunStr[8]+sunStr[5])/5.0f;
 
         quadBuffer[3*3+0] = (float)x; // 왼쪽
         quadBuffer[3*3+1] = (float)y;
         quadBuffer[3*3+2] = (float)z+1.0f; // 앞쪽
+        sunStrs[3] = (sunStr[0]+sunStr[6]+sunStr[7]+sunStr[4])/5.0f;
     }
     else if(face == 2) { // 왼쪽면, 왼쪽에서 봤을 때 반시계방향으로 그린다.
         quadBuffer[0*3+0] = (float)x; // 왼쪽
         quadBuffer[0*3+1] = (float)y; // 아래
         quadBuffer[0*3+2] = (float)z; // 뒷쪽(화면 깊은쪽)
+        sunStrs[0] = (sunStr[0]+sunStr[1]+sunStr[2]+sunStr[4])/5.0f;
 
         quadBuffer[1*3+0] = (float)x; //
         quadBuffer[1*3+1] = (float)y; //
-        quadBuffer[1*3+2] = (float)z+1.0f; //
+        quadBuffer[1*3+2] = (float)z+1.0f; // 앞쪽
+        sunStrs[1] = (sunStr[0]+sunStr[6]+sunStr[7]+sunStr[4])/5.0f;
 
         quadBuffer[2*3+0] = (float)x; //
         quadBuffer[2*3+1] = (float)y+1.0f; //
         quadBuffer[2*3+2] = (float)z+1.0f; //
+        sunStrs[2] = (sunStr[0]+sunStr[6]+sunStr[7]+sunStr[4])/4.0f;
 
         quadBuffer[3*3+0] = (float)x; //
         quadBuffer[3*3+1] = (float)y+1.0f; //
         quadBuffer[3*3+2] = (float)z; //
+        sunStrs[3] = (sunStr[0]+sunStr[1]+sunStr[2]+sunStr[4])/4.0f;
     }
     else if(face == 3) { // 오른쪽면, 오른쪽에서 봤을 때 반시계방향으로 그린다.
         quadBuffer[0*3+0] = (float)x+1.0f; // 오른쪽
         quadBuffer[0*3+1] = (float)y; // 아래
         quadBuffer[0*3+2] = (float)z; // 뒷쪽(화면 깊은쪽)
+        sunStrs[0] = (sunStr[0]+sunStr[2]+sunStr[3]+sunStr[5])/5.0f;
 
         quadBuffer[1*3+0] = (float)x+1.0f; //
         quadBuffer[1*3+1] = (float)y+1.0f; //
         quadBuffer[1*3+2] = (float)z; //
+        sunStrs[1] = (sunStr[0]+sunStr[2]+sunStr[3]+sunStr[5])/4.0f;
 
         quadBuffer[2*3+0] = (float)x+1.0f; //
         quadBuffer[2*3+1] = (float)y+1.0f; //
         quadBuffer[2*3+2] = (float)z+1.0f; //
+        sunStrs[2] = (sunStr[0]+sunStr[7]+sunStr[8]+sunStr[5])/4.0f;
 
         quadBuffer[3*3+0] = (float)x+1.0f; //
         quadBuffer[3*3+1] = (float)y; //
         quadBuffer[3*3+2] = (float)z+1.0f; //
+        sunStrs[3] = (sunStr[0]+sunStr[7]+sunStr[8]+sunStr[5])/5.0f;
     }
     else if(face == 4) { // 뒷면, 뒷쪽에서 봤을 때 반시계방향으로 그린다. 앞에서 봤을 때 시계방향임
         quadBuffer[0*3+0] = (float)x; // 왼쪽
         quadBuffer[0*3+1] = (float)y; // 아래
         quadBuffer[0*3+2] = (float)z; // 뒷쪽(화면 깊은쪽)
+        sunStrs[0] = (sunStr[0]+sunStr[1]+sunStr[2]+sunStr[4])/5.0f;
 
         quadBuffer[1*3+0] = (float)x; //
         quadBuffer[1*3+1] = (float)y+1.0f; //
         quadBuffer[1*3+2] = (float)z; //
+        sunStrs[1] = (sunStr[0]+sunStr[1]+sunStr[2]+sunStr[4])/4.0f;
 
         quadBuffer[2*3+0] = (float)x+1.0f; //
         quadBuffer[2*3+1] = (float)y+1.0f; //
         quadBuffer[2*3+2] = (float)z; //
+        sunStrs[2] = (sunStr[0]+sunStr[2]+sunStr[3]+sunStr[5])/4.0f;
 
         quadBuffer[3*3+0] = (float)x+1.0f; //
         quadBuffer[3*3+1] = (float)y; //
         quadBuffer[3*3+2] = (float)z; //
+        sunStrs[3] = (sunStr[0]+sunStr[2]+sunStr[3]+sunStr[5])/5.0f;
     }
     else if(face == 5) { // 앞면, 앞쪽에서 봤을 때 반시계방향으로 그린다.
         quadBuffer[0*3+0] = (float)x; // 왼쪽
         quadBuffer[0*3+1] = (float)y; // 아래
         quadBuffer[0*3+2] = (float)z+1.0f; // 앞쪽(화면 얕은쪽)
+        sunStrs[0] = (sunStr[0]+sunStr[6]+sunStr[7]+sunStr[4])/5.0f;
 
         quadBuffer[1*3+0] = (float)x+1.0f; //
         quadBuffer[1*3+1] = (float)y; //
         quadBuffer[1*3+2] = (float)z+1.0f; //
+        sunStrs[1] = (sunStr[0]+sunStr[7]+sunStr[8]+sunStr[5])/5.0f;
 
         quadBuffer[2*3+0] = (float)x+1.0f; //
         quadBuffer[2*3+1] = (float)y+1.0f; //
         quadBuffer[2*3+2] = (float)z+1.0f; //
+        sunStrs[2] = (sunStr[0]+sunStr[7]+sunStr[8]+sunStr[5])/4.0f;
 
         quadBuffer[3*3+0] = (float)x; //
         quadBuffer[3*3+1] = (float)y+1.0f; //
         quadBuffer[3*3+2] = (float)z+1.0f; //
+        sunStrs[3] = (sunStr[0]+sunStr[6]+sunStr[7]+sunStr[4])/4.0f;
     }
     if(face == 0)
     {
@@ -2427,6 +2449,10 @@ void FillColor(int x, int y, int z, int face, unsigned char *out, float sunStr, 
         ny = 0.0f;
         nz = 1.0f;
     }
+    for(k=0;k<4;++k)
+    {
+        colors[k] = (unsigned char)(255.0f*sunStrs[k]*0.6f);
+    }
     for(i=0; i<27;++i)
     {
         if(extras[i])
@@ -2449,14 +2475,14 @@ void FillColor(int x, int y, int z, int face, unsigned char *out, float sunStr, 
                         length = 0.0001f;
                     face2 = extras[i]->torches[j].face;
                     dot = xxx*nx+yyy*ny+zzz*nz;
-                    dot += 1.0f;
-                    dot *= 0.5f;
+                    dot = ABS(dot);
+                    if(dot < 0.5f)
+                        dot = 1.0f-0.5f;
                     if(extras[i]->torches[j].x == x && extras[i]->torches[j].y == y && extras[i]->torches[j].z == z)
                         dot = 1.0f;
-                    dot = 1.0f;
-                    if(length < 8.0f)
+                    if(length < 4.0f)
                     {
-                        colors[k] += (unsigned char)(255.0f*((8.0f-length)/8.0f)*dot);
+                        colors[k] += (unsigned char)(255.0f*((4.0f-length)/4.0f)*dot);
                         if(colors[k] > 255)
                             colors[k] = 255;
                     }
@@ -2592,6 +2618,9 @@ int TestSunLit(int x, int y, int z, Chunk *chunk, Chunk **chunks, int pos[9][3],
     }
     int countHigherThanCurrent = 0;
     int curFaceOpen = false;
+    // 버텍스 수준으로 어떻게 하나?
+    // 안쪽 버텍스는 그대로 바깥쪽 버텍스는.....
+    // 음 이걸 얻어올 때 주변 8개의 sunstr을 다 얻어와서 평균값을 써야한다.
     for(k=0;k<rad;++k)
     {
         for(i=0;i<rad;++i)
@@ -2624,7 +2653,9 @@ int TestSunLit(int x, int y, int z, Chunk *chunk, Chunk **chunks, int pos[9][3],
     if(countHigherThanCurrent == 0 || y >= heights[z*128+x])
         return true;
     else
+    {
         *outSunStrength = SunLit(place, countHigherThanCurrent, curFaceOpen);
+    }
     return false;
 }
 
@@ -2683,7 +2714,7 @@ int Check6Side(int x, int y, int z, int ox, int oy, int oz, int pos[9][3], Chunk
     return false;
 }
 
-void GenQuads(float *tV[64], float *tT[64], float *tN[64], int tIdx[64], int tLen[64], float *nsV[64], float *nsT[64], unsigned char *nsC[64], int nsIdx[64], int nsLen[64], float *aV[64], float *aT[64], unsigned char *aC[64], int aIdx[64], int aLen[64], float *iV[64], float *iT[64], unsigned char *iC[64], int iIdx[64], int iLen[64], Octree *root, Octree *parent, Chunk *chunk, Octree **octrees, Chunk **chunks, int pos[9][3], int depth, double frustum[6][4], int x, int y, int z, int ox, int oy, int oz, float vx, float vy, float vz, int lx, int ly, int lz, int updateCoords[64*3], int drawIdx)
+void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64], int tLen[64], float *nsV[64], float *nsT[64], unsigned char *nsC[64], int nsIdx[64], int nsLen[64], float *aV[64], float *aT[64], unsigned char *aC[64], int aIdx[64], int aLen[64], float *iV[64], float *iT[64], unsigned char *iC[64], int iIdx[64], int iLen[64], Octree *root, Octree *parent, Chunk *chunk, Octree **octrees, Chunk **chunks, int pos[9][3], int depth, double frustum[6][4], int x, int y, int z, int ox, int oy, int oz, float vx, float vy, float vz, int lx, int ly, int lz, int updateCoords[64*3], int drawIdx, float sunx, float suny, float sunz)
 {
     // 일단 레벨 2까지는 검사하고 레벨 3이 되면 하위의 몇개의 버텍스가 나올것인가를 검사한다. 2패스로. 그러면 거기서 alloc을 하고
     // 다시 버텍스를 채운다.
@@ -2745,7 +2776,7 @@ void GenQuads(float *tV[64], float *tT[64], float *tN[64], int tIdx[64], int tLe
     int dxnb;
     int dynb;
     int dznb;
-    float sunstrength;
+    float sunstrength[9];
 
 
     for(i=0; i < depth; ++i)
@@ -3713,9 +3744,72 @@ void GenQuads(float *tV[64], float *tT[64], float *tN[64], int tIdx[64], int tLe
                             }
 
 
+                            int ttt;
+                            for(ttt=0; ttt<9;++ttt)
+                            {
+                                sunstrength[ttt] = 1.0f; // 이거 8방향만 하는게 아니라 26방향으로 해야 제대로 된다. XXX
+                            }
+
+                            if(TestSunLit(xBx, yBy, zBz, chunk, chunks, pos, ox, oy, oz, 1, &sunstrength[0]))
+                            {
+                                //sunstrength
+                                //여기서 노멀과 태양위치로 쉐이딩
+                            }
+
+                            Chunk *curLitChunk=NULL;
+                            int a,b,c,A,B,C;
+
+                            GetLocalCoords(&a,&b,&c,&A,&B,&C,xBO-1,yBO,zBO-1);
+                            GetChunkByCoord(&curLitChunk, chunks, pos, a,b,c,A,B,C);
+                            if(curLitChunk)
+                            {
+                                TestSunLit(a, b, c, curLitChunk, chunks, pos, A, B, C, 1, &sunstrength[1]);
+                            }
+                            GetLocalCoords(&a,&b,&c,&A,&B,&C,xBO,yBO,zBO-1);
+                            GetChunkByCoord(&curLitChunk, chunks, pos, a,b,c,A,B,C);
+                            if(curLitChunk)
+                            {
+                                TestSunLit(a, b, c, curLitChunk, chunks, pos, A, B, C, 1, &sunstrength[2]);
+                            }
+                            GetLocalCoords(&a,&b,&c,&A,&B,&C,xBO+1,yBO,zBO-1);
+                            GetChunkByCoord(&curLitChunk, chunks, pos, a,b,c,A,B,C);
+                            if(curLitChunk)
+                            {
+                                TestSunLit(a, b, c, curLitChunk, chunks, pos, A, B, C, 1, &sunstrength[3]);
+                            }
+                            GetLocalCoords(&a,&b,&c,&A,&B,&C,xBO-1,yBO,zBO);
+                            GetChunkByCoord(&curLitChunk, chunks, pos, a,b,c,A,B,C);
+                            if(curLitChunk)
+                            {
+                                TestSunLit(a, b, c, curLitChunk, chunks, pos, A, B, C, 1, &sunstrength[4]);
+                            }
+                            GetLocalCoords(&a,&b,&c,&A,&B,&C,xBO+1,yBO,zBO);
+                            GetChunkByCoord(&curLitChunk, chunks, pos, a,b,c,A,B,C);
+                            if(curLitChunk)
+                            {
+                                TestSunLit(a, b, c, curLitChunk, chunks, pos, A, B, C, 1, &sunstrength[5]);
+                            }
+                            GetLocalCoords(&a,&b,&c,&A,&B,&C,xBO-1,yBO,zBO+1);
+                            GetChunkByCoord(&curLitChunk, chunks, pos, a,b,c,A,B,C);
+                            if(curLitChunk)
+                            {
+                                TestSunLit(a, b, c, curLitChunk, chunks, pos, A, B, C, 1, &sunstrength[6]);
+                            }
+                            GetLocalCoords(&a,&b,&c,&A,&B,&C,xBO,yBO,zBO+1);
+                            GetChunkByCoord(&curLitChunk, chunks, pos, a,b,c,A,B,C);
+                            if(curLitChunk)
+                            {
+                                TestSunLit(a, b, c, curLitChunk, chunks, pos, A, B, C, 1, &sunstrength[7]);
+                            }
+                            GetLocalCoords(&a,&b,&c,&A,&B,&C,xBO+1,yBO,zBO+1);
+                            GetChunkByCoord(&curLitChunk, chunks, pos, a,b,c,A,B,C);
+                            if(curLitChunk)
+                            {
+                                TestSunLit(a, b, c, curLitChunk, chunks, pos, A, B, C, 1, &sunstrength[8]);
+                            }
+
                             if(curBlock == BLOCK_WATER || curBlock == BLOCK_GLASS || curBlock == BLOCK_LEAVES || curBlock == BLOCK_CHEST)
                             {
-                                sunstrength = 1.0f;
                                 //if(IsPolyFront(j, (xBO), (yBO), (zBO),vx,vy,vz)) // Front검사도 더이상 하지 않는다.
                                     // 프러스텀컬링 front검사는 할 필요가 없다. 제대로 된OpenGL에서는 이런걸 알아서 한다.
                                     // 매번 이걸 검사하는게 더 느리다. 왜냐면 캐슁을 하기 때문!
@@ -3752,7 +3846,7 @@ void GenQuads(float *tV[64], float *tT[64], float *tN[64], int tIdx[64], int tLe
                                         aLen[drawIdx] = aLen[drawIdx]*2;
                                     }
 
-                                    TestSunLit(xBx, yBy, zBz, chunk, chunks, pos, ox, oy, oz, j, &sunstrength);
+
                                     GenQuad(&aV[drawIdx][aIdx[drawIdx]*12], j, (xBO), (yBO), (zBO));
                                     FillTex(&aT[drawIdx][aIdx[drawIdx]*8], j, chunk->chunk[(zBz)*xzSize+(yBy)*128+(xBx)]);
                                     FillColor((xBO), (yBO), (zBO), j, &aC[drawIdx][aIdx[drawIdx]*12], sunstrength, extras);
@@ -3769,9 +3863,9 @@ void GenQuads(float *tV[64], float *tT[64], float *tN[64], int tIdx[64], int tLe
                                 //
                                 // 에러가 있다. 땅밑으로 일정 이상 파게 되면 안그려지는 면들이 많이 있다.
                                 // 옆블럭이 빈블럭이 아니라서?
-                                // 렌더 리스트에 안들어가는데, 그 이유는 무엇인가?
+                                // 렌더 리스트에 안들어가는데, 그 이유는 무엇인가? 다고침
                                 
-                                if(TestSunLit(xBx, yBy, zBz, chunk, chunks, pos, ox, oy, oz, j, &sunstrength)) 
+                                if(TestSunLit(xBx, yBy, zBz, chunk, chunks, pos, ox, oy, oz, j, &sunstrength[0])) 
                                 {
                                     if(drawIdx == -1)
                                         printf("error");
@@ -3779,24 +3873,25 @@ void GenQuads(float *tV[64], float *tT[64], float *tN[64], int tIdx[64], int tLe
                                     {
                                         tV[drawIdx] = (float*)malloc(sizeof(float)*3*4);
                                         tT[drawIdx] = (float*)malloc(sizeof(float)*2*4);
-                                        tN[drawIdx] = (float*)malloc(sizeof(float)*3*4);
+                                        tC[drawIdx] = (unsigned char*)malloc(sizeof(unsigned char)*3*4);
                                         tLen[drawIdx] = 1;
                                     }
                                     if(tLen[drawIdx] <= tIdx[drawIdx]+1)
                                     {
                                         tV[drawIdx] = (float*)realloc(tV[drawIdx], sizeof(float)*4*3*tLen[drawIdx]*2);
                                         tT[drawIdx] = (float*)realloc(tT[drawIdx], sizeof(float)*4*2*tLen[drawIdx]*2);
-                                        tN[drawIdx] = (float*)realloc(tN[drawIdx], sizeof(float)*4*3*tLen[drawIdx]*2);
+                                        tC[drawIdx] = (unsigned char*)realloc(tC[drawIdx], sizeof(unsigned char)*4*3*tLen[drawIdx]*2);
                                         tLen[drawIdx] = tLen[drawIdx]*2;
                                     }
+                                    TestSunLit(xBx, yBy, zBz, chunk, chunks, pos, ox, oy, oz, j, &sunstrength[0]);
                                     GenQuad(&tV[drawIdx][tIdx[drawIdx]*12], j, (xBO), (yBO), (zBO));
                                     FillTex(&tT[drawIdx][tIdx[drawIdx]*8], j, chunk->chunk[(zBz)*xzSize+(yBy)*128+(xBx)]);
-                                    GenNormal(&tN[drawIdx][tIdx[drawIdx]*12], j);
+                                    FillColor((xBO), (yBO), (zBO), j, &tC[drawIdx][tIdx[drawIdx]*12], sunstrength, extras);
                                     tIdx[drawIdx] += 1;
                                 }
                                 else
                                 {// 이걸 하면 일정 Y값 이하의 블럭들이 안보인다. 뭔가가 잘못됨~~~~~~~~ 고침
-                                    // 새로운 문제. 경계선의 그림자가 엉망. 왤까
+                                    // 새로운 문제. 경계선의 그림자가 엉망. 왤까 - 고침
                                     //
                                     if(drawIdx == -1)
                                         printf("error");
@@ -3858,12 +3953,12 @@ void GenQuads(float *tV[64], float *tT[64], float *tN[64], int tIdx[64], int tLe
                                 aIdx[iiii] = 0;
                                 iIdx[iiii] = 0;
 
-                                GenQuads(tV, tT, tN, tIdx, tLen, nsV, nsT, nsC, nsIdx, nsLen, aV, aT, aC, aIdx, aLen, iV, iT, iC, iIdx, iLen, root, parent->children[k*2*2+j*2+i], chunk, octrees, chunks, pos, depth+1, frustum, x+(i*stride), y+(j*stride), z+(k*stride), ox,oy,oz, vx,vy,vz, lx,ly,lz, updateCoords, iiii);
+                                GenQuads(tV, tT, tC, tIdx, tLen, nsV, nsT, nsC, nsIdx, nsLen, aV, aT, aC, aIdx, aLen, iV, iT, iC, iIdx, iLen, root, parent->children[k*2*2+j*2+i], chunk, octrees, chunks, pos, depth+1, frustum, x+(i*stride), y+(j*stride), z+(k*stride), ox,oy,oz, vx,vy,vz, lx,ly,lz, updateCoords, iiii,sunx,suny,sunz);
                             }
                         }
                         else
                         {
-                            GenQuads(tV, tT, tN, tIdx, tLen, nsV, nsT, nsC, nsIdx, nsLen, aV, aT, aC, aIdx, aLen, iV, iT, iC, iIdx, iLen, root, parent->children[k*2*2+j*2+i], chunk, octrees, chunks, pos, depth+1, frustum, x+(i*stride), y+(j*stride), z+(k*stride), ox,oy,oz, vx,vy,vz, lx,ly,lz, updateCoords, drawIdx);
+                            GenQuads(tV, tT, tC, tIdx, tLen, nsV, nsT, nsC, nsIdx, nsLen, aV, aT, aC, aIdx, aLen, iV, iT, iC, iIdx, iLen, root, parent->children[k*2*2+j*2+i], chunk, octrees, chunks, pos, depth+1, frustum, x+(i*stride), y+(j*stride), z+(k*stride), ox,oy,oz, vx,vy,vz, lx,ly,lz, updateCoords, drawIdx,sunx,suny,sunz);
                         }
                     }
                 }
