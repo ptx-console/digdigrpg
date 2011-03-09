@@ -831,9 +831,10 @@ unsigned char GenOre(unsigned char y)
         BLOCK_SAND,
         BLOCK_DIRT,
         BLOCK_IRONORE,
-        BLOCK_COALORE
+        BLOCK_COALORE,
+        BLOCK_GRAVEL,
             };
-    int num50 = 5;
+    int num50 = 6;
     unsigned char ores40[] = {
         BLOCK_SILVERORE
             };
@@ -850,8 +851,10 @@ unsigned char GenOre(unsigned char y)
     factor = rand()%100;
     if(y > 50)
     {
-        if(factor > 35)
+        if(factor > 65)
             return ores50[0];
+        else if(factor > 35)
+            return ores50[5];
         else if(factor > 30)
             return ores50[1];
         else if(factor > 25)
@@ -863,8 +866,10 @@ unsigned char GenOre(unsigned char y)
     }
     else if(y > 40)
     {
-        if(factor > 45)
+        if(factor > 65)
             return ores50[0];
+        else if(factor > 45)
+            return ores50[5];
         else if(factor > 40)
             return ores50[1];
         else if(factor > 35)
@@ -878,8 +883,10 @@ unsigned char GenOre(unsigned char y)
     }
     else if(y > 30)
     {
-        if(factor > 55)
+        if(factor > 75)
             return ores50[0];
+        else if(factor > 55)
+            return ores50[5];
         else if(factor > 50)
             return ores50[1];
         else if(factor > 45)
@@ -895,8 +902,11 @@ unsigned char GenOre(unsigned char y)
     }
     else
     {
-        if(factor > 65)
+
+        if(factor > 75)
             return ores50[0];
+        else if(factor > 65)
+            return ores50[5];
         else if(factor > 60)
             return ores50[1];
         else if(factor > 55)
