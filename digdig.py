@@ -901,7 +901,7 @@ class DigDigGUI(object):
         self.makes[53] = MakeTool(u"Gold Necklace", u"A gold necklace\n- Necklace -", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101))], (ITEM_GOLDNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[54] = MakeTool(u"Diamond Ring", u"A diamond ring\n- Ring -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217))], (ITEM_DIAMONDRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[55] = MakeTool(u"Diamond Necklace", u"A diamond necklace\n- Necklace -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217))], (ITEM_DIAMONDNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[56] = MakeTool(u"Enchant Scroll", u"Used to create or\nimprove an item\n(Use enchant menu\nto create or improve)", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK, (255,255,255))], (ITEM_SCROLL, [], [], 64, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[56] = MakeTool(u"Enchant Scroll", u"Used to change item attributes\n(Use enchant menu to use)", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK, (255,255,255))], (ITEM_SCROLL, [], [], 64, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.recipeTextID = self.textRenderer.NewTextObject(u"Recipe:", (0,0,0))
 
         self.invSlotPos = []
@@ -958,12 +958,11 @@ class DigDigGUI(object):
         self.PutItemInInventory(Block(BLOCK_CPU, 64))
         self.PutItemInInventory(Block(BLOCK_ENERGY, 64))
         """
-        self.PutItemInInventory(Block(BLOCK_WOOD, 64))
-        self.PutItemInInventory(Block(BLOCK_WOOD, 64))
-        self.PutItemInInventory(Block(BLOCK_WOOD, 64))
-        self.PutItemInInventory(Block(BLOCK_WOOD, 64))
-        self.PutItemInInventory(Block(BLOCK_WOOD, 64))
-        self.PutItemInInventory(Block(BLOCK_WOOD, 64))
+        self.PutItemInInventory(Item(ITEM_IRON, 64, color = (107,107,107), stackable=True))
+        self.PutItemInInventory(Item(ITEM_IRON, 64, color = (107,107,107), stackable=True))
+        self.PutItemInInventory(Item(ITEM_GOLD, 64, color = (207,207,101), stackable=True))
+        self.PutItemInInventory(Item(ITEM_SILVER, 64, color = (201,201,201), stackable=True))
+        self.PutItemInInventory(Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True))
 
 
         # 여기서 텍스쳐를 생성한다.
@@ -2636,7 +2635,7 @@ def GUIDrawMode():
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
 
-G_FAR = 20.0
+G_FAR = 300.0
 def GameDrawMode():
     glEnable(GL_CULL_FACE)
     glEnable(GL_DEPTH_TEST)
@@ -5101,10 +5100,8 @@ class DigDigApp(object):
             dirV = self.cam1.GetDirV()
             posV = self.cam1.pos# - dirV
             self.cam1.ApplyCamera() 
-            glLightfv(GL_LIGHT0, GL_POSITION, (posV.x, posV.y+3.0, -posV.z, 1.0))	# Position The Light 
             posV = Vector(posV.x, posV.y-G_FAR/10.0, posV.z)
 
-            glDisable(GL_LIGHTING)
 
             glDisable(GL_DEPTH_TEST)
             texID = self.skyup
@@ -5213,7 +5210,6 @@ class DigDigApp(object):
             glEnd()
             glEnable(GL_DEPTH_TEST)
 
-            #glLightfv(GL_LIGHT0, GL_POSITION, (self.cam1.pos.x, self.cam1.pos.y, -self.cam1.pos.z, 1.0))	# Position The Light 
             glEnable(GL_FOG)#;	
             mat = ViewingMatrix()
             if mat is not None:
@@ -5234,7 +5230,6 @@ class DigDigApp(object):
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
 
-                glEnable(GL_LIGHTING)
                 self.chunks.GenVerts(frustum, (self.cam1.pos.x, self.cam1.pos.y, -self.cam1.pos.z), updateFrame, self.gui.tooltex, self.tex)
                 self.RenderStairs(frustum)
                 updateFrameCounter += 0
@@ -6200,4 +6195,5 @@ NPC인터랙션 메뉴를 만들고 상점등을 만들고
 ---------------
 이제 인챈팅 테이블을 만들어서 아이템 인챈팅을 거기서 하도록 한다?
 아니면... 인챈트 메뉴를 E버튼에 넣어 만들까.
+--------------------------------
 """

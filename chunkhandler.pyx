@@ -95,7 +95,7 @@ cdef extern from "genquads.h":
     Octree *AccessRecur(Octree *parent, int curx, int cury, int curz, int targetx, int targety, int targetz, int depth, int targetdepth)
     Octree *AccessOctreeWithXYZ(Octree * root, int x, int y, int z, int targetdepth)
     int CubeInFrustum(float x, float y, float z, double size, double frustum[6][4])
-    void GenQuads(float *tV[64], float *tT[64], float *tN[64], int tIdx[64], int tLen[64], float *nsV[64], float *nsT[64], unsigned char *nsC[64], int nsIdx[64], int nsLen[64], float *aV[64], float *aT[64], unsigned char *aC[64], int aIdx[64], int aLen[64], float *iV[64], float *iT[64], unsigned char *iC[64], int iIdx[64], int iLen[64], Octree *root, Octree *parent, Chunk *chunk, Octree **octrees, Chunk **chunks, int pos[9][3], int depth, double frustum[6][4], int x, int y, int z, int ox, int oy, int oz, float vx, float vy, float vz, int lx, int ly, int lz, int updateCoords[64*3], int drawIdx)
+    void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64], int tLen[64], float *nsV[64], float *nsT[64], unsigned char *nsC[64], int nsIdx[64], int nsLen[64], float *aV[64], float *aT[64], unsigned char *aC[64], int aIdx[64], int aLen[64], float *iV[64], float *iT[64], unsigned char *iC[64], int iIdx[64], int iLen[64], Octree *root, Octree *parent, Chunk *chunk, Octree **octrees, Chunk **chunks, int pos[9][3], int depth, double frustum[6][4], int x, int y, int z, int ox, int oy, int oz, float vx, float vy, float vz, int lx, int ly, int lz, int updateCoords[64*3], int drawIdx, float sunx, float suny, float sunz)
     void GenIndexList(unsigned int *outIndexList, int *outIndexLen, float *quads, int quadLen, float vx, float vy, float vz)
 
 cimport libc.stdio as stdio
@@ -797,7 +797,7 @@ cdef class Chunks:
    # cdef int curIdx
     cdef float *tV[64]
     cdef float *tT[64]
-    cdef float *tN[64] # terrain
+    cdef unsigned char *tC[64] # terrain
     cdef int tIdx[64]
     cdef int tLen[64]
     cdef float *nsV[64]
@@ -846,7 +846,7 @@ cdef class Chunks:
             if self.tLen[i] != 0:
                 free(self.tV[i])
                 free(self.tT[i])
-                free(self.tN[i])
+                free(self.tC[i])
             if self.nsLen[i] != 0:
                 free(self.nsV[i])
                 free(self.nsT[i])
@@ -3202,16 +3202,13 @@ cdef class Chunks:
                     for i in range(TEST_SIZE):
                         ox,oy,oz = pos[i][0], 0, pos[i][2]
                         oy = 0
-                        self.GenQuads(self.tV, self.tT, self.tN, self.tIdx, self.tLen, self.nsV, self.nsT, self.nsC, self.nsIdx, self.nsLen, self.aV, self.aT, self.aC, self.aIdx, self.aLen, self.iV, self.iT, self.iC, self.iIdx, self.iLen, octrees[i], octrees[i], outchunks[i], octrees, outchunks, pos, 1, frustumC, 0,0,0, ox,0,oz, viewpoint[0],viewpoint[1],viewpoint[2], self.lastX, self.lastY, self.lastZ, self.updateCoords, -1)
+                        self.GenQuads(self.tV, self.tT, self.tC, self.tIdx, self.tLen, self.nsV, self.nsT, self.nsC, self.nsIdx, self.nsLen, self.aV, self.aT, self.aC, self.aIdx, self.aLen, self.iV, self.iT, self.iC, self.iIdx, self.iLen, octrees[i], octrees[i], outchunks[i], octrees, outchunks, pos, 1, frustumC, 0,0,0, ox,0,oz, viewpoint[0],viewpoint[1],viewpoint[2], self.lastX, self.lastY, self.lastZ, self.updateCoords, -1, 0.0, 1.0, 0.0)
         
 
         if True:
             GL.glEnableClientState(GL.GL_VERTEX_ARRAY)
             GL.glEnableClientState(GL.GL_TEXTURE_COORD_ARRAY)
-            GL.glEnableClientState(GL.GL_NORMAL_ARRAY)
-            GL.glDisableClientState(GL.GL_COLOR_ARRAY)
-            GL.glEnable(GL.GL_LIGHTING)
-            GL.glEnable(GL.GL_LIGHT0)
+            GL.glEnableClientState(GL.GL_COLOR_ARRAY)
             GL.glEnable(GL.GL_CULL_FACE)
             GL.glEnable(GL.GL_DEPTH_TEST)
             GL.glDisable(GL.GL_BLEND)
@@ -3232,7 +3229,7 @@ cdef class Chunks:
                     GenIndexList(self.indexList, &indexLen, self.tV[i], self.tIdx[i], viewpoint[0], viewpoint[1], viewpoint[2])
                     glVertexPointer( 3, GL.GL_FLOAT, 0, <void*>self.tV[i]) 
                     glTexCoordPointer( 2, GL.GL_FLOAT, 0, <void*>self.tT[i]) 
-                    glNormalPointer(GL.GL_FLOAT, 0, <void*>self.tN[i]) 
+                    glColorPointer(3, GL.GL_UNSIGNED_BYTE, 0, <void*>self.tC[i]) 
                     #glDrawArrays(GL.GL_QUADS, 0, self.tIdx[i]*4)
                     glDrawElements(GL.GL_QUADS, indexLen, GL.GL_UNSIGNED_INT, self.indexList)
 
@@ -3256,10 +3253,6 @@ cdef class Chunks:
             glDrawElements(GL.GL_QUADS, indexLen, GL.GL_UNSIGNED_INT, self.indexList)
             """
 
-            GL.glDisable(GL.GL_LIGHTING)
-            GL.glDisable(GL.GL_LIGHT0)
-            GL.glDisableClientState(GL.GL_NORMAL_ARRAY)
-            GL.glEnableClientState(GL.GL_COLOR_ARRAY)
 
 
 
@@ -3364,8 +3357,8 @@ cdef class Chunks:
                 # 8x8x8도 꽤 그럴싸함. 4096개밖에 안되고.
                 # 레벨 5로 하자.
                 
-    cdef GenQuads(self, float *tV[64], float *tT[64], float *tN[64], int tIdx[64], int tLen[64], float *nsV[64], float *nsT[64], unsigned char *nsC[64], int nsIdx[64], int nsLen[64], float *aV[64], float *aT[64], unsigned char *aC[64], int aIdx[64], int aLen[64], float *iV[64], float *iT[64], unsigned char *iC[64], int iIdx[64], int iLen[64], Octree *root, Octree *parent, Chunk *chunk, Octree **octrees, Chunk **chunks, int pos[9][3], int depth, double frustum[6][4], int x, int y, int z, int ox, int oy, int oz, float vx, float vy, float vz, int lx, int ly, int lz, int updateCoords[64*3], int drawIdx):
-        GenQuads(tV, tT, tN, tIdx, tLen, nsV, nsT, nsC, nsIdx, nsLen, aV, aT, aC, aIdx, aLen, iV, iT, iC, iIdx, iLen, root, parent, chunk, octrees, chunks, pos, depth, frustum, x, y, z, ox, oy, oz, vx, vy, vz, lx, ly, lz, updateCoords, drawIdx)
+    cdef GenQuads(self, float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64], int tLen[64], float *nsV[64], float *nsT[64], unsigned char *nsC[64], int nsIdx[64], int nsLen[64], float *aV[64], float *aT[64], unsigned char *aC[64], int aIdx[64], int aLen[64], float *iV[64], float *iT[64], unsigned char *iC[64], int iIdx[64], int iLen[64], Octree *root, Octree *parent, Chunk *chunk, Octree **octrees, Chunk **chunks, int pos[9][3], int depth, double frustum[6][4], int x, int y, int z, int ox, int oy, int oz, float vx, float vy, float vz, int lx, int ly, int lz, int updateCoords[64*3], int drawIdx, float sunx, float suny, float sunz):
+        GenQuads(tV, tT, tC, tIdx, tLen, nsV, nsT, nsC, nsIdx, nsLen, aV, aT, aC, aIdx, aLen, iV, iT, iC, iIdx, iLen, root, parent, chunk, octrees, chunks, pos, depth, frustum, x, y, z, ox, oy, oz, vx, vy, vz, lx, ly, lz, updateCoords, drawIdx, sunx,suny,sunz)
 
     cdef void GetNeighboringOctrees(self, Octree * neighbors[6], Octree * octree):
         pass
