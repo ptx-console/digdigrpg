@@ -672,6 +672,7 @@ ITEM_SILVERNECLACE = GenId()
 ITEM_DIAMONDRING = GenId()
 ITEM_DIAMONDNECLACE = GenId()
 ITEM_SCROLL = GenId()
+ITEM_ENCHANTSCROLL = GenId()
 ITEM_NONE = 0
 TOOL_TEX_COORDS = [
         0,0,
@@ -704,6 +705,7 @@ TOOL_TEX_COORDS = [
         2,2,
         2,3,
         0,6,
+        0,7,
         ]
 
 TYPE_BLOCK = "Block"
@@ -800,6 +802,7 @@ class DigDigGUI(object):
         self.otherPoints = [] # 땅에 떨굴 때 사용하는 영역
         self.selectedItem = 0
         self.selectedMakeTool = -1
+        self.selectedContItem = ITEM_NONE
 
         EMgrSt.BindTick(self.Tick)
         EMgrSt.BindMotion(self.Motion)
@@ -881,7 +884,7 @@ class DigDigGUI(object):
         self.makes[34] = MakeTool(u"Diamond shovel", u"Digs up dirts or sands", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_SHOVEL, [30,], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[10] = MakeTool(u"Torch(Charcoal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_CHARCOAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[11] = MakeTool(u"Torch(Coal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[12] = MakeTool(u"Chest", u"Can hold items and blocks", (255,255,255), [(BLOCK_WOOD, 8, TYPE_BLOCK, (255,255,255))], (ITEM_CHEST, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[12] = MakeTool(u"Chest", u"Can hold items and blocks", (255,255,255), [(BLOCK_WOOD, 8, TYPE_BLOCK)], (ITEM_CHEST, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[30] = MakeTool(u"Code", u"Runs python code.\nUsed to launch commands\nor spawn an object\n(Put scripts in scripts directory)", (255,255,255), [(ITEM_GOLD, 4, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 4, TYPE_ITEM, (201,201,201))], (BLOCK_CODE, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         #self.makes[32] = MakeTool(u"전기선(일자)", u"코드와 기계를\n연결합니다.", (255,255,255), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (ITEM_LINE, [], [], 10, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         #self.makes[33] = MakeTool(u"전기선(기역자)", u"코드와 기계를\n연결합니다.", (255,255,255), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (ITEM_LINEL, [], [], 10, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
@@ -901,7 +904,10 @@ class DigDigGUI(object):
         self.makes[53] = MakeTool(u"Gold Necklace", u"A gold necklace\n- Necklace -", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101))], (ITEM_GOLDNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[54] = MakeTool(u"Diamond Ring", u"A diamond ring\n- Ring -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217))], (ITEM_DIAMONDRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[55] = MakeTool(u"Diamond Necklace", u"A diamond necklace\n- Necklace -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217))], (ITEM_DIAMONDNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[56] = MakeTool(u"Enchant Scroll", u"Used to change item attributes\n(Use enchant menu to use)", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK, (255,255,255))], (ITEM_SCROLL, [], [], 64, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[56] = MakeTool(u"Blank Scroll", u"Used to make enchant scroll", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_SCROLL, [], [], 64, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[57] = MakeTool(u"Silver Enchant Scroll", u"Used to enchant item\n(Use enchant menu to use)", (255,255,255), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_ENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[58] = MakeTool(u"Gold Enchant Scroll", u"Used to enchant item\n(Use enchant menu to use)", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_ENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[59] = MakeTool(u"Diamond Enchant Scroll", u"Used to enchant item\n(Use enchant menu to use)", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_ENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.recipeTextID = self.textRenderer.NewTextObject(u"Recipe:", (0,0,0))
 
         self.invSlotPos = []
@@ -957,12 +963,12 @@ class DigDigGUI(object):
         self.PutItemInInventory(Block(BLOCK_CODE, 64))
         self.PutItemInInventory(Block(BLOCK_CPU, 64))
         self.PutItemInInventory(Block(BLOCK_ENERGY, 64))
-        """
         self.PutItemInInventory(Item(ITEM_IRON, 64, color = (107,107,107), stackable=True))
         self.PutItemInInventory(Item(ITEM_IRON, 64, color = (107,107,107), stackable=True))
         self.PutItemInInventory(Item(ITEM_GOLD, 64, color = (207,207,101), stackable=True))
         self.PutItemInInventory(Item(ITEM_SILVER, 64, color = (201,201,201), stackable=True))
         self.PutItemInInventory(Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True))
+        """
 
 
         # 여기서 텍스쳐를 생성한다.
@@ -1055,6 +1061,57 @@ class DigDigGUI(object):
                     x = foundIdx % 10
                     y = (foundIdx - x) / 10
                     self.selectedMakeTool = foundIdx
+
+
+            idx = 0
+            foundIdx = -1
+            self.selectedContItem = ITEM_NONE
+            for pos in self.invSlotPos:
+                x,y = pos
+                if InRect(x,y,30,30,m.x,m.y):
+                    foundIdx = idx
+                    break
+                idx += 1
+            if foundIdx != -1:
+                self.selectedContItem = self.inventory[foundIdx]
+
+            idx = 0
+            foundIdx = -1
+            for pos in self.qbSlotPos:
+                x,y = pos
+                if InRect(x,y,30,30,m.x,m.y):
+                    foundIdx = idx
+                    break
+                idx += 1
+
+            if foundIdx != -1:
+                self.selectedContItem = self.qbar[foundIdx]
+
+            if self.toolMode == TM_BOX:
+                idx = 0
+                foundIdx = -1
+                for pos in self.makeSlotPos:
+                    x,y = pos
+                    if InRect(x,y,30,30,m.x,m.y):
+                        foundIdx = idx
+                        break
+                    idx += 1
+
+                if foundIdx != -1:
+                    self.selectedContItem = self.selectedBox[foundIdx]
+            elif self.toolMode == TM_EQ:
+                idx = 0
+                foundIdx = -1
+                for pos in self.eqSlotPos:
+                    x,y = pos
+                    if InRect(x,y,30,30,m.x,m.y):
+                        foundIdx = idx
+                        break
+                    idx += 1
+
+                if foundIdx != -1:
+                    self.selectedContItem = self.eqs[foundIdx]
+
     def LDown(self, t, m, k):
         if self.toolMode in [TM_BOX, TM_TOOL, TM_EQ]:
             self.OnDown(t,m,k,False)
@@ -1230,6 +1287,10 @@ class DigDigGUI(object):
                     self.DoEquip(foundIdx)
 
 
+    def GenEntity(self):
+        # 음......... 어떤 마법 스킬에 따라서 더 좋은 결과가 나온다.
+        # 몬스터도 인챈트 스크롤을 드랍한다. 아이템 대신!
+        pass
     def DoMake(self, makeIdx):
         tool = self.makes[makeIdx]
 
@@ -1237,12 +1298,18 @@ class DigDigGUI(object):
         if name == TYPE_BLOCK:
             returneditem = Block(type_, count)
         elif name == TYPE_ITEM:
-            if count == 0:
-                returneditem = Item(type_, 999, color=tool.color)
-            elif count == -1:
-                returneditem = Item(type_, 1, color=tool.color)
+            if type_ == ITEM_ENCHANTSCROLL:
+
+                #인챈트 스크롤 복사하는 아이템이 고급 몬스터에게서 떨어진다. XXX:
+                entity = self.GenEntity()
+                returneditem = Item(type_, 1, color=tool.color, entity=entity)
             else:
-                returneditem = Item(type_, count, color=tool.color, stackable=True)
+                if count == 0:
+                    returneditem = Item(type_, 999, color=tool.color)
+                elif count == -1:
+                    returneditem = Item(type_, 1, color=tool.color)
+                else:
+                    returneditem = Item(type_, count, color=tool.color, stackable=True)
         if not self.CanPutItemInInventory(returneditem):
             return
 
@@ -1753,6 +1820,106 @@ class DigDigGUI(object):
 
                         idx += 1
 
+                def RenderItemDesc(item):
+                    print item.entity
+                    return
+                    x,y,w,h = 5, 20, 165, 380
+                    glDisable(GL_TEXTURE_2D)
+                    glBegin(GL_QUADS)
+                    glColor4f(1.0,1.0,1.0,0.85)
+                    glVertex3f(float(x), -float(y+h), 100.0)
+                    glVertex3f(float(x+w), -float(y+h), 100.0)
+                    glVertex3f(float(x+w), -float(y), 100.0)
+                    glVertex3f(x, -float(y), 100.0)
+                    glEnd()
+
+                    glLineWidth(3.0)
+                    glBegin(GL_LINES)
+                    glColor4f(0.0,0.0,0.0,1.0)
+                    glVertex3f(float(x), -float(y+h), 100.0)
+                    glVertex3f(float(x+w), -float(y+h), 100.0)
+                    
+                    glVertex3f(float(x+w), -float(y+h), 100.0)
+                    glVertex3f(float(x+w), -float(y), 100.0)
+
+                    glVertex3f(float(x+w), -float(y), 100.0)
+                    glVertex3f(x, -float(y), 100.0)
+
+                    glVertex3f(x, -float(y), 100.0)
+                    glVertex3f(float(x), -float(y+h), 100.0)
+                    glEnd()
+                    glEnable(GL_TEXTURE_2D)
+
+                    tool = self.makes[self.selectedMakeTool]
+                    self.textRenderer.RenderText(tool.textidName, (10, 25))
+                    y = 0
+                    y += 20
+                    for textid in tool.textidDesc:
+                        self.textRendererSmall.RenderText(textid, (10, 25+y))
+                        y += 15
+                    y += 20
+                    self.textRenderer.RenderText(self.recipeTextID, (10, 25+y))
+                    y += 20+25
+
+                    x = 10
+                    for need in tool.needs:
+                        if len(need) == 3:
+                            item, count, textype = need
+                            color=(255,255,255)
+                        elif len(need) == 4:
+                            item, count, textype, color = need
+                        if textype == TYPE_BLOCK:
+                            glBindTexture(GL_TEXTURE_2D, AppSt.tex)
+                            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+                            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+                            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE)
+                            texupx = (BLOCK_TEX_COORDS[item*2*3 + 0]*32.0) / 512.0
+                            texupy = (BLOCK_TEX_COORDS[item*2*3 + 1]*32.0) / 512.0
+                            glBegin(GL_QUADS)
+                            glTexCoord2f(texupx, texupy+float(32)/512.0)
+                            glVertex3f(float(x), -float(y+30), 100.0)
+
+                            glTexCoord2f(texupx+float(32)/512.0, texupy+float(32)/512.0)
+                            glVertex3f(float(x+30), -float(y+30), 100.0)
+
+                            glTexCoord2f(texupx+float(32)/512.0, texupy)
+                            glVertex3f(float(x+30), -float(y), 100.0)
+
+                            glTexCoord2f(texupx, texupy)
+                            glVertex3f(x, -float(y), 100.0)
+                            glEnd()
+                            self.RenderNumber(count, x, y)
+                        elif textype == TYPE_ITEM:
+                            glBindTexture(GL_TEXTURE_2D, self.tooltex)
+                            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+                            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+                            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
+                            texupx = (TOOL_TEX_COORDS[item*2 + 0]*30.0) / 512.0
+                            texupy = (TOOL_TEX_COORDS[item*2 + 1]*30.0) / 512.0
+                            glBegin(GL_QUADS)
+                            glColor3ub(*color)
+                            glTexCoord2f(texupx, texupy+float(30)/512.0)
+                            glVertex3f(float(x), -float(y+30), 100.0)
+
+                            glTexCoord2f(texupx+float(30)/512.0, texupy+float(30)/512.0)
+                            glVertex3f(float(x+30), -float(y+30), 100.0)
+
+                            glTexCoord2f(texupx+float(30)/512.0, texupy)
+                            glVertex3f(float(x+30), -float(y), 100.0)
+
+                            glTexCoord2f(texupx, texupy)
+                            glVertex3f(x, -float(y), 100.0)
+                            glEnd()
+                            self.RenderNumber(count, x, y)
+                        x += 35
+                        if x+35 >= 160:
+                            x = 10
+                            y += 35
+
+
+                if self.selectedContItem:
+                    if self.selectedContItem.name == "Item":
+                        RenderItemDesc(self.selectedContItem)
 
                 if self.selectedMakeTool != -1 and self.makes[self.selectedMakeTool]:
                     x,y,w,h = 5, 20, 165, 380
@@ -6195,5 +6362,9 @@ NPC인터랙션 메뉴를 만들고 상점등을 만들고
 ---------------
 이제 인챈팅 테이블을 만들어서 아이템 인챈팅을 거기서 하도록 한다?
 아니면... 인챈트 메뉴를 E버튼에 넣어 만들까.
+음..........골드, 실버, 다이아몬드 한개와 인챈트 스크롤을 합치면 여러가지 속성이 있는 인챈트 스크롤이 나온다?
+가장 약한 아이템이라도 실버/골드/다이아중 하나가 든다. 실버 골드 다이아는 희소성이 비슷하기 때문에 그냥....
+속성이 다른 인챈트 스크롤이 나오기로 하고, 플레이어의 어떤 특정한 속성에 비례해서 더 좋은 인챈트 스크롤이 나오도록 하자.
+아이템은 최대 5회 인챈트를 할 수 있고, 인챈트를 성공하면 스크롤의 속성이 ADD되며, 인챈트를 실패하면 스크롤이 날아간다는 슬픈 이야기가.
 --------------------------------
 """

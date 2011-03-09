@@ -3748,6 +3748,9 @@ void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64],
                             for(ttt=0; ttt<9;++ttt)
                             {
                                 sunstrength[ttt] = 1.0f; // 이거 8방향만 하는게 아니라 26방향으로 해야 제대로 된다. XXX
+                                //XXX 또한 FillColor에서 토치와 현재 버텍스 사이에 블럭이 하나라도 있으면 빛을 받지 않도록 한다.
+                                //주변에 받는 빛이 반사되어 여기에 받을 수 있음.
+                                //이거만 잘해도 radiosity같은거 없이 멋진 라이팅 가능하다.
                             }
 
                             if(TestSunLit(xBx, yBy, zBz, chunk, chunks, pos, ox, oy, oz, 1, &sunstrength[0]))
