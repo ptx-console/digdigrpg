@@ -753,7 +753,7 @@ class MakeTool(object):
         self.color = color
         self.needs = needs
         self.returns = returns
-        self.textidName = textRenderer.NewTextObject(self.name, (0,0,0))
+        self.textidName = [textRenderer.NewTextObject(text, (0,0,0)) for text in self.name.split("\n")]
         self.textidDesc = [textRendererSmall.NewTextObject(text, (0,0,0)) for text in self.desc.split("\n")]
 class DigDigGUI(object):
     def __init__(self):
@@ -905,10 +905,10 @@ class DigDigGUI(object):
         self.makes[53] = MakeTool(u"Gold Necklace", u"A gold necklace\n- Necklace -", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101))], (ITEM_GOLDNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[54] = MakeTool(u"Diamond Ring", u"A diamond ring\n- Ring -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217))], (ITEM_DIAMONDRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[55] = MakeTool(u"Diamond Necklace", u"A diamond necklace\n- Necklace -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217))], (ITEM_DIAMONDNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[56] = MakeTool(u"Blank Scroll", u"Used to make enchant scroll", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_SCROLL, [], [], 64, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[57] = MakeTool(u"Silver Enchant Scroll", u"Used to enchant item\n(Use enchant menu to use)", (255,255,255), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_ENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[58] = MakeTool(u"Gold Enchant Scroll", u"Used to enchant item\n(Use enchant menu to use)", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_ENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[59] = MakeTool(u"Diamond Enchant Scroll", u"Used to enchant item\n(Use enchant menu to use)", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_ENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[56] = MakeTool(u"Blank Scroll", u"Used to make enchant scrolls", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_SCROLL, [], [], 64, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[57] = MakeTool(u"Silver Enchant Scroll", u"Used to enchant an item\n(Use enchant menu to use)", (255,255,255), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_ENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[58] = MakeTool(u"Gold Enchant Scroll", u"Used to enchant an item\n(Use enchant menu to use)", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_ENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[59] = MakeTool(u"Diamond\nEnchant Scroll", u"Used to enchant an item\n(Use enchant menu to use)", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_ENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.recipeTextID = self.textRenderer.NewTextObject(u"Recipe:", (0,0,0))
 
         self.invSlotPos = []
@@ -1851,9 +1851,11 @@ class DigDigGUI(object):
                     glEnd()
                     glEnable(GL_TEXTURE_2D)
 
-                    tool = self.makes[self.selectedMakeTool]
-                    self.textRenderer.RenderText(tool.textidName, (10, 25))
                     y = 0
+                    tool = self.makes[self.selectedMakeTool]
+                    for textid in tool.textidName:
+                        self.textRenderer.RenderText(textid, (10, 25+y))
+                        y += 20
                     y += 20
                     for textid in tool.textidDesc:
                         self.textRendererSmall.RenderText(textid, (10, 25+y))
@@ -1951,8 +1953,10 @@ class DigDigGUI(object):
                     glEnable(GL_TEXTURE_2D)
 
                     tool = self.makes[self.selectedMakeTool]
-                    self.textRenderer.RenderText(tool.textidName, (10, 25))
                     y = 0
+                    for textid in tool.textidName:
+                        self.textRenderer.RenderText(textid, (10, 25+y))
+                        y += 20
                     y += 20
                     for textid in tool.textidDesc:
                         self.textRendererSmall.RenderText(textid, (10, 25+y))
@@ -5677,6 +5681,7 @@ class DigDigApp(object):
             sound.set_volume(0.8)
         isFullScreen = 0#FULLSCREEN
         screen = pygame.display.set_mode((SW,SH), HWSURFACE|OPENGL|DOUBLEBUF|isFullScreen)#|FULLSCREEN)
+        pygame.mouse.set_cursor(*pygame.cursors.load_xbm("./images/digdig/cursor.xbm", "./images/digdig/cursor-mask.xbm"))
         
         resize(SW,SH)
         init()
