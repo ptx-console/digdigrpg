@@ -778,6 +778,7 @@ class DigDigGUI(object):
 
 
         self.invShown = False
+        self.setInvShown = False
         self.toolMode = TM_TOOL # 장비창이냐 제작창이냐 상자창이냐 등등
         self.font = pygame.font.Font("./fonts/Fanwood.ttf", 18)
         self.font2 = pygame.font.Font("./fonts/FanwoodText-Italic.ttf", 13)
@@ -1040,7 +1041,7 @@ class DigDigGUI(object):
                 else:
                     AppSt.DropItem(self.draggingItem)
 
-        self.invShown = show
+        self.setInvShown = show
 
     def Tick(self, t, m, k):
         pass
@@ -1821,8 +1822,8 @@ class DigDigGUI(object):
                         idx += 1
 
                 def RenderItemDesc(item):
-                    print item.entity
-                    return
+                    if not item.entity:
+                        return
                     x,y,w,h = 5, 20, 165, 380
                     glDisable(GL_TEXTURE_2D)
                     glBegin(GL_QUADS)
@@ -2802,7 +2803,7 @@ def GUIDrawMode():
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
 
-G_FAR = 300.0
+G_FAR = 20.0
 def GameDrawMode():
     glEnable(GL_CULL_FACE)
     glEnable(GL_DEPTH_TEST)
@@ -5887,6 +5888,7 @@ class DigDigApp(object):
                     pass
                 emgr.Event(e)
             emgr.Tick()
+            self.gui.invShown = self.gui.setInvShown
             self.regenTex = False
             fps.End()
             #print fps.GetFPS()

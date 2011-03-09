@@ -29,6 +29,8 @@ cdef extern from "genquads.h":
     struct tChunk:
         unsigned char *chunk
         char *heights
+        unsigned char *colors
+
         int x,y,z
     ctypedef tChunk Chunk
     struct tOctree:
@@ -1463,6 +1465,8 @@ cdef class Chunks:
                     chunk = <Chunk *>malloc(sizeof(Chunk))
                     chunk.chunk = chunkData
                     chunk.heights = <char*>malloc(sizeof(char)*128*128)
+                    chunk.colors = <char*>malloc(sizeof(char)*128*128*128*3)
+                    memset(chunk.colors, 0, sizeof(char)*128*128*128*3)
                     chunk.x = pos[i][0]
                     chunk.y = 0
                     chunk.z = pos[i][2]
@@ -1478,6 +1482,8 @@ cdef class Chunks:
                     chunk = <Chunk *>malloc(sizeof(Chunk))
                     chunk.chunk = chunkData
                     chunk.heights = <char*>malloc(sizeof(char)*128*128)
+                    chunk.colors = <char*>malloc(sizeof(char)*128*128*128*3)
+                    memset(chunk.colors, 0, sizeof(char)*128*128*128*3)
                     chunk.x = pos[i][0]
                     chunk.y = 0
                     chunk.z = pos[i][2]

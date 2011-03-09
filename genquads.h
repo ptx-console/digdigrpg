@@ -8,6 +8,7 @@ typedef struct tXY {
 } vec2;
 typedef struct tChunk {
     unsigned char *chunk;
+    unsigned char *colors;
     char *heights;
     int x,y,z;
 } Chunk;
