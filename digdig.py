@@ -865,8 +865,12 @@ class DigDigGUI(object):
         self.makes[1] = MakeTool(u"Stick", u"Multi purpose stick", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_STICK, [], [], 4, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[2] = MakeTool(u"Charcoal", u"A charcoal", (60,60,60), [(BLOCK_LOG, 1, TYPE_BLOCK)], (ITEM_CHARCOAL, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[3] = MakeTool(u"Glass", u"A glass", (255,255,255), [(BLOCK_SAND, 1, TYPE_BLOCK)], (BLOCK_GLASS, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
-        self.makes[4] = MakeTool(u"Stair", u"A stair", (30,30,30), [(BLOCK_COBBLESTONE, 1, TYPE_BLOCK)], (ITEM_STAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[5] = MakeTool(u"Wooden stair", u"A wooden stair", (116,100,46), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_WOODENSTAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[4] = MakeTool(u"Stone", u"A stone block", (255,255,255), [(BLOCK_COBBLESTONE, 1, TYPE_BLOCK)], (BLOCK_STONE, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes[5] = MakeTool(u"Brick", u"A brick block", (255,255,255), [(BLOCK_COBBLESTONE, 1, TYPE_BLOCK)], (BLOCK_BRICK, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes[6] = MakeTool(u"Wall", u"A wall block", (255,255,255), [(BLOCK_COBBLESTONE, 1, TYPE_BLOCK)], (BLOCK_BRICK, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes[7] = MakeTool(u"TNT", u"Kaboom! - Machine -", (255,255,255), [(BLOCK_GRAVEL, 1, TYPE_BLOCK)], (BLOCK_TNT, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes[13] = MakeTool(u"Wooden stair", u"A wooden stair", (116,100,46), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_WOODENSTAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[14] = MakeTool(u"Stair", u"A stair", (30,30,30), [(BLOCK_COBBLESTONE, 1, TYPE_BLOCK)], (ITEM_STAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[20] = MakeTool(u"Wooden pickaxe", u"Used to pick stones, ores", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_PICKAXE, [15,20], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         # returns: 아이템, 체력깎는 정도, 못파는 광물목록
         self.makes[21] = MakeTool(u"Wooden axe", u"Wood cutting wooden axe", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_AXE, [15,20], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
@@ -4421,7 +4425,7 @@ class DigDigApp(object):
         self.guiRenderDelay = 500
         self.show = True
         self.prevDig = 0
-        self.digDelay = 100
+        self.digDelay = 80
         self.prevBlock = None
         self.lastBlock = None
         self.blockHP = -1
