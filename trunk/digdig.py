@@ -867,22 +867,22 @@ class DigDigGUI(object):
         self.makes[3] = MakeTool(u"Glass", u"A glass", (255,255,255), [(BLOCK_SAND, 1, TYPE_BLOCK)], (BLOCK_GLASS, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         self.makes[4] = MakeTool(u"Stair", u"A stair", (30,30,30), [(BLOCK_COBBLESTONE, 1, TYPE_BLOCK)], (ITEM_STAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[5] = MakeTool(u"Wooden stair", u"A wooden stair", (116,100,46), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_WOODENSTAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[20] = MakeTool(u"Wooden pickaxe", u"Used to pick stones, ores", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_PICKAXE, [30,], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[20] = MakeTool(u"Wooden pickaxe", u"Used to pick stones, ores", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_PICKAXE, [15,20], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         # returns: 아이템, 체력깎는 정도, 못파는 광물목록
-        self.makes[21] = MakeTool(u"Wooden axe", u"Wood cutting wooden axe", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_AXE, [30], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[22] = MakeTool(u"Shovel", u"Digs up dirts or sands", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_SHOVEL, [30,], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[23] = MakeTool(u"Stone pickaxe", u"Used to pick stones, ores", (47,43,43), [(BLOCK_COBBLESTONE, 5, TYPE_BLOCK)], (ITEM_PICKAXE, [30,], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[21] = MakeTool(u"Wooden axe", u"Wood cutting wooden axe", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_AXE, [15,20], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[22] = MakeTool(u"Wooden shovel", u"Digs up dirts or sands", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_SHOVEL, [15,20], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[23] = MakeTool(u"Stone pickaxe", u"Used to pick stones, ores", (47,43,43), [(BLOCK_COBBLESTONE, 5, TYPE_BLOCK)], (ITEM_PICKAXE, [20,10], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         # returns: 아이템, 체력깎는 정도, 못파는 광물목록
-        self.makes[24] = MakeTool(u"Stone axe", u"Used to cut trees", (47,43,43), [(BLOCK_COBBLESTONE, 5, TYPE_BLOCK)], (ITEM_AXE, [30], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[25] = MakeTool(u"Stone shovel", u"Digs up dirts or sands", (47,43,43), [(BLOCK_COBBLESTONE, 5, TYPE_BLOCK)], (ITEM_SHOVEL, [30,], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[26] = MakeTool(u"Iron pickaxe", u"Used to pick stones, ores", (107,107,107), [(ITEM_IRON, 5, TYPE_ITEM, (107,107,107))], (ITEM_PICKAXE, [30,], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[24] = MakeTool(u"Stone axe", u"Used to cut trees", (47,43,43), [(BLOCK_COBBLESTONE, 5, TYPE_BLOCK)], (ITEM_AXE, [20,10], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[25] = MakeTool(u"Stone shovel", u"Digs up dirts or sands", (47,43,43), [(BLOCK_COBBLESTONE, 5, TYPE_BLOCK)], (ITEM_SHOVEL, [20,10], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[26] = MakeTool(u"Iron pickaxe", u"Used to pick stones, ores", (107,107,107), [(ITEM_IRON, 5, TYPE_ITEM, (107,107,107))], (ITEM_PICKAXE, [40,5], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         # returns: 아이템, 체력깎는 정도, 못파는 광물목록
-        self.makes[27] = MakeTool(u"Iron axe", u"Used to cut trees", (107,107,107), [(ITEM_IRON, 5, TYPE_ITEM, (107,107,107))], (ITEM_AXE, [30], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[28] = MakeTool(u"Iron shovel", u"Digs up dirts or sands", (107,107,107), [(ITEM_IRON, 5, TYPE_ITEM, (107,107,107))], (ITEM_SHOVEL, [30,], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[32] = MakeTool(u"Diamond pickaxe", u"Used to pick stones, ores", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_PICKAXE, [30,], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[27] = MakeTool(u"Iron axe", u"Used to cut trees", (107,107,107), [(ITEM_IRON, 5, TYPE_ITEM, (107,107,107))], (ITEM_AXE, [40,5], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[28] = MakeTool(u"Iron shovel", u"Digs up dirts or sands", (107,107,107), [(ITEM_IRON, 5, TYPE_ITEM, (107,107,107))], (ITEM_SHOVEL, [40,5], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[32] = MakeTool(u"Diamond pickaxe", u"Used to pick stones, ores", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_PICKAXE, [60,1], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         # returns: 아이템, 체력깎는 정도, 못파는 광물목록
-        self.makes[33] = MakeTool(u"Diamond axe", u"Used to cut trees", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_AXE, [30], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[34] = MakeTool(u"Diamond shovel", u"Digs up dirts or sands", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_SHOVEL, [30,], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[33] = MakeTool(u"Diamond axe", u"Used to cut trees", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_AXE, [60,1], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[34] = MakeTool(u"Diamond shovel", u"Digs up dirts or sands", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_SHOVEL, [60,1], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[10] = MakeTool(u"Torch(Charcoal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_CHARCOAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[11] = MakeTool(u"Torch(Coal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[12] = MakeTool(u"Chest", u"Can hold items and blocks", (255,255,255), [(BLOCK_WOOD, 8, TYPE_BLOCK)], (ITEM_CHEST, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
@@ -1306,11 +1306,11 @@ class DigDigGUI(object):
                 returneditem = Item(type_, 1, color=tool.color, entity=entity)
             else:
                 if count == 0:
-                    returneditem = Item(type_, 999, color=tool.color)
+                    returneditem = Item(type_, 999, color=tool.color, stats=stats)
                 elif count == -1:
-                    returneditem = Item(type_, 1, color=tool.color)
+                    returneditem = Item(type_, 1, color=tool.color, stats=stats)
                 else:
-                    returneditem = Item(type_, count, color=tool.color, stackable=True)
+                    returneditem = Item(type_, count, color=tool.color, stackable=True, stats=stats)
         if not self.CanPutItemInInventory(returneditem):
             return
 
@@ -3320,7 +3320,7 @@ BLOCK_SPAWNER = GenId()
 
 
 class Item(object):
-    def __init__(self, type_, count, stackable = False, name="Item", color=None, inv=None, entity=None):
+    def __init__(self, type_, count, stackable = False, name="Item", color=None, inv=None, entity=None, stats=[]):
         self.type_ = type_
         self.maxLen = 64
         self.stackable = stackable
@@ -3329,6 +3329,7 @@ class Item(object):
         self.color = color
         self.optionalInventory = inv
         self.entity = entity
+        self.stats = stats
 
 class Block(Item):
     def __init__(self, type_, count):
@@ -4956,7 +4957,7 @@ class DigDigApp(object):
         glLineWidth(3.0)
         x = float((SW-100)/2.0)
         y = float((SH-25)/2.0)
-        width = float(self.blockHP)
+        width = float(self.blockHP/self.maxBlockHP)*100.0
         if width < 0.0:
             width = 0.0
 
@@ -5019,9 +5020,25 @@ class DigDigApp(object):
                 self.chColor = self.RED_CH
                 return
 
-            self.blockHP = 100.0
-            self.prevDig = t
-            self.digging = False
+            if self.lastBlock:
+                x,y,z,f,b = self.lastBlock
+                hp = 100.0
+                if b == BLOCK_COALORE:
+                    hp = 120.0
+                if b == BLOCK_IRONORE:
+                    hp = 150.0
+                if b == BLOCK_SILVERORE:
+                    hp = 180.0
+                if b == BLOCK_GOLDORE:
+                    hp = 250.0
+                if b == BLOCK_DIAMONDORE:
+                    hp = 500.0
+
+                self.blockHP = hp
+                self.maxBlockHP = hp
+                self.prevDig = t
+                self.digging = False
+
             self.RunScript()
     def RunScript(self):
         if self.lastBlock:
@@ -5078,62 +5095,111 @@ class DigDigApp(object):
         item = self.gui.qbar[self.gui.selectedItem]
         if not self.gui.invShown and self.lastBlock and self.prevBlock:
             x,y,z,face,block = self.lastBlock
-            if block in [BLOCK_CODE, BLOCK_SPAWNER]:
-                return
             x2,y2,z2,face2,block2 = self.prevBlock
             if x==x2 and y==y2 and z==z2 and block == block2 and block != BLOCK_WATER:
-                tool = self.gui.qbar[self.gui.selectedItem]
-                if tool and tool.name == TYPE_ITEM and tool.type_ == ITEM_PICKAXE:
-                    self.blockHP -= (float(t - self.prevDig)*30.0/100.0)
-                    tool.count -= int(float(t-self.prevDig)*15.0/100.0)
-                    if tool.count <= 0:
-                        self.gui.qbar[self.gui.selectedItem] = ITEM_NONE
-                else:
-                    self.blockHP -= (float(t - self.prevDig)*15.0/100.0)
                 self.digging = True
-            else:
-                self.blockHP = 100.0
+            if t-self.prevDig > self.digDelay:
+                if block in [BLOCK_GRASS, BLOCK_DIRT, BLOCK_SAND, BLOCK_LEAVES, BLOCK_GRAVEL]:
+                    self.sounds["Shovel"].play()
+                else:
+                    self.sounds["Dig"].play()
 
-            if self.blockHP <= 0 and self.lastBlock:
-                self.blockHP = 100.0
-                x,y,z,f,b = self.lastBlock
-                block, items = self.chunks.DigBlock(x,y,z)
-                if block:
-                    if b in [BLOCK_GRASS, BLOCK_DIRT, BLOCK_SAND, BLOCK_LEAVES, BLOCK_GRAVEL]:
-                        self.sounds["ShovelDone"].play()
+                if block in [BLOCK_CODE, BLOCK_SPAWNER]:
+                    return
+                x2,y2,z2,face2,block2 = self.prevBlock
+                if x==x2 and y==y2 and z==z2 and block == block2 and block != BLOCK_WATER:
+                    tool = self.gui.qbar[self.gui.selectedItem]
+                    if tool and tool.name == TYPE_ITEM and tool.type_ == ITEM_PICKAXE and block not in [BLOCK_GRASS, BLOCK_DIRT, BLOCK_SAND, BLOCK_LEAVES, BLOCK_GRAVEL]+[BLOCK_LOG, BLOCK_WOOD]:
+                        self.blockHP -= (float(t - self.prevDig)*tool.stats[0]/100.0)
+                        tool.count -= int(float(t-self.prevDig)*tool.stats[1]/100.0)
+                        if tool.count <= 0:
+                            self.gui.qbar[self.gui.selectedItem] = ITEM_NONE
+                    elif tool and tool.name == TYPE_ITEM and tool.type_ == ITEM_AXE and block in [BLOCK_LOG, BLOCK_WOOD, BLOCK_LEAVES]:
+                        self.blockHP -= (float(t - self.prevDig)*tool.stats[0]/100.0)
+                        tool.count -= int(float(t-self.prevDig)*tool.stats[1]/100.0)
+                        if tool.count <= 0:
+                            self.gui.qbar[self.gui.selectedItem] = ITEM_NONE
+                    elif tool and tool.name == TYPE_ITEM and tool.type_ == ITEM_SHOVEL and block in [BLOCK_GRASS, BLOCK_DIRT, BLOCK_SAND, BLOCK_GRAVEL]:
+                        self.blockHP -= (float(t - self.prevDig)*tool.stats[0]/100.0)
+                        tool.count -= int(float(t-self.prevDig)*tool.stats[1]/100.0)
+                        if tool.count <= 0:
+                            self.gui.qbar[self.gui.selectedItem] = ITEM_NONE
                     else:
-                        self.sounds["DigDone"].play()
+                        self.blockHP -= (float(t - self.prevDig)*5.0/100.0)
+                else:
+                    if self.lastBlock:
+                        x,y,z,f,b = self.lastBlock
+                        hp = 100.0
+                        if b == BLOCK_COALORE:
+                            hp = 120.0
+                        if b == BLOCK_IRONORE:
+                            hp = 150.0
+                        if b == BLOCK_SILVERORE:
+                            hp = 180.0
+                        if b == BLOCK_GOLDORE:
+                            hp = 250.0
+                        if b == BLOCK_DIAMONDORE:
+                            hp = 500.0
 
-                    if block == BLOCK_SPAWNER:
-                        del self.gui.spawns[(x,y,z)]
-                    if block == BLOCK_CODE:
-                        del self.gui.codes[(x,y,z)]
-                    if block == BLOCK_GRASS:
-                        block = BLOCK_DIRT
-                    if block not in [BLOCK_CHEST, BLOCK_IRONORE, BLOCK_COALORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE]:
-                        self.SpawnBlockItems(x,y,z, block)
-                    else:
-                        if block == BLOCK_IRONORE:
-                            self.gui.PutItemInInventory(Item(ITEM_IRON, 1, color=(107,107,107), stackable=True))
-                        if block == BLOCK_COALORE:
-                            self.gui.PutItemInInventory(Item(ITEM_COAL, 1, color=(60,60,60), stackable=True))
-                        if block == BLOCK_SILVERORE:
-                            self.gui.PutItemInInventory(Item(ITEM_SILVER, 1, color=(201,201,201), stackable=True))
-                        if block == BLOCK_GOLDORE:
-                            self.gui.PutItemInInventory(Item(ITEM_GOLD, 1, color=(207,207,101), stackable=True))
-                        if block == BLOCK_DIAMONDORE:
-                            self.gui.PutItemInInventory(Item(ITEM_DIAMOND, 1, color=(80,212,217), stackable=True))
-                        #XXX: 아이템이 인벤에 넣을 공간이 없으면 땅에 드랍하는 거 구현해야함
+                        self.blockHP = hp
+                        self.maxBlockHP = hp
 
-                if items:
-                    for item in items:
-                        if item == ITEM_TORCH:
-                            self.gui.PutItemInInventory(Item(item, 1, color=(255,255,255), stackable=True))
-                        if item == ITEM_CHEST:
-                            self.gui.PutItemInInventory(Item(item, 1, color=(255,255,255), stackable=False, inv=self.gui.boxes[(x,y,z)]))
-                            del self.gui.boxes[(x,y,z)]
+                if self.blockHP <= 0 and self.lastBlock:
+                    if self.lastBlock:
+                        x,y,z,f,b = self.lastBlock
+                        hp = 100.0
+                        if b == BLOCK_COALORE:
+                            hp = 120.0
+                        if b == BLOCK_IRONORE:
+                            hp = 150.0
+                        if b == BLOCK_SILVERORE:
+                            hp = 180.0
+                        if b == BLOCK_GOLDORE:
+                            hp = 250.0
+                        if b == BLOCK_DIAMONDORE:
+                            hp = 500.0
 
-        self.prevDig = t
+                        self.blockHP = hp
+                        self.maxBlockHP = hp
+
+                    x,y,z,f,b = self.lastBlock
+                    block, items = self.chunks.DigBlock(x,y,z)
+                    if block:
+                        if b in [BLOCK_GRASS, BLOCK_DIRT, BLOCK_SAND, BLOCK_LEAVES, BLOCK_GRAVEL]:
+                            self.sounds["ShovelDone"].play()
+                        else:
+                            self.sounds["DigDone"].play()
+
+                        if block == BLOCK_SPAWNER:
+                            del self.gui.spawns[(x,y,z)]
+                        if block == BLOCK_CODE:
+                            del self.gui.codes[(x,y,z)]
+                        if block == BLOCK_GRASS:
+                            block = BLOCK_DIRT
+                        if block not in [BLOCK_CHEST, BLOCK_IRONORE, BLOCK_COALORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE]:
+                            self.SpawnBlockItems(x,y,z, block)
+                        else:
+                            if block == BLOCK_IRONORE:
+                                self.gui.PutItemInInventory(Item(ITEM_IRON, 1, color=(107,107,107), stackable=True))
+                            if block == BLOCK_COALORE:
+                                self.gui.PutItemInInventory(Item(ITEM_COAL, 1, color=(60,60,60), stackable=True))
+                            if block == BLOCK_SILVERORE:
+                                self.gui.PutItemInInventory(Item(ITEM_SILVER, 1, color=(201,201,201), stackable=True))
+                            if block == BLOCK_GOLDORE:
+                                self.gui.PutItemInInventory(Item(ITEM_GOLD, 1, color=(207,207,101), stackable=True))
+                            if block == BLOCK_DIAMONDORE:
+                                self.gui.PutItemInInventory(Item(ITEM_DIAMOND, 1, color=(80,212,217), stackable=True))
+                            #XXX: 아이템이 인벤에 넣을 공간이 없으면 땅에 드랍하는 거 구현해야함
+
+                    if items:
+                        for item in items:
+                            if item == ITEM_TORCH:
+                                self.gui.PutItemInInventory(Item(item, 1, color=(255,255,255), stackable=True))
+                            if item == ITEM_CHEST:
+                                self.gui.PutItemInInventory(Item(item, 1, color=(255,255,255), stackable=False, inv=self.gui.boxes[(x,y,z)]))
+                                del self.gui.boxes[(x,y,z)]
+                self.prevDig = t
+
 
     def SpawnBlockItems(self, x,y,z, block):
         self.blockItems += [(x+0.5,y+0.5,z+0.5, block, pygame.time.get_ticks(), None)]
@@ -5241,13 +5307,6 @@ class DigDigApp(object):
 
 
 
-        if t - self.soundPrevTime > self.soundDelay:
-            if self.digging:
-                x,y,z,f,b = self.lastBlock
-                if b in [BLOCK_GRASS, BLOCK_DIRT, BLOCK_SAND, BLOCK_LEAVES, BLOCK_GRAVEL]:
-                    self.sounds["Shovel"].play()
-                else:
-                    self.sounds["Dig"].play()
         if True or t - self.renderPrevTime > self.renderDelay:
             self.DoMove(t,m,k)
             self.FallOrJump(t)
