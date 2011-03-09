@@ -739,6 +739,9 @@ TM_EQ = GenId()
 TM_BOX = GenId()
 TM_CODE = GenId()
 TM_SPAWN = GenId()
+TM_CHAR = GenId()
+TM_SKILL = GenId()
+TM_ENCHANT = GenId()
 
 
 class MakeTool(object):
@@ -868,6 +871,14 @@ class DigDigGUI(object):
         # returns: 아이템, 체력깎는 정도, 못파는 광물목록
         self.makes[24] = MakeTool(u"Stone axe", u"Used to cut trees", (47,43,43), [(BLOCK_COBBLESTONE, 5, TYPE_BLOCK)], (ITEM_AXE, [30], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[25] = MakeTool(u"Stone shovel", u"Digs up dirts or sands", (47,43,43), [(BLOCK_COBBLESTONE, 5, TYPE_BLOCK)], (ITEM_SHOVEL, [30,], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[26] = MakeTool(u"Iron pickaxe", u"Used to pick stones, ores", (107,107,107), [(ITEM_IRON, 5, TYPE_ITEM, (107,107,107))], (ITEM_PICKAXE, [30,], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        # returns: 아이템, 체력깎는 정도, 못파는 광물목록
+        self.makes[27] = MakeTool(u"Iron axe", u"Used to cut trees", (107,107,107), [(ITEM_IRON, 5, TYPE_ITEM, (107,107,107))], (ITEM_AXE, [30], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[28] = MakeTool(u"Iron shovel", u"Digs up dirts or sands", (107,107,107), [(ITEM_IRON, 5, TYPE_ITEM, (107,107,107))], (ITEM_SHOVEL, [30,], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[32] = MakeTool(u"Diamond pickaxe", u"Used to pick stones, ores", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_PICKAXE, [30,], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        # returns: 아이템, 체력깎는 정도, 못파는 광물목록
+        self.makes[33] = MakeTool(u"Diamond axe", u"Used to cut trees", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_AXE, [30], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[34] = MakeTool(u"Diamond shovel", u"Digs up dirts or sands", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_SHOVEL, [30,], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[10] = MakeTool(u"Torch(Charcoal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_CHARCOAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[11] = MakeTool(u"Torch(Coal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[12] = MakeTool(u"Chest", u"Can hold items and blocks", (255,255,255), [(BLOCK_WOOD, 8, TYPE_BLOCK, (255,255,255))], (ITEM_CHEST, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
@@ -5469,6 +5480,10 @@ class DigDigApp(object):
             self.guiMode = not self.guiMode
             self.gui.toolMode = TM_TOOL
             self.gui.ShowInventory(self.guiMode)
+        elif k.pressedKey == K_c and not self.guiMode:
+            self.guiMode = not self.guiMode
+            self.gui.toolMode = TM_CHAR
+            self.gui.ShowInventory(self.guiMode)
         elif k.pressedKey == K_e and not self.guiMode:
             self.guiMode = not self.guiMode
             self.gui.toolMode = TM_EQ
@@ -6182,4 +6197,7 @@ NPC인터랙션 메뉴를 만들고 상점등을 만들고
 일단 장비를 입자
 
 아이템 제작에 포지와 콜이나 챠콜이 필요하도록 하는 것도 필요하지만서도..
+---------------
+이제 인챈팅 테이블을 만들어서 아이템 인챈팅을 거기서 하도록 한다?
+아니면... 인챈트 메뉴를 E버튼에 넣어 만들까.
 """
