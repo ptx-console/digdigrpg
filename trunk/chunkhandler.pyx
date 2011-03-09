@@ -3208,7 +3208,7 @@ cdef class Chunks:
                     for i in range(TEST_SIZE):
                         ox,oy,oz = pos[i][0], 0, pos[i][2]
                         oy = 0
-                        self.GenQuads(self.tV, self.tT, self.tC, self.tIdx, self.tLen, self.nsV, self.nsT, self.nsC, self.nsIdx, self.nsLen, self.aV, self.aT, self.aC, self.aIdx, self.aLen, self.iV, self.iT, self.iC, self.iIdx, self.iLen, octrees[i], octrees[i], outchunks[i], octrees, outchunks, pos, 1, frustumC, 0,0,0, ox,0,oz, viewpoint[0],viewpoint[1],viewpoint[2], self.lastX, self.lastY, self.lastZ, self.updateCoords, -1, 0.0, 1.0, 0.0)
+                        self.GenQuads(self.tV, self.tT, self.tC, self.tIdx, self.tLen, self.nsV, self.nsT, self.nsC, self.nsIdx, self.nsLen, self.aV, self.aT, self.aC, self.aIdx, self.aLen, self.iV, self.iT, self.iC, self.iIdx, self.iLen, octrees[i], octrees[i], outchunks[i], octrees, outchunks, pos, 1, frustumC, 0,0,0, ox,0,oz, viewpoint[0],viewpoint[1],viewpoint[2], self.lastX, self.lastY, self.lastZ, self.updateCoords, -1, 0.0, -1.0, 0.0)
         
 
         if True:
