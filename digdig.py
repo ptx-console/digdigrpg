@@ -656,6 +656,22 @@ ITEM_IRON = GenId()
 ITEM_DIAMOND = GenId()
 ITEM_STAIR = GenId()
 ITEM_WOODENSTAIR = GenId()
+ITEM_SWORD = GenId()
+ITEM_SPEAR = GenId()
+ITEM_MACE = GenId()
+ITEM_KNUCKLE = GenId()
+ITEM_SHIELD = GenId()
+ITEM_GLOVES = GenId()
+ITEM_BOOTS = GenId()
+ITEM_GOLDRING = GenId()
+ITEM_GOLDNECLACE = GenId()
+ITEM_HELM = GenId()
+ITEM_ARMOR = GenId()
+ITEM_SILVERRING = GenId()
+ITEM_SILVERNECLACE = GenId()
+ITEM_DIAMONDRING = GenId()
+ITEM_DIAMONDNECLACE = GenId()
+ITEM_SCROLL = GenId()
 ITEM_NONE = 0
 TOOL_TEX_COORDS = [
         0,0,
@@ -672,6 +688,22 @@ TOOL_TEX_COORDS = [
         6,0,
         4,1,
         4,1,
+        0,1,
+        0,2,
+        0,3,
+        0,4,
+        0,5,
+        1,1,
+        1,2,
+        1,3,
+        1,4,
+        1,5,
+        2,1,
+        1,3,
+        1,4,
+        2,2,
+        2,3,
+        0,6,
         ]
 
 TYPE_BLOCK = "Block"
@@ -807,14 +839,14 @@ class DigDigGUI(object):
 
         
         eqTexts = [
-        u"무기",
-        u"방패",
-        u"모자",
-        u"몸통",
-        u"장갑",
-        u"신발",
-        u"목걸이",
-        u"반지",]
+        u"RightHand",
+        u"LeftHand",
+        u"Head",
+        u"Body",
+        u"Gloves",
+        u"Boots",
+        u"Necklace",
+        u"Ring",]
         self.eqTexts = []
         for t in eqTexts:
             self.eqTexts += [self.textRendererSmall.NewTextObject(t, (0,0,0))]
@@ -826,7 +858,7 @@ class DigDigGUI(object):
         self.makes[1] = MakeTool(u"Stick", u"Multi purpose stick", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_STICK, [], [], 4, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[2] = MakeTool(u"Charcoal", u"A charcoal", (60,60,60), [(BLOCK_LOG, 1, TYPE_BLOCK)], (ITEM_CHARCOAL, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[3] = MakeTool(u"Glass", u"A glass", (255,255,255), [(BLOCK_SAND, 1, TYPE_BLOCK)], (BLOCK_GLASS, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
-        self.makes[4] = MakeTool(u"Stair", u"A stair", (30,30,30), [(BLOCK_STONE, 1, TYPE_BLOCK)], (ITEM_STAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[4] = MakeTool(u"Stair", u"A stair", (30,30,30), [(BLOCK_COBBLESTONE, 1, TYPE_BLOCK)], (ITEM_STAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[5] = MakeTool(u"Wooden stair", u"A wooden stair", (116,100,46), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_WOODENSTAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[20] = MakeTool(u"Wooden pickaxe", u"Used to pick stones, ores", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_PICKAXE, [30,], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         # returns: 아이템, 체력깎는 정도, 못파는 광물목록
@@ -843,6 +875,22 @@ class DigDigGUI(object):
         #self.makes[32] = MakeTool(u"전기선(일자)", u"코드와 기계를\n연결합니다.", (255,255,255), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (ITEM_LINE, [], [], 10, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         #self.makes[33] = MakeTool(u"전기선(기역자)", u"코드와 기계를\n연결합니다.", (255,255,255), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (ITEM_LINEL, [], [], 10, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[31] = MakeTool(u"Spawner", u"Spawning spot\n- Machine -", (255,255,255), [(ITEM_GOLD, 4, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 4, TYPE_ITEM, (201,201,201))], (BLOCK_SPAWNER, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes[40] = MakeTool(u"Sword", u"A sword\n- Weapon -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107))], (ITEM_SWORD, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[41] = MakeTool(u"Spear", u"A spear\n- Two Handed Weapon -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107))], (ITEM_SPEAR, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[42] = MakeTool(u"Mace", u"A mace\n- Weapon -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107))], (ITEM_MACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[43] = MakeTool(u"Brass Knuckle", u"A brass knuckle\n- Weapon -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107))], (ITEM_KNUCKLE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[44] = MakeTool(u"Shield", u"A shield\n- Shield -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107))], (ITEM_SHIELD, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[45] = MakeTool(u"Helm", u"A Helm\n- Helm -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107))], (ITEM_HELM, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[46] = MakeTool(u"Armor", u"A body armor\n- Armor -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107))], (ITEM_ARMOR, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[47] = MakeTool(u"Gloves", u"A pair of gloves\n- Gloves -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107))], (ITEM_GLOVES, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[48] = MakeTool(u"Boots", u"A pair of boots\n- Boots -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107))], (ITEM_BOOTS, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[50] = MakeTool(u"Silver Ring", u"A silver ring\n- Ring -", (201,201,201), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (ITEM_SILVERRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[51] = MakeTool(u"Silver Necklace", u"A silver necklace\n- Necklace -", (201,201,201), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (ITEM_SILVERNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[52] = MakeTool(u"Gold Ring", u"A gold ring\n- Ring -", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101))], (ITEM_GOLDRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[53] = MakeTool(u"Gold Necklace", u"A gold necklace\n- Necklace -", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101))], (ITEM_GOLDNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[54] = MakeTool(u"Diamond Ring", u"A diamond ring\n- Ring -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217))], (ITEM_DIAMONDRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[55] = MakeTool(u"Diamond Necklace", u"A diamond necklace\n- Necklace -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217))], (ITEM_DIAMONDNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[56] = MakeTool(u"Enchant Scroll", u"Used to create or\nimprove an item\n(Use enchant menu\nto create or improve)", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK, (255,255,255))], (ITEM_SCROLL, [], [], 64, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.recipeTextID = self.textRenderer.NewTextObject(u"Recipe:", (0,0,0))
 
         self.invSlotPos = []
@@ -1386,7 +1434,7 @@ class DigDigGUI(object):
                 idx += 1
             for pos in self.eqSlotPos[4:]:
                 x,y = pos
-                x -= 42
+                x -= 56
                 y += 3
                 self.textRendererSmall.RenderText(self.eqTexts[idx], (x,y))
                 idx += 1
@@ -6130,4 +6178,8 @@ GenVerts에다가 태양의 Dir을 전해주면 그걸 GenQuads에서 써서한�
 NPC인터랙션 메뉴를 만들고 상점등을 만들고
 캐릭터 창을 만들고 스킬같은걸 고르게 하고
 스킬을 사용하고 전투를 구현하고 뭐 그런걸 한다. 코드로 치면 게임의 내용과는 관계가 좀 없음
+
+일단 장비를 입자
+
+아이템 제작에 포지와 콜이나 챠콜이 필요하도록 하는 것도 필요하지만서도..
 """
