@@ -910,10 +910,10 @@ class DigDigGUI(object):
         # returns: 아이템, 체력깎는 정도, 못파는 광물목록
         self.makes[27] = MakeTool(u"Iron axe", u"Used to cut trees", (107,107,107), [(ITEM_IRON, 5, TYPE_ITEM, (107,107,107))], (ITEM_AXE, [40,5], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[28] = MakeTool(u"Iron shovel", u"Digs up dirts or sands", (107,107,107), [(ITEM_IRON, 5, TYPE_ITEM, (107,107,107))], (ITEM_SHOVEL, [40,5], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[32] = MakeTool(u"Diamond pickaxe", u"Used to pick stones, ores", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_PICKAXE, [60,1], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[32] = MakeTool(u"Diamond pickaxe", u"Used to pick stones, ores", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_PICKAXE, [100,1], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         # returns: 아이템, 체력깎는 정도, 못파는 광물목록
-        self.makes[33] = MakeTool(u"Diamond axe", u"Used to cut trees", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_AXE, [60,1], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[34] = MakeTool(u"Diamond shovel", u"Digs up dirts or sands", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_SHOVEL, [60,1], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[33] = MakeTool(u"Diamond axe", u"Used to cut trees", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_AXE, [100,1], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[34] = MakeTool(u"Diamond shovel", u"Digs up dirts or sands", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_SHOVEL, [100,1], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[10] = MakeTool(u"Torch(Charcoal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_CHARCOAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[11] = MakeTool(u"Torch(Coal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[12] = MakeTool(u"Chest", u"Can hold items and blocks", (255,255,255), [(BLOCK_WOOD, 8, TYPE_BLOCK)], (ITEM_CHEST, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
@@ -5295,17 +5295,22 @@ class DigDigApp(object):
                     tool = self.gui.qbar[self.gui.selectedItem]
                     if tool and tool.name == TYPE_ITEM and tool.type_ == ITEM_PICKAXE and block not in [BLOCK_GRASS, BLOCK_DIRT, BLOCK_SAND, BLOCK_LEAVES, BLOCK_GRAVEL]+[BLOCK_LOG, BLOCK_WOOD]:
                         self.blockHP -= (float(t - self.prevDig)*tool.stats[0]/100.0)
-                        tool.count -= int(float(t-self.prevDig)*tool.stats[1]/100.0)
+                        tool.count -= int(float(t-self.prevDig)*tool.stats[1]/50.0)
                         if tool.count <= 0:
                             self.gui.qbar[self.gui.selectedItem] = ITEM_NONE
                     elif tool and tool.name == TYPE_ITEM and tool.type_ == ITEM_AXE and block in [BLOCK_LOG, BLOCK_WOOD, BLOCK_LEAVES]:
                         self.blockHP -= (float(t - self.prevDig)*tool.stats[0]/100.0)
-                        tool.count -= int(float(t-self.prevDig)*tool.stats[1]/100.0)
+                        tool.count -= int(float(t-self.prevDig)*tool.stats[1]/50.0)
                         if tool.count <= 0:
                             self.gui.qbar[self.gui.selectedItem] = ITEM_NONE
                     elif tool and tool.name == TYPE_ITEM and tool.type_ == ITEM_SHOVEL and block in [BLOCK_GRASS, BLOCK_DIRT, BLOCK_SAND, BLOCK_GRAVEL]:
                         self.blockHP -= (float(t - self.prevDig)*tool.stats[0]/100.0)
-                        tool.count -= int(float(t-self.prevDig)*tool.stats[1]/100.0)
+                        tool.count -= int(float(t-self.prevDig)*tool.stats[1]/50.0)
+                        if tool.count <= 0:
+                            self.gui.qbar[self.gui.selectedItem] = ITEM_NONE
+                    elif tool and tool.name == TYPE_ITEM and tool.type_ in [ITEM_SHOVEL, ITEM_AXE, ITEM_PICKAXE]:
+                        self.blockHP -= (float(t - self.prevDig)*tool.stats[0]*0.5/100.0)
+                        tool.count -= int(float(t-self.prevDig)*tool.stats[1]/50.0)
                         if tool.count <= 0:
                             self.gui.qbar[self.gui.selectedItem] = ITEM_NONE
                     else:

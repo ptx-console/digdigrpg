@@ -4228,6 +4228,10 @@ int CheckWalkable(char block)
 }
 int CheckCollide(float x, float y, float z, float vx, float vy, float vz, float bx, float by, float bz, float ydiff)
 {
+    if(by > 1.0f)
+    {
+        by = 1.0f;
+    }
     return BoxBoxCollide(x-0.19f,y-0.19f,z-0.19f,x+1.19f,y+1.19f,z+1.19f,vx-(float)bx/2.0f, vy+0.001, vz-(float)bz/2.0f, vx+(float)bx/2.0f, vy+by-0.001, vz+(float)bz/2.0f);
 }
 int InWater(float x, float y, float z, float vx, float vy, float vz)
