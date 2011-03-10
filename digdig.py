@@ -6579,12 +6579,12 @@ begin안에 드어가니까
 Intro 
 Long time ago there was a dragon named Ashu Ishtagal and he made a sword by using his magic and sword's name was Gajyo-wa.
 Using that sword, a guy named Nerd K. defeated the evil magician 8th grader Jungebyung.
-But few years after Nerd K.'s death, a trader named Dapalah came to possess the sword.
+But few years after the Nerd K.'s death, a trader named Dapalah came to possess the sword.
 
 So, I want you to bring me 10 cobble stone blocks.
 
 
-[OK] -- bring the cobble stone blocks -- repeat indefinately
+[OK] -- user brings cobble stone blocks -- give 1 dirt block for reward, repeat indefinately
 [What does it have to do with 10 cobble stone blocks and what did Dapalah do with the sword?] ---
     OK. About the sword. Long time ago there was ....(repeat of first sentence)
     So, I want you to bring me 10 cobble stone blocks.
