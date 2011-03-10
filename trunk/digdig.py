@@ -1898,7 +1898,7 @@ class DigDigGUI(object):
                         textDesc = [u"Enchant"]
                     return textDesc
                 def GenItemParams(item):
-                    textParams = str(item.element.params).split(',')
+                    textParams = str(item.element.params).replace("{","").replace("}","").split(', ')
                     return textParams
 
                 cleared = False
@@ -1950,6 +1950,7 @@ class DigDigGUI(object):
                             y += 20
                     except:
                         pass
+                    y += 10
 
                     textDesc = GenItemDesc(item)
                     paramText = GenItemParams(item)
@@ -1964,7 +1965,7 @@ class DigDigGUI(object):
                             y += 15
                     except:
                         pass
-                    y += 20
+                    y += 10
 
 
 
@@ -2008,10 +2009,11 @@ class DigDigGUI(object):
                     for textid in tool.textidName:
                         self.textRenderer.RenderText(textid, (10, 25+y))
                         y += 20
+                    y += 10
                     for textid in tool.textidDesc:
                         self.textRendererSmall.RenderText(textid, (10, 25+y))
                         y += 15
-                    y += 20
+                    y += 10
                     self.textRenderer.RenderText(self.recipeTextID, (10, 25+y))
                     y += 20+25
 
