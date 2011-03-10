@@ -478,6 +478,7 @@ class DynamicTextRenderer(object):
                     y += h
                     needLen -= 512
         self.texts += [[surfid, newtextposList, pos]]
+        return len(self.texts)-1
 
     def Clear(self): # 걍 무조건 1초에 4번 불린다. 아니면 3번 불리던가.
         self.texts = []
@@ -488,13 +489,15 @@ class DynamicTextRenderer(object):
             surfid, poslist, pos = text
             self.RenderText(textid, pos)
             textid += 1
+    def RenderOne(self, textid, pos):
+        self.RenderText(textid, pos)
     def RegenTex(self, t,m,k):
         if AppSt.regenTex:
             for idx in range(len(self.surfs)):
                 self.surfs[idx][1] = glGenTexturesDebug(1)
                 self.surfs[idx][2] = True
     def RenderText(self, textid, pos):
-        surfid, posList, pos = self.texts[textid]
+        surfid, posList, pos_ = self.texts[textid]
         surf, texid, updated = self.surfs[surfid]
         glEnable(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, texid)
@@ -672,7 +675,9 @@ ITEM_SILVERNECLACE = GenId()
 ITEM_DIAMONDRING = GenId()
 ITEM_DIAMONDNECLACE = GenId()
 ITEM_SCROLL = GenId()
-ITEM_ENCHANTSCROLL = GenId()
+ITEM_SENCHANTSCROLL = GenId()
+ITEM_GENCHANTSCROLL = GenId()
+ITEM_DENCHANTSCROLL = GenId()
 ITEM_NONE = 0
 TOOL_TEX_COORDS = [
         0,0,
@@ -705,6 +710,8 @@ TOOL_TEX_COORDS = [
         2,2,
         2,3,
         0,6,
+        0,7,
+        0,7,
         0,7,
         ]
 
@@ -786,11 +793,14 @@ class DigDigGUI(object):
         self.textRenderer = StaticTextRenderer(self.font)
         self.textRendererSmall = StaticTextRenderer(self.font2)
         self.textRendererArea = DynamicTextRenderer(self.font3)
+        self.textRendererItemTitle = DynamicTextRenderer(self.font)
+        self.textRendererItemSmall = DynamicTextRenderer(self.font2)
         #self.testText = TextArea(0,30,640,400, 16, 16)
         self.testFile = FileSelector("./scripts")
         self.testEdit = SpawnerGUI((SW-400)/2,(SH-50)/2,400,50,14)
         #self.testText.SetText(u"asdhoihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhrrㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱrrㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ가가가가\nadsasd")
         self.prevAreaT = 0
+        self.prevDescT = 0
         self.areaDelay = 500
         self.numbers = [self.textRenderer.NewTextObject(`i`, (255,255,255), True, (0,0,0)) for i in range(10)]
 
@@ -868,7 +878,7 @@ class DigDigGUI(object):
         self.makes[4] = MakeTool(u"Stone", u"A stone block", (255,255,255), [(BLOCK_COBBLESTONE, 1, TYPE_BLOCK)], (BLOCK_STONE, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         self.makes[5] = MakeTool(u"Brick", u"A brick block", (255,255,255), [(BLOCK_COBBLESTONE, 1, TYPE_BLOCK)], (BLOCK_BRICK, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         self.makes[6] = MakeTool(u"Wall", u"A wall block", (255,255,255), [(BLOCK_COBBLESTONE, 1, TYPE_BLOCK)], (BLOCK_WALL, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
-        self.makes[7] = MakeTool(u"TNT", u"Kaboom! - Machine -", (255,255,255), [(BLOCK_GRAVEL, 1, TYPE_BLOCK)], (BLOCK_TNT, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes[7] = MakeTool(u"TNT", u"Kaboom!\n- Machine -", (255,255,255), [(BLOCK_GRAVEL, 1, TYPE_BLOCK)], (BLOCK_TNT, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         self.makes[13] = MakeTool(u"Wooden stair", u"A wooden stair", (116,100,46), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_WOODENSTAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[14] = MakeTool(u"Stair", u"A stair", (30,30,30), [(BLOCK_COBBLESTONE, 1, TYPE_BLOCK)], (ITEM_STAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[20] = MakeTool(u"Wooden pickaxe", u"Used to pick stones, ores", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_PICKAXE, [15,20], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
@@ -910,9 +920,9 @@ class DigDigGUI(object):
         self.makes[54] = MakeTool(u"Diamond Ring", u"A diamond ring\n- Ring -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217))], (ITEM_DIAMONDRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[55] = MakeTool(u"Diamond Necklace", u"A diamond necklace\n- Necklace -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217))], (ITEM_DIAMONDNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[56] = MakeTool(u"Blank Scroll", u"Used to make enchant scrolls", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_SCROLL, [], [], 64, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[57] = MakeTool(u"Silver Enchant Scroll", u"Used to enchant an item\n(Use enchant menu to use)", (255,255,255), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_ENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[58] = MakeTool(u"Gold Enchant Scroll", u"Used to enchant an item\n(Use enchant menu to use)", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_ENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[59] = MakeTool(u"Diamond\nEnchant Scroll", u"Used to enchant an item\n(Use enchant menu to use)", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_ENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[57] = MakeTool(u"Silver Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (255,255,255), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_SENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[58] = MakeTool(u"Gold Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_GENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[59] = MakeTool(u"Diamond\nEnchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_DENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.recipeTextID = self.textRenderer.NewTextObject(u"Recipe:", (0,0,0))
 
         self.invSlotPos = []
@@ -1154,7 +1164,13 @@ class DigDigGUI(object):
                 if not rmb:
                     Swap()
                 else:
-                    if self.draggingItem.type_ == cont[y*10+x].type_ and self.draggingItem.name == cont[y*10+x].name and self.draggingItem.stackable:
+                    if self.draggingItem.type_ in [ITEM_SENCHANTSCROLL, ITEM_GENCHANTSCROLL, ITEM_DENCHANTSCROLL]:
+                        self.ApplyEnchantScroll(cont[y*10+x], self.draggingItem)
+                        self.dragging = False
+                        self.draggingItem = None
+                        self.dragPos = None
+                        self.dragCont = None
+                    elif self.draggingItem.type_ == cont[y*10+x].type_ and self.draggingItem.name == cont[y*10+x].name and self.draggingItem.stackable:
                         if self.draggingItem.count > 1:
                             half = self.draggingItem.count / 2
                             self.draggingItem.count -= half
@@ -1217,10 +1233,18 @@ class DigDigGUI(object):
             self.OnDown(t,m,k,True)
 
 
+    def ApplyEnchantScroll(self, item, scroll):
+        if not item.element:
+            item.element = FightingElements("test", (0,0,0), {"atk": 5})
+        item.element.ApplyEnchantScroll(scroll)
     def DoEquip(self, idx):
         # dragging이 있으면 그걸 입을수있는지 검사
         # 없으면 언이큅
+        """
+        if self.draggingItem.type_ in [ITEM_SENCHANTSCROLL, ITEM_GENCHANTSCROLL, ITEM_DENCHANTSCROLL]:
+            self.ApplyEnchantScroll(self.eqs[idx], self.draggingItem)
         print idx
+        """
         pass
     def OnDown(self, t, m, k, rmb=False):
         if self.invShown:
@@ -1297,7 +1321,8 @@ class DigDigGUI(object):
                     self.DoEquip(foundIdx)
 
 
-    def GenEntity(self):
+    def GenElement(self, gentype):
+        return FightingElements("test", (0,0,0), {"atk": 5})
         # 음......... 어떤 마법 스킬에 따라서 더 좋은 결과가 나온다.
         # 몬스터도 인챈트 스크롤을 드랍한다. 아이템 대신!
         pass
@@ -1308,11 +1333,11 @@ class DigDigGUI(object):
         if name == TYPE_BLOCK:
             returneditem = Block(type_, count)
         elif name == TYPE_ITEM:
-            if type_ == ITEM_ENCHANTSCROLL:
+            if type_ in [ITEM_SENCHANTSCROLL, ITEM_GENCHANTSCROLL, ITEM_DENCHANTSCROLL]:
 
                 #인챈트 스크롤 복사하는 아이템이 고급 몬스터에게서 떨어진다. XXX:
-                entity = self.GenEntity()
-                returneditem = Item(type_, 1, color=tool.color, entity=entity)
+                element = self.GenElement(type_)
+                returneditem = Item(type_, 1, color=tool.color, element=element)
             else:
                 if count == 0:
                     returneditem = Item(type_, 999, color=tool.color, stats=stats)
@@ -1417,8 +1442,8 @@ class DigDigGUI(object):
 
     def Render(self, t, m, k):
         if t - self.prevAreaT >= self.areaDelay:
-            self.prevAreaT = t
             if self.invShown:
+                self.prevAreaT = t
                 self.textRendererArea.Clear()
                 #self.testText.Update(self.textRendererArea)
                 if self.toolMode == TM_CODE:
@@ -1830,8 +1855,32 @@ class DigDigGUI(object):
 
                         idx += 1
 
+                def GenItemName(item):
+                    textTitle = ["Item"]
+                    if item.type_ == ITEM_SENCHANTSCROLL:
+                        textTitle = [u"Silver Enchant Scroll"]
+                    # 여기서 text width에 맞게 적당히 split을 하고
+                    # 접두사 접미사를 붙인다.
+                    return textTitle
+                def GenItemDesc(item):
+                    textDesc = ["Desc"]
+                    if item.type_ == ITEM_SENCHANTSCROLL:
+                        textDesc = [u"Enchant"]
+                    return textDesc
+                def GenItemParams(item):
+                    textParams = [str(item.element.params)]
+                    return textParams
+
+                cleared = False
+                if t - self.prevDescT >= self.areaDelay:
+                    self.prevDescT = t
+                    self.textRendererItemTitle.Clear()
+                    self.textRendererItemSmall.Clear()
+                    cleared = True
+                
+
                 def RenderItemDesc(item):
-                    if not item.entity:
+                    if not item.element:
                         return
                     x,y,w,h = 5, 20, 165, 380
                     glDisable(GL_TEXTURE_2D)
@@ -1861,77 +1910,40 @@ class DigDigGUI(object):
                     glEnable(GL_TEXTURE_2D)
 
                     y = 0
-                    tool = self.makes[self.selectedMakeTool]
-                    for textid in tool.textidName:
-                        self.textRenderer.RenderText(textid, (10, 25+y))
-                        y += 20
+                    textTitle = GenItemName(item)
+                    if not item.textTitleIdx or cleared:
+                        item.textTitleIdx = [self.textRendererItemTitle.NewTextObject(text, (0,0,0), (10, 25+y)) for text in textTitle]
+
+                    try:
+                        for idx in item.textTitleIdx:
+                            self.textRendererItemTitle.RenderOne(idx, (10, 25+y))
+                            y += 20
+                    except:
+                        pass
+
+                    textDesc = GenItemDesc(item)
+                    paramText = GenItemParams(item)
+                    if not item.textDescIdx or cleared:
+                        item.textDescIdx = [self.textRendererItemSmall.NewTextObject(text, (0,0,0), (10, 25+y)) for text in textDesc]
+                        item.textDescIdx += [self.textRendererItemSmall.NewTextObject(text, (0,0,0), (10, 25+y)) for text in paramText]
+
+
+                    try:
+                        for textid in item.textDescIdx:
+                            self.textRendererItemSmall.RenderOne(textid, (10, 25+y))
+                            y += 15
+                    except:
+                        pass
                     y += 20
-                    for textid in tool.textidDesc:
-                        self.textRendererSmall.RenderText(textid, (10, 25+y))
-                        y += 15
-                    y += 20
-                    self.textRenderer.RenderText(self.recipeTextID, (10, 25+y))
-                    y += 20+25
 
-                    x = 10
-                    for need in tool.needs:
-                        if len(need) == 3:
-                            item, count, textype = need
-                            color=(255,255,255)
-                        elif len(need) == 4:
-                            item, count, textype, color = need
-                        if textype == TYPE_BLOCK:
-                            glBindTexture(GL_TEXTURE_2D, AppSt.tex)
-                            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-                            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-                            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE)
-                            texupx = (BLOCK_TEX_COORDS[item*2*3 + 0]*32.0) / 512.0
-                            texupy = (BLOCK_TEX_COORDS[item*2*3 + 1]*32.0) / 512.0
-                            glBegin(GL_QUADS)
-                            glTexCoord2f(texupx, texupy+float(32)/512.0)
-                            glVertex3f(float(x), -float(y+30), 100.0)
-
-                            glTexCoord2f(texupx+float(32)/512.0, texupy+float(32)/512.0)
-                            glVertex3f(float(x+30), -float(y+30), 100.0)
-
-                            glTexCoord2f(texupx+float(32)/512.0, texupy)
-                            glVertex3f(float(x+30), -float(y), 100.0)
-
-                            glTexCoord2f(texupx, texupy)
-                            glVertex3f(x, -float(y), 100.0)
-                            glEnd()
-                            self.RenderNumber(count, x, y)
-                        elif textype == TYPE_ITEM:
-                            glBindTexture(GL_TEXTURE_2D, self.tooltex)
-                            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-                            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-                            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
-                            texupx = (TOOL_TEX_COORDS[item*2 + 0]*30.0) / 512.0
-                            texupy = (TOOL_TEX_COORDS[item*2 + 1]*30.0) / 512.0
-                            glBegin(GL_QUADS)
-                            glColor3ub(*color)
-                            glTexCoord2f(texupx, texupy+float(30)/512.0)
-                            glVertex3f(float(x), -float(y+30), 100.0)
-
-                            glTexCoord2f(texupx+float(30)/512.0, texupy+float(30)/512.0)
-                            glVertex3f(float(x+30), -float(y+30), 100.0)
-
-                            glTexCoord2f(texupx+float(30)/512.0, texupy)
-                            glVertex3f(float(x+30), -float(y), 100.0)
-
-                            glTexCoord2f(texupx, texupy)
-                            glVertex3f(x, -float(y), 100.0)
-                            glEnd()
-                            self.RenderNumber(count, x, y)
-                        x += 35
-                        if x+35 >= 160:
-                            x = 10
-                            y += 35
 
 
                 if self.selectedContItem:
                     if self.selectedContItem.name == "Item":
                         RenderItemDesc(self.selectedContItem)
+
+
+
 
                 if self.selectedMakeTool != -1 and self.makes[self.selectedMakeTool]:
                     x,y,w,h = 5, 20, 165, 380
@@ -1966,7 +1978,6 @@ class DigDigGUI(object):
                     for textid in tool.textidName:
                         self.textRenderer.RenderText(textid, (10, 25+y))
                         y += 20
-                    y += 20
                     for textid in tool.textidDesc:
                         self.textRendererSmall.RenderText(textid, (10, 25+y))
                         y += 15
@@ -3329,7 +3340,7 @@ BLOCK_SPAWNER = GenId()
 
 
 class Item(object):
-    def __init__(self, type_, count, stackable = False, name="Item", color=None, inv=None, entity=None, stats=[]):
+    def __init__(self, type_, count, stackable = False, name="Item", color=None, inv=None, element=None, stats=[]):
         self.type_ = type_
         self.maxLen = 64
         self.stackable = stackable
@@ -3337,8 +3348,10 @@ class Item(object):
         self.count = count
         self.color = color
         self.optionalInventory = inv
-        self.entity = entity
+        self.element = element
         self.stats = stats
+        self.textTitleIdx = []
+        self.textDescIdx = []
 
 class Block(Item):
     def __init__(self, type_, count):
@@ -4195,8 +4208,7 @@ class MobGL(object):
         glPopMatrix()
 
 class FightingElements(object):
-    def __init__(self, id_, name, pos, params):
-        self.id = id_
+    def __init__(self, name, pos, params):
         self.name = name
         self.pos = pos
         self.params = params
@@ -4204,9 +4216,11 @@ class FightingElements(object):
     def OnAttack(self, attacker, defenders):
         # 이렇게 하지 말고 일단 전투를 구현한 다음에 하나하나 유틸라이즈하자.
         pass
+    def ApplyEnchantScroll(self, scroll):
+        print scroll.element.params
 
 class FightingEntity(object):
-    def __init__(self, id_, name, pos, params):
+    def __init__(self, name, pos, params):
         # 복잡하게 str이 체력을 올려주고 이러지 말고
         # str은 밀리무기 공격력
         # dex는 레인지 무기 공격력
@@ -4214,7 +4228,6 @@ class FightingEntity(object):
         # 여러가지를 둔다.
         # 연사력은 그냥 다 똑같음?
         # 멀티는 하지 말고 싱글만 만들자.
-        self.id = id_
         self.name = name
         self.pos = pos
         self.basehp = params["hp"]
@@ -4346,7 +4359,7 @@ class DigDigScript(object):
             (1*64.0/512.0, 1*64.0/512.0),
             (1*64.0/512.0, 1*64.0/512.0)]]
 
-        entity = FightingEntity(AppSt.GenId(), "Mob1", AppSt.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
+        entity = FightingEntity("Mob1", AppSt.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
         AppSt.mobs += [MobGL((pos[0]+0.5, pos[1]+3.0+0.5, pos[2]+0.5), [0.8,1.7,0.8], skin, MOB_SKELETON, (200,200,200,255), entity)]
 class ScriptLauncher(object):
     def __init__(self, coord):
@@ -5208,8 +5221,9 @@ class DigDigApp(object):
                             if item == ITEM_TORCH:
                                 self.gui.PutItemInInventory(Item(item, 1, color=(255,255,255), stackable=True))
                             if item == ITEM_CHEST:
-                                self.gui.PutItemInInventory(Item(item, 1, color=(255,255,255), stackable=False, inv=self.gui.boxes[(x,y,z)]))
-                                del self.gui.boxes[(x,y,z)]
+                                if (x,y,z) in self.gui.boxes:
+                                    self.gui.PutItemInInventory(Item(item, 1, color=(255,255,255), stackable=False, inv=self.gui.boxes[(x,y,z)]))
+                                    del self.gui.boxes[(x,y,z)]
                 self.prevDig = t
 
 
@@ -5779,7 +5793,7 @@ class DigDigApp(object):
         emgr.BindTick(self.RegenTex)
         self.font = pygame.font.Font("./fonts/NanumGothicBold.ttf", 19)
         self.id = 0
-        self.entity = FightingEntity(self.GenId(), "Player", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
+        self.entity = FightingEntity("Player", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
         # 스탯등을 올릴 때 처음엔 네 대 때려야 죽을게 3대 때리면 죽고 싸우다보면 2대 때리면 죽고 이런식으로
         # 좀 뭔가 레벨업 하듯이 할맛 나게
 
@@ -5856,10 +5870,10 @@ class DigDigApp(object):
 
 
         """
-        entity = FightingEntity(self.GenId(), "Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
+        entity = FightingEntity("Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         """
-        entity = FightingEntity(self.GenId(), "Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
+        entity = FightingEntity("Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
         self.mobs = []
         #self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         try:
@@ -6445,4 +6459,19 @@ NPC인터랙션 메뉴를 만들고 상점등을 만들고
 속성이 다른 인챈트 스크롤이 나오기로 하고, 플레이어의 어떤 특정한 속성에 비례해서 더 좋은 인챈트 스크롤이 나오도록 하자.
 아이템은 최대 5회 인챈트를 할 수 있고, 인챈트를 성공하면 스크롤의 속성이 ADD되며, 인챈트를 실패하면 스크롤이 날아간다는 슬픈 이야기가.
 --------------------------------
+이제 인챈트 메뉴를 E버튼에 다른 탭으로 선택할 수 있게 오른쪽 여백에다가 넣고
+아이템의 속성을 보게한다
+일단 그전에 공격력을 높여주는 엔티티를 만들자
+자 그전에 버텍스 애니메이션을 하자
+회전행렬, 트랜슬레이션행렬을 검색해서 수동으로 함
+또는 회전행렬을 포함한 디스플레이 리스트를 여러개 만들면 되겠군?
+용량이 쩔까나?-_-;
+몹당 한개의 디스플레이리스트가 아닌 몹 종류당 또는 모든 인간형몹당 디스플레이리스트 1개 이렇게 하면 되겠지.
+몹당 디스플레이 1개 하면 아 텍스쳐 코드만 바꿔주면 되겠구만 이라던가 그냥 몹 종류당 하나 하면 텍스쳐 코드도 안바꿔도 되고 텍스코드는
+begin안에 드어가니까
+음 걍 몹종류당 리스트세트 하나(애니 프레임당 리스트 1개)
+
+
+스크롤을 넣는 창과 아이템을 넣는 창이 있고, 넣고 버튼을 누르면 인챈트가 완료?
+그러지 말고, 인챈트 스크롤을 집고 그걸 무기 위에 오른쪽 버튼으로 드랍하면 인챈트가 적용? ㅇㅇ
 """
