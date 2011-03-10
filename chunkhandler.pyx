@@ -2792,6 +2792,19 @@ cdef class Chunks:
         if block in disallowedBlocks:
             return False
         return True
+    def IsBlockThere(self, x,y,z):
+        cdef int pos[9][3]
+        cdef Octree * octrees[9]
+        cdef Chunk * outchunks[9]
+        self.GetOctreesByViewpoint(pos, octrees, outchunks, x,y,z)
+        (a,b,c),(A,B,C) = self.GetLocalCoordAndOffset(x,y,z)
+        retBlock = 0
+        for ii in range(9):
+            if pos[ii][0] == A and pos[ii][2] == C:
+                if outchunks[ii].chunk[c*128*128+b*128+a]:
+                    return True
+        return False
+
     cdef int ModifyBlock(self, int pos[9][3], int x, int y, int z, Octree *octrees[9], Chunk *chunks[9], unsigned char block):
         # face -> 위 아래 왼쪽 오른쪽 앞 뒤 0 1 2 3 4 5
         # 즉... x,y,z에서 어느 좌표를 -1 +1 해줄것인가를 결정

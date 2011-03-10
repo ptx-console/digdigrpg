@@ -998,12 +998,12 @@ class DigDigGUI(object):
         self.PutItemInInventory(Item(ITEM_GOLD, 64, color = (207,207,101), stackable=True))
         self.PutItemInInventory(Item(ITEM_SILVER, 64, color = (201,201,201), stackable=True))
         self.PutItemInInventory(Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True))
-        """
         self.PutItemInInventory(Block(BLOCK_LOG, 64))
         self.PutItemInInventory(Item(ITEM_IRON, 64, color = (107,107,107), stackable=True))
         self.PutItemInInventory(Item(ITEM_GOLD, 64, color = (207,207,101), stackable=True))
         self.PutItemInInventory(Item(ITEM_SILVER, 64, color = (201,201,201), stackable=True))
         self.PutItemInInventory(Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True))
+        """
 
 
         # 여기서 텍스쳐를 생성한다.
@@ -4752,6 +4752,8 @@ class DigDigApp(object):
         dir_ = dir_.MultScalar(math.sqrt(2)*9.0)
         dir_ += pos
 
+        if self.IsStairThere(x,y,z):
+            return
         if not self.gui.invShown:
             if (x,y,z) in self.gui.boxes:
                 self.gui.selectedBox = self.gui.boxes[(x,y,z)]
@@ -4845,7 +4847,7 @@ class DigDigApp(object):
             elif item and item.name == "Item":
 
                 if item.type_ == ITEM_CHEST:
-                    dirV = self.cam1.GetDirV()
+                    dirV = self.cam1.GetDirV().Normalized()
                     dx,dz = dirV.x,-dirV.z
                     if abs(dx) > abs(dz):
                         if dx < 0:
@@ -4889,7 +4891,7 @@ class DigDigApp(object):
                     if item.count == 0:
                         self.gui.qbar[self.gui.selectedItem] = ITEM_NONE
                 if item.type_ in [ITEM_STAIR, ITEM_WOODENSTAIR]:
-                    dirV = self.cam1.GetDirV()
+                    dirV = self.cam1.GetDirV().Normalized()
                     dx,dz = dirV.x,-dirV.z
                     if abs(dx) > abs(dz):
                         if dx < 0:
@@ -4918,6 +4920,8 @@ class DigDigApp(object):
                     xx = xyz[0]-(xyz[0]%32)
                     yy = xyz[1]-(xyz[1]%32)
                     zz = xyz[2]-(xyz[2]%32)
+                    if self.chunks.IsBlockThere(*xyz):
+                        return
                     if (xx,yy,zz) not in self.stairs:
                         self.stairs[(xx,yy,zz)] = []
                     if xyz+(facing,ITEM_STAIR) in self.stairs[(xx,yy,zz)] or xyz+(facing,ITEM_WOODENSTAIR) in self.stairs[(xx,yy,zz)]:
@@ -5198,8 +5202,50 @@ class DigDigApp(object):
         # XXX 여기서 마법 또는 상점 인터랙션?
         pass
 
+    def IsStairThere(self, x,y,z):
+        x1 = x-(x%32)
+        y1 = y-(y%32)
+        z1 = z-(z%32)
+        if (x1,y1,z1) in self.stairs:
+            for stair in self.stairs[(x1,y1,z1)]:
+                if stair[0] == x and stair[1] == y and stair[2] == z:
+                    return True
+        return False
+
     def GetStair(self):
-        pass
+        mobIntersects = []
+        pos = self.cam1.pos
+        pos = (pos.x, pos.y, -pos.z)
+        x,y,z = pos
+        x -= x%32
+        y -= y%32
+        z -= z%32
+        _9pos = [
+                (x-32, y, z-32), (x, y, z-32), (x+32, y, z-32),
+                (x-32, y, z), (x, y, z), (x+32, y, z),
+                (x-32, y, z+32), (x, y, z+32), (x+32, y, z+32),]
+        for surpos in _9pos:
+            if surpos in self.stairs:
+                for stair in self.stairs[surpos]:
+                    dir_ = self.cam1.GetDirV().Normalized().MultScalar(3.0)
+                    dir_ = (dir_.x, dir_.y, -dir_.z)
+                    x,y,z,f,b = stair
+                    min = float(x),float(y),float(z)
+                    max = x+1.0,y+1.0,z+1.0
+                    intersects, coord = self.chunks.HitBoundingBox(min,max,pos,dir_)
+                    if intersects:
+                        mobIntersects += [(stair, coord)]
+        if mobIntersects:
+            pos = self.cam1.pos
+            pos = Vector(pos.x, pos.y, -pos.z)
+            lowest = mobIntersects[0][:3]
+            for mobcoord in mobIntersects[1:]:
+                stair, coord = mobcoord
+                c = Vector(*coord[:3])
+                if (c-pos).Length() < (Vector(*lowest[1])-pos).Length():
+                    lowest = mobcoord
+            return lowest
+        return None
 
     def LPressing(self, t, m, k):
         if not self.gui.invShown:
@@ -5211,8 +5257,22 @@ class DigDigApp(object):
 
             stair = self.GetStair()
             if stair:
+                x,y,z,f,b = stair[0]
+                x1 = x-(x%32)
+                y1 = y-(y%32)
+                z1 = z-(z%32)
+                for stair2 in self.stairs[(x1,y1,z1)][:]:
+                    xx,yy,zz,ff,bb = stair2
+                    if xx == x and yy == y and zz == z:
+                        self.stairs[(x1,y1,z1)].remove(stair2)
+                        if b == ITEM_WOODENSTAIR:
+                            color = (116,100,46)
+                        if b == ITEM_STAIR:
+                            color = (30,30,30)
+                        self.gui.PutItemInInventory(Item(b, 1, color=color, stackable=True))
+                return
+
                 # XXX HP를 깎고 스테어를 지운다.
-                pass
                 #self.DestroyStair()
 
         self.digging = False
@@ -5588,8 +5648,8 @@ class DigDigApp(object):
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
 
-                self.chunks.GenVerts(frustum, (self.cam1.pos.x, self.cam1.pos.y, -self.cam1.pos.z), updateFrame, self.gui.tooltex, self.tex)
                 self.RenderStairs(frustum)
+                self.chunks.GenVerts(frustum, (self.cam1.pos.x, self.cam1.pos.y, -self.cam1.pos.z), updateFrame, self.gui.tooltex, self.tex)
                 updateFrameCounter += 0
                 updateFrameCounter %= 1 # 화면이 좀 깨지기는 하지만 프레임률이 4번에 1번 하면 2배로 올라가는?
                 # 8번에 1번 하면 뭐 무슨 3배로 올라가겠네 우왕 빠르당 ㅠㅠ 이걸로 가자.
@@ -5673,7 +5733,7 @@ class DigDigApp(object):
             mat = ViewingMatrix()
             lookPos = None
             if mat is not None:
-                self.lastBlock = lookPos = self.chunks.LookAtBlock(pos, dir_, 7, self.bound, mat)#self.difY)
+                self.lastBlock = lookPos = self.chunks.LookAtBlock(pos, dir_, 9, self.bound, mat)#self.difY)
 
             if lookPos and lookPos[4] != BLOCK_WATER:
                 x,y,z,face,block = lookPos
