@@ -1235,7 +1235,7 @@ class DigDigGUI(object):
 
     def ApplyEnchantScroll(self, item, scroll):
         if not item.element:
-            item.element = FightingElements("test", (0,0,0), {"atk": 5})
+            item.element = FightingElements("Test", (0,0,0), {})
         item.element.ApplyEnchantScroll(scroll)
     def DoEquip(self, idx):
         # dragging이 있으면 그걸 입을수있는지 검사
@@ -1322,10 +1322,19 @@ class DigDigGUI(object):
 
 
     def GenElement(self, gentype):
-        return FightingElements("test", (0,0,0), {"atk": 5})
+        return FightingElements("test", (0,0,0), {"atk": 5,"hp":5}) # 여기서 아이템을 제작하는 코드가 다있다. XXX:
+        # 음..... maxenchant횟수를 5번으로 적용하고
+        # 만약 스크롤에 maxenchant횟수를 늘리는 게 있다면 그만큼 늘려주고 뭐 이런다.
+        # 맥스인챈트 늘려수는 횟수가 가끔씩 랜덤하게 나온다.
+        # 아이템의 max atk이런건 없고 무제한. 맥스 인챈트 횟수랑
+        # 인챈트 스크롤의 퀄리티가 현재 전투 스킬에 따라 다르게 나오게 한다.
+        # 뭐 SWORD스킬이 좋으면 SWORD스킬 관련 스탯이 좀 더 좋게 나온다던가 이런다.
+        # 마법 스킬이 높으면 방어구나 무기에 마법 관련 스탯이 좋게 나오고 뭐 이런다.
+        # 한 개의 인챈트 스크롤에 나올 수 있는 스탯의 숫자는 정해져있다.
+        # 실버에서는 밀리 전투 스킬관련, 골드에서는 마법 관련 스킬, 다이아에서는 스탯 관련 
+        #
         # 음......... 어떤 마법 스킬에 따라서 더 좋은 결과가 나온다.
         # 몬스터도 인챈트 스크롤을 드랍한다. 아이템 대신!
-        pass
     def DoMake(self, makeIdx):
         tool = self.makes[makeIdx]
 
@@ -1861,6 +1870,10 @@ class DigDigGUI(object):
                         textTitle = [u"Silver Enchant Scroll"]
                     # 여기서 text width에 맞게 적당히 split을 하고
                     # 접두사 접미사를 붙인다.
+                    # param에 뭐가 있느냐에 따라 접두사 접미사를..
+                    # 굉장히 귀찮을 듯.
+                    # 음.....아이템 생성에 대해서도 디아처럼 생성하면 되겠네 구조를 아니까...
+                    # 데이지서버 할 때 처럼 스탯 맞추면 될 듯.
                     return textTitle
                 def GenItemDesc(item):
                     textDesc = ["Desc"]
@@ -1868,7 +1881,7 @@ class DigDigGUI(object):
                         textDesc = [u"Enchant"]
                     return textDesc
                 def GenItemParams(item):
-                    textParams = [str(item.element.params)]
+                    textParams = str(item.element.params).split(',')
                     return textParams
 
                 cleared = False
@@ -4217,7 +4230,11 @@ class FightingElements(object):
         # 이렇게 하지 말고 일단 전투를 구현한 다음에 하나하나 유틸라이즈하자.
         pass
     def ApplyEnchantScroll(self, scroll):
-        print scroll.element.params
+        for param in scroll.element.params:
+            if param in self.params:
+                self.params[param] += scroll.element.params[param]
+            else:
+                self.params[param] = scroll.element.params[param]
 
 class FightingEntity(object):
     def __init__(self, name, pos, params):
