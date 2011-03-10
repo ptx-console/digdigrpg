@@ -985,9 +985,9 @@ class DigDigGUI(object):
 
         """
         for i in range(4):
-            self.eqSlotPos += [(self.makeRealPos[0]+26, self.makeRealPos[1]+28+i*34)]
+            self.eqSlotPos += [(self.makeRealPos[0]+23, self.makeRealPos[1]+25+i*34)]
         for i in range(4):
-            self.eqSlotPos += [(self.makeRealPos[0]+250, self.makeRealPos[1]+28+i*34)]
+            self.eqSlotPos += [(self.makeRealPos[0]+247, self.makeRealPos[1]+25+i*34)]
 
         """
         self.PutItemInInventory(Item(ITEM_GOLD, 64, color = (207,207,101), stackable=True))
@@ -1258,11 +1258,62 @@ class DigDigGUI(object):
         # dragging이 있으면 그걸 입을수있는지 검사
         # 없으면 언이큅
         """
-        if self.draggingItem.type_ in [ITEM_SENCHANTSCROLL, ITEM_GENCHANTSCROLL, ITEM_DENCHANTSCROLL]:
-            self.ApplyEnchantScroll(self.eqs[idx], self.draggingItem)
-        print idx
+        u"RightHand",
+        u"LeftHand",
+        u"Head",
+        u"Body",
+        u"Gloves",
+        u"Boots",
+        u"Necklace",
+        u"Ring",]
         """
-        pass
+
+        if self.draggingItem and self.draggingItem.type_ in [ITEM_SWORD, ITEM_SPEAR, ITEM_MACE, ITEM_KNUCKLE, ITEM_SHIELD, ITEM_GLOVES, ITEM_BOOTS, ITEM_GOLDRING, ITEM_GOLDNECLACE, ITEM_HELM, ITEM_ARMOR, ITEM_SILVERRING, ITEM_SILVERNECLACE, ITEM_DIAMONDRING, ITEM_DIAMONDNECLACE]:
+            item = self.draggingItem
+            def Drop():
+                self.dragging = False
+                self.eqs[idx] = self.draggingItem
+                self.draggingItem = None
+                self.dragPos = None
+                self.dragCont = None
+            def Swap():
+                self.draggingItem, self.eqs[idx] = self.eqs[idx], self.draggingItem
+
+            idxToTypes = [
+                    [ITEM_SWORD, ITEM_SPEAR, ITEM_MACE, ITEM_KNUCKLE, ITEM_SHIELD],
+                    [ITEM_SWORD, ITEM_SPEAR, ITEM_MACE, ITEM_KNUCKLE, ITEM_SHIELD],
+                    [ITEM_HELM],
+                    [ITEM_ARMOR],
+                    [ITEM_BOOTS],
+                    [ITEM_GLOVES],
+                    [ITEM_SILVERNECLACE, ITEM_GOLDNECLACE, ITEM_DIAMONDNECLACE],
+                    [ITEM_SILVERRING, ITEM_GOLDRING, ITEM_DIAMONDRING]
+                    ]
+            idx2 = 0
+            for types in idxToTypes:
+                if idx == idx2:
+                    if item.type_ in types:
+                        if not self.eqs[1] and self.eqs[0] and idx2 == 1 and self.eqs[0].type_ == ITEM_SPEAR:
+                            self.draggingItem, self.eqs[idx2] = self.eqs[0], self.draggingItem
+                            self.eqs[0] = ITEM_NONE
+                        elif not self.eqs[0] and self.eqs[1] and idx2 == 0 and self.eqs[1].type_ == ITEM_SPEAR:
+                            self.draggingItem, self.eqs[idx2] = self.eqs[1], self.draggingItem
+                            self.eqs[1] = ITEM_NONE
+                        elif self.eqs[idx]:
+                            Swap()
+                        else:
+                            Drop()
+                    break
+                idx2 += 1
+        elif self.eqs[idx]:
+            def Pick():
+                self.dragging = True
+                self.draggingItem = self.eqs[idx]
+                self.dragPos = (idx,0)
+                self.dragCont = self.eqs
+                self.eqs[idx] = ITEM_NONE
+            Pick()
+
     def OnDown(self, t, m, k, rmb=False):
         if self.invShown:
             idx = 0
