@@ -1033,7 +1033,7 @@ class DigDigGUI(object):
         for invItem in self.qbar+self.inventory:
             if invItem == ITEM_NONE:
                 continue
-            if invItem.type_ == item.type_ and invItem.count+item.count < invItem.maxLen and invItem.name == item.name and invItem.stackable:
+            if invItem.type_ == item.type_ and invItem.count+item.count <= invItem.maxLen and invItem.name == item.name and invItem.stackable:
                 invItem.count += item.count
                 return True
 
@@ -4460,7 +4460,7 @@ class DigDigScript(object):
             (1*64.0/512.0, 1*64.0/512.0),
             (1*64.0/512.0, 1*64.0/512.0)]]
 
-        entity = FightingEntity("Mob1", AppSt.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
+        entity = FightingEntity("Mob1", AppSt.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"matk":5,"mdfn":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
         AppSt.mobs += [MobGL((pos[0]+0.5, pos[1]+3.0+0.5, pos[2]+0.5), [0.8,1.7,0.8], skin, MOB_SKELETON, (200,200,200,255), entity)]
 class ScriptLauncher(object):
     def __init__(self, coord):
@@ -5894,7 +5894,7 @@ class DigDigApp(object):
         emgr.BindTick(self.RegenTex)
         self.font = pygame.font.Font("./fonts/NanumGothicBold.ttf", 19)
         self.id = 0
-        self.entity = FightingEntity("Player", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
+        self.entity = FightingEntity("Player", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"matk":5,"mdfn":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
         # 스탯등을 올릴 때 처음엔 네 대 때려야 죽을게 3대 때리면 죽고 싸우다보면 2대 때리면 죽고 이런식으로
         # 좀 뭔가 레벨업 하듯이 할맛 나게
 
@@ -5974,7 +5974,7 @@ class DigDigApp(object):
         entity = FightingEntity("Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         """
-        entity = FightingEntity("Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
+        entity = FightingEntity("Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"matk":5,"mdfn":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
         self.mobs = []
         #self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         try:
