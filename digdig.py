@@ -918,8 +918,6 @@ class DigDigGUI(object):
         self.makes[11] = MakeTool(u"Torch(Coal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[12] = MakeTool(u"Chest", u"Can hold items and blocks", (255,255,255), [(BLOCK_WOOD, 8, TYPE_BLOCK)], (ITEM_CHEST, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[30] = MakeTool(u"Code", u"Runs python code.\nUsed to launch commands\nor spawn an object\n(Put scripts in scripts directory)", (255,255,255), [(ITEM_GOLD, 4, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 4, TYPE_ITEM, (201,201,201))], (BLOCK_CODE, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
-        #self.makes[32] = MakeTool(u"전기선(일자)", u"코드와 기계를\n연결합니다.", (255,255,255), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (ITEM_LINE, [], [], 10, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        #self.makes[33] = MakeTool(u"전기선(기역자)", u"코드와 기계를\n연결합니다.", (255,255,255), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (ITEM_LINEL, [], [], 10, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[31] = MakeTool(u"Spawner", u"Spawning spot\n- Machine -", (255,255,255), [(ITEM_GOLD, 4, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 4, TYPE_ITEM, (201,201,201))], (BLOCK_SPAWNER, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         self.makes[40] = MakeTool(u"Sword", u"A sword\n- Weapon -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107))], (ITEM_SWORD, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[41] = MakeTool(u"Spear", u"A spear\n- Two Handed Weapon -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107))], (ITEM_SPEAR, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
@@ -4322,6 +4320,22 @@ class FightingEntity(object):
         self.str = params["str"]
         self.dex = params["dex"]
         self.int = params["int"]
+        self.atk = params["atk"]
+        self.dfn = params["dfn"]
+        self.matk = params["matk"]
+        self.mdfn = params["mdfn"]
+        self.sword = params["sword"]
+        self.mace = params["mace"]
+        self.spear = params["spear"]
+        self.knuckle = params["knuckle"]
+        self.armor = params["armor"]
+        self.magic = params["magic"]
+        self.swordSkills = {}
+        self.maceSkills = {}
+        self.spearSkills = {}
+        self.knuckleSkills = {}
+        self.armorSkills = {}
+        self.magicCategories = {} # 각 카테고리 안에 여러가지 각각의 스킬을 넣음. 각 카테고리는 sword, mace등과 동일한 뎁쓰레벨
         self.curhp = self.basehp
         self.curmp = self.basemp
         self.eqs = [] # 몹일경우 여기에 담고
@@ -6561,4 +6575,24 @@ begin안에 드어가니까
 
 스크롤을 넣는 창과 아이템을 넣는 창이 있고, 넣고 버튼을 누르면 인챈트가 완료?
 그러지 말고, 인챈트 스크롤을 집고 그걸 무기 위에 오른쪽 버튼으로 드랍하면 인챈트가 적용? ㅇㅇ
+------------------------------
+Intro 
+Long time ago there was a dragon named Ashu Ishtagal and he made a sword by using his magic and sword's name was Gajyo-wa.
+Using that sword, a guy named Nerd K. defeated the evil magician 8th grader Jungebyung.
+But few years after Nerd K.'s death, a trader named Dapalah came to possess the sword.
+
+So, I want you to bring me 10 cobble stone blocks.
+
+
+[OK] -- bring the cobble stone blocks -- repeat indefinately
+[What does it have to do with 10 cobble stone blocks and what did Dapalah do with the sword?] ---
+    OK. About the sword. Long time ago there was ....(repeat of first sentence)
+    So, I want you to bring me 10 cobble stone blocks.
+    [OK] -- repeat first
+    [OK so what does it have to do with bringing 10 cobble stone blocks]
+        OK. About the cobblestone. Long time ago there was ....(repeat of first sentence)
+        So, I want you to bring me 10 cobble stone blocks.
+        [OK] -- repeat first
+        [Beat him and take his possessions] - give basic equipments and items and a quest note
+
 """
