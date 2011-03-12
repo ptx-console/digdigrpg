@@ -4304,6 +4304,24 @@ class FightingElements(object):
             else:
                 self.params[param] = scroll.element.params[param]
 
+class RawSkill(object):
+    def __init__(self, name, params):
+        self.value = params["value"]
+        self.incFactor = params["incFactor"]  # 데미지는 sword스킬일경우 sword스킬레벨이 올라갈 때마다 증가한다. 여기서 정한 퍼센티지로 선형적으로 증가한다
+        self.skilltype = params["stype"] # 공격이냐 버프냐 힐이냐
+        self.name = name
+
+    def Apply(self, user, target):
+        pass
+
+class CombinedSkill(object): # 위의 생스킬을 합쳐서 스킬하나를 만든다.
+    def __init__(self, name, raws):
+        self.raws = raws
+        self.name = name
+        self.minreq = params["minreq"] # 스킬을 사용할 수 있는 sword스킬레벨 제한
+    def Apply(self, user, target):
+        pass
+
 class FightingEntity(object):
     def __init__(self, name, pos, params):
         # 복잡하게 str이 체력을 올려주고 이러지 말고
@@ -4355,13 +4373,34 @@ class FightingEntity(object):
 
     def BindDead(self, func):
         self.ondead = func
+
     def BindHit(self, func):
         self.onhit = func
+
+    def CalculateAttack(self):
+        atk = self.atk
+        for item in self.eqs:
+            if "atk" in item.element:
+                atk += item.element["atk"] # 보너스로 웨폰 스킬로 데미지 퍼센티지로 추가
+        return atk
+
+    def CalculateDmg(self, dfn):
+        atk = self.CalculateAttack()
+        return atk - dfn
+
+    def CalculateDefense(self):
+        dfn = self.dfn
+        for item in self.eqs:
+            if "dfn" in item.element:
+                dfn += item.element["dfn"]
+        return dfn
+
     def Attack(self, other):
-        other.curhp -= 20
+        other.curhp -= self.CalculateDmg(other.CalculateDefense())
         other.onhit(self)
         if other.IsDead():
             other.ondead(self)
+
     def IsDead(self):
         if self.curhp <= 0:
             return True
@@ -4606,23 +4645,32 @@ class DigDigApp(object):
                 x,y,z = self.chunks.FixPos(Vector(x,y,z), Vector(x,y-(self.speed*factor),z), self.bound)
 
                 # 여기서 계단위에 있으면 그만큼 좌표를 올려준다.
-                xx,yy,zz = int(x),int(y-1.19),int(z)
+                if x >= 0:
+                    xx = int(x)
+                else:
+                    xx = int(x-0.5)
+                yy = int(y-1.19)
+                if z >= 0:
+                    zz = int(z)
+                else:
+                    zz = int(z-0.5)
                 xxx = xx-(xx%32)
                 yyy = yy-(yy%32)
                 zzz = zz-(zz%32)
                 if (xxx,yyy,zzz) in self.stairs:
+                    print xxx,yyy,zzz,x,y,z
                     for stair in self.stairs[(xxx,yyy,zzz)]:
                         x1,y1,z1,f,b = stair
                         if x1 <= x <= x1+1.0 and z1 <= z <= z1+1.0 and y1+1.19 <= y <= y1+2.20:
                             plus = 0
                             if f == 2:
-                                plus = abs((x)-int((x)))
+                                plus = abs(x-int(x))
                             if f == 3:
-                                plus = 1.0-abs((x)-int((x)))
+                                plus = 1.0-abs(x-int(x))
                             if f == 4:
-                                plus = int((z)-(abs(z)))
+                                plus = abs(z-int(z))
                             if f == 5:
-                                plus = 1.0-abs(abs(z)-int(abs(z)))
+                                plus = 1.0-abs(z-int(z))
                             plus *= 2
                             if plus > 1.0:
                                 plus = 1.0
@@ -4641,7 +4689,6 @@ class DigDigApp(object):
             for stair in stairs:
                 x,y,z,f,b = stair
                 if (x,y,z) not in self.stairsDL[xyz] or self.regenTex:
-
                     self.stairsDL[xyz][(x,y,z)] = dList = glGenLists(1)
                     glNewList(dList, GL_COMPILE)
                     if b == ITEM_STAIR:
@@ -4924,8 +4971,9 @@ class DigDigApp(object):
                         return
                     if (xx,yy,zz) not in self.stairs:
                         self.stairs[(xx,yy,zz)] = []
-                    if xyz+(facing,ITEM_STAIR) in self.stairs[(xx,yy,zz)] or xyz+(facing,ITEM_WOODENSTAIR) in self.stairs[(xx,yy,zz)]:
-                        return
+                    for stair in self.stairs[(xx,yy,zz)]:
+                        if xyz == stair[:3]:
+                            return
                     else:
                         self.stairs[(xx,yy,zz)] += [xyz+(facing,item.type_)]
                         item.count -= 1
@@ -5265,6 +5313,11 @@ class DigDigApp(object):
                     xx,yy,zz,ff,bb = stair2
                     if xx == x and yy == y and zz == z:
                         self.stairs[(x1,y1,z1)].remove(stair2)
+                        try:
+                            glDeleteLists(self.stairsDL[(x1,y1,z1)][xx,yy,zz], 1)
+                            del self.stairsDL[(x1,y1,z1)][xx,yy,zz]
+                        except:
+                            pass
                         if b == ITEM_WOODENSTAIR:
                             color = (116,100,46)
                         if b == ITEM_STAIR:
@@ -5319,6 +5372,8 @@ class DigDigApp(object):
                     if self.lastBlock:
                         x,y,z,f,b = self.lastBlock
                         hp = 100.0
+                        if b == BLOCK_WOOD:
+                            hp = 150.0
                         if b == BLOCK_COALORE:
                             hp = 120.0
                         if b == BLOCK_IRONORE:
@@ -5337,6 +5392,8 @@ class DigDigApp(object):
                     if self.lastBlock:
                         x,y,z,f,b = self.lastBlock
                         hp = 100.0
+                        if b == BLOCK_WOOD:
+                            hp = 150.0
                         if b == BLOCK_COALORE:
                             hp = 120.0
                         if b == BLOCK_IRONORE:
@@ -5959,7 +6016,6 @@ class DigDigApp(object):
         emgr.BindTick(self.RegenTex)
         self.font = pygame.font.Font("./fonts/NanumGothicBold.ttf", 19)
         self.id = 0
-        self.entity = FightingEntity("Player", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"matk":5,"mdfn":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
         # 스탯등을 올릴 때 처음엔 네 대 때려야 죽을게 3대 때리면 죽고 싸우다보면 2대 때리면 죽고 이런식으로
         # 좀 뭔가 레벨업 하듯이 할맛 나게
 
@@ -5972,6 +6028,9 @@ class DigDigApp(object):
         #self.inventoryV.Show(False)
         #cbg = QBBG((0,450,300,30))
         self.gui = DigDigGUI()
+        self.entity = FightingEntity("Player", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"matk":5,"mdfn":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
+        self.entity.eqs = self.gui.eqs
+        self.entity.inventory = self.gui.inventory
         self.scripts = {}
         for coord in self.gui.codes:
             self.scripts[coord] = ScriptLauncher(coord)
@@ -6123,7 +6182,7 @@ class DigDigApp(object):
             mob.pos = p.x+idx*1.0, p.y, (-p.z)
             idx += 1
         
-        self.chunks.SaveRegion("test", (64,0,64), (127+64,127,127+64))
+        #self.chunks.SaveRegion("test", (64,0,64), (127+64,127,127+64))
         while not done:
             fps.Start()
             for e in pygame.event.get():
@@ -6659,5 +6718,10 @@ So, I want you to bring me 10 cobble stone blocks.
         So, I want you to bring me 10 cobble stone blocks.
         [OK] -- repeat first
         [Beat him and take his possessions] - give basic equipments and items and a quest note
-
+--------------
+랜덤한 구름을 128x128짜리로 한장 만들어서
+전체 맵에 반복해서 흘러가게 한다.
+태양은 뭐 그냥 동쪽에서 위로갔다가 서쪽으로 가고
+태양을 GenQuads에 전달.
+-------------------------
 """
