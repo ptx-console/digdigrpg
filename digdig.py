@@ -820,6 +820,7 @@ class DigDigGUI(object):
         self.prevDescT = 0
         self.areaDelay = 500
         self.numbers = [self.textRenderer.NewTextObject(`i`, (255,255,255), True, (0,0,0)) for i in range(10)]
+        self.numbers += [self.textRenderer.NewTextObject("-", (255,255,255), True, (0,0,0))]
 
 
 
@@ -831,6 +832,7 @@ class DigDigGUI(object):
         self.selectedItem = 0
         self.selectedMakeTool = -1
         self.selectedContItem = ITEM_NONE
+        self.qbMode2 = False
 
         EMgrSt.BindTick(self.Tick)
         EMgrSt.BindMotion(self.Motion)
@@ -849,9 +851,15 @@ class DigDigGUI(object):
         except:
             self.inventory = [ITEM_NONE for i in range(60)]
         try:
-            self.qbar = pickle.load(open("./map/qb.pkl", "r"))
+            self.qbar1 = pickle.load(open("./map/qb.pkl", "r"))
         except:
-            self.qbar = [ITEM_NONE for i in range(10)]
+            self.qbar1 = [ITEM_NONE for i in range(10)]
+
+        self.qbar = self.qbar1
+        try:
+            self.qbar2 = pickle.load(open("./map/qb2.pkl", "r"))
+        except:
+            self.qbar2 = [ITEM_NONE for i in range(10)]
 
         try:
             self.boxes = pickle.load(open("./map/chests.pkl", "r"))
@@ -959,6 +967,8 @@ class DigDigGUI(object):
                 self.makeSlotPos += [(invX+x*30, invY+y*30)]
 
         self.eqSlotPos = []
+        self.charTab = False
+        self.selectedSkill = None
         """
         무기
         방패
@@ -1101,6 +1111,7 @@ class DigDigGUI(object):
             idx = 0
             foundIdx = -1
             self.selectedContItem = ITEM_NONE
+            self.selectedSkill = None
             for pos in self.invSlotPos:
                 x,y = pos
                 if InRect(x,y,30,30,m.x,m.y):
@@ -1147,6 +1158,21 @@ class DigDigGUI(object):
                 if foundIdx != -1:
                     self.selectedContItem = self.eqs[foundIdx]
 
+            elif self.toolMode == TM_CHAR and not self.charTab:
+                idx = 0
+                foundIdx = -1
+                for pos in self.makeSlotPos:
+                    x,y = pos
+                    if InRect(x,y,30,30,m.x,m.y):
+                        foundIdx = idx
+                        break
+                    idx += 1
+
+                if foundIdx != -1:
+                    skills = (AppSt.entity.magics.values()+AppSt.entity.swordSkills.values()+AppSt.entity.maceSkills.values()+AppSt.entity.spearSkills.values()+AppSt.entity.knuckleSkills.values())
+                    if idx < len(skills):
+                        self.selectedSkill = skills[idx]
+
     def LDown(self, t, m, k):
         if self.toolMode in [TM_BOX, TM_TOOL, TM_EQ]:
             self.OnDown(t,m,k,False)
@@ -1179,7 +1205,7 @@ class DigDigGUI(object):
                 if not rmb:
                     Swap()
                 else:
-                    if self.draggingItem.type_ in [ITEM_SENCHANTSCROLL, ITEM_GENCHANTSCROLL, ITEM_DENCHANTSCROLL]:
+                    if self.draggingItem.type_ in [ITEM_SENCHANTSCROLL, ITEM_GENCHANTSCROLL, ITEM_DENCHANTSCROLL] and cont[y*10+x].type_ in [ITEM_SWORD, ITEM_SPEAR, ITEM_MACE, ITEM_KNUCKLE, ITEM_SHIELD,ITEM_HELM,ITEM_ARMOR,ITEM_BOOTS,ITEM_GLOVES,ITEM_SILVERNECLACE, ITEM_GOLDNECLACE, ITEM_DIAMONDNECLACE,ITEM_SILVERRING, ITEM_GOLDRING, ITEM_DIAMONDRING]:
                         self.ApplyEnchantScroll(cont[y*10+x], self.draggingItem)
                         self.dragging = False
                         self.draggingItem = None
@@ -1295,6 +1321,12 @@ class DigDigGUI(object):
                             self.draggingItem, self.eqs[idx2] = self.eqs[0], self.draggingItem
                             self.eqs[0] = ITEM_NONE
                         elif not self.eqs[0] and self.eqs[1] and idx2 == 0 and self.eqs[1].type_ == ITEM_SPEAR:
+                            self.draggingItem, self.eqs[idx2] = self.eqs[1], self.draggingItem
+                            self.eqs[1] = ITEM_NONE
+                        elif not self.eqs[1] and self.eqs[0] and idx2 == 1 and self.draggingItem.type_ != self.eqs[0].type_:
+                            self.draggingItem, self.eqs[idx2] = self.eqs[0], self.draggingItem
+                            self.eqs[0] = ITEM_NONE
+                        elif not self.eqs[0] and self.eqs[1] and idx2 == 0 and self.draggingItem.type_ != self.eqs[1].type_:
                             self.draggingItem, self.eqs[idx2] = self.eqs[1], self.draggingItem
                             self.eqs[1] = ITEM_NONE
                         elif self.eqs[idx]:
@@ -1512,7 +1544,10 @@ class DigDigGUI(object):
         x = x
         y = y
         for c in count:
-            self.textRenderer.RenderText(self.numbers[int(c)], (x, y))
+            if c == "-":
+                self.textRenderer.RenderText(self.numbers[10], (x, y))
+            else:
+                self.textRenderer.RenderText(self.numbers[int(c)], (x, y))
             x += 9
 
     def Render(self, t, m, k):
@@ -1569,6 +1604,33 @@ class DigDigGUI(object):
 
 
         if self.invShown and self.toolMode in [TM_BOX, TM_TOOL]:
+            x,y = self.invPos
+            glTexCoord2f(0.0, float(186)/512.0)
+            glVertex3f(float(x), -float(y+186), 100.0)
+
+            glTexCoord2f(float(306)/512.0, float(186)/512.0)
+            glVertex3f(float(x+306), -float(y+186), 100.0)
+
+            glTexCoord2f(float(306)/512.0, 0.0)
+            glVertex3f(float(x+306), -float(y), 100.0)
+
+            glTexCoord2f(0.0, 0.0)
+            glVertex3f(x, -float(y), 100.0)
+
+            x,y = self.makePos
+            glTexCoord2f(0.0, float(186)/512.0)
+            glVertex3f(float(x), -float(y+186), 100.0)
+
+            glTexCoord2f(float(306)/512.0, float(186)/512.0)
+            glVertex3f(float(x+306), -float(y+186), 100.0)
+
+            glTexCoord2f(float(306)/512.0, 0.0)
+            glVertex3f(float(x+306), -float(y), 100.0)
+
+            glTexCoord2f(0.0, 0.0)
+            glVertex3f(x, -float(y), 100.0)
+
+        if self.invShown and self.toolMode == TM_CHAR and not self.charTab:
             x,y = self.invPos
             glTexCoord2f(0.0, float(186)/512.0)
             glVertex3f(float(x), -float(y+186), 100.0)
@@ -1686,6 +1748,41 @@ class DigDigGUI(object):
             """
             if text:
                 self.RenderNumber(item.count, x, y)
+        def RenderSkill(skill, idx, posx, posy, text=True):
+            x = idx%10
+            y = (idx-x)/10
+            x*=30
+            y*=30
+            x += posx
+            y += posy
+            glBindTexture(GL_TEXTURE_2D, self.tooltex)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE)
+            texupx = (skill.texcoord[0]*30.0) / 512.0
+            texupy = (skill.texcoord[1]*30.0) / 512.0
+            glBegin(GL_QUADS)
+            glTexCoord2f(texupx, texupy+float(30)/512.0)
+            glVertex3f(float(x), -float(y+30), 100.0)
+
+            glTexCoord2f(texupx+float(30)/512.0, texupy+float(30)/512.0)
+            glVertex3f(float(x+30), -float(y+30), 100.0)
+
+            glTexCoord2f(texupx+float(30)/512.0, texupy)
+            glVertex3f(float(x+30), -float(y), 100.0)
+
+            glTexCoord2f(texupx, texupy)
+            glVertex3f(x, -float(y), 100.0)
+            glEnd()
+
+            """
+            texmidx = (BLOCK_TEX_COORDS[b*2*3 + 2]*32.0) / 512.0
+            texmidy = (BLOCK_TEX_COORDS[b*2*3 + 3]*32.0) / 512.0
+            texbotx = (BLOCK_TEX_COORDS[b*2*3 + 4]*32.0) / 512.0
+            texboty = (BLOCK_TEX_COORDS[b*2*3 + 5]*32.0) / 512.0
+            """
+            if text:
+                self.RenderNumber(int(skill.skillPoint), x, y)
         def RenderItem(item, idx, posx, posy, text=True):
             x = idx%10
             y = (idx-x)/10
@@ -1791,6 +1888,105 @@ class DigDigGUI(object):
                     RenderItem(item, idx, self.invRealPos[0], self.invRealPos[1])
                     idx += 1
 
+            if self.toolMode == TM_CHAR and not self.charTab:
+                idx = 0
+                for skill in AppSt.entity.magics.values()+AppSt.entity.swordSkills.values()+AppSt.entity.maceSkills.values()+AppSt.entity.spearSkills.values()+AppSt.entity.knuckleSkills.values():
+                    RenderSkill(skill, idx, self.makeRealPos[0], self.makeRealPos[1])
+                    idx += 1
+                cleared = False
+                if t - self.prevDescT >= self.areaDelay:
+                    self.prevDescT = t
+                    self.textRendererItemTitle.Clear()
+                    self.textRendererItemSmall.Clear()
+                    cleared = True
+
+                def RenderSkillDesc(skill):
+                    x,y,w,h = 5, 20, 165, 380
+                    glDisable(GL_TEXTURE_2D)
+                    glBegin(GL_QUADS)
+                    glColor4f(1.0,1.0,1.0,0.85)
+                    glVertex3f(float(x), -float(y+h), 100.0)
+                    glVertex3f(float(x+w), -float(y+h), 100.0)
+                    glVertex3f(float(x+w), -float(y), 100.0)
+                    glVertex3f(x, -float(y), 100.0)
+                    glEnd()
+
+                    glLineWidth(3.0)
+                    glBegin(GL_LINES)
+                    glColor4f(0.0,0.0,0.0,1.0)
+                    glVertex3f(float(x), -float(y+h), 100.0)
+                    glVertex3f(float(x+w), -float(y+h), 100.0)
+                    
+                    glVertex3f(float(x+w), -float(y+h), 100.0)
+                    glVertex3f(float(x+w), -float(y), 100.0)
+
+                    glVertex3f(float(x+w), -float(y), 100.0)
+                    glVertex3f(x, -float(y), 100.0)
+
+                    glVertex3f(x, -float(y), 100.0)
+                    glVertex3f(float(x), -float(y+h), 100.0)
+                    glEnd()
+                    glEnable(GL_TEXTURE_2D)
+
+                    y = 0
+                    textTitle = [skill.name]
+                    if not skill.textTitleIdx or cleared:
+                        skill.textTitleIdx = [self.textRendererItemTitle.NewTextObject(text, (0,0,0), (10, 25+y)) for text in textTitle]
+
+                    try:
+                        for idx in skill.textTitleIdx:
+                            self.textRendererItemTitle.RenderOne(idx, (10, 25+y))
+                            y += 20
+                    except:
+                        pass
+                    y += 10
+
+                    textDesc = ["Level: %d" % skill.skillPoint, "Range: %d" % skill.range]
+                    for raw in skill.raws:
+                        typetexts = {SKILL_PHYSICAL: "Physical",
+                                SKILL_FIRE: "Fire",
+                                SKILL_ICE: "Ice",
+                                SKILL_ELECTRIC: "Electric",
+                                SKILL_POISON: "Poison",
+                                SKILL_HEAL: "Heal",
+                                SKILL_CURE: "Cure Poison",
+                                SKILL_STR: "Increse Strength",
+                                SKILL_DEX: "Increase Dexterity",
+                                SKILL_INT: "Increase Intelligence",
+                                SKILL_BASEHP: "Increase Max HP",
+                                SKILL_BASEMP: "Increase Max MP",
+                                SKILL_SKILL: "Increase %s" % raw.targetskillname,}
+                        textDesc += ["Point: %d" % (raw.value*(skill.skillPoint*raw.incFactor))]
+                        textDesc += ["Type: %s" % typetexts[raw.skilltype]]
+                        if raw.targettype == TARGET_SELF:
+                            textDesc += ["Target: Self"]
+                        if raw.targettype == TARGET_OTHER:
+                            textDesc += ["Target: Enemy"]
+                        if raw.duration == 0:
+                            textDesc += ["Duration: Instant"]
+                        else:
+                            textDesc += ["Duration: %s sec." % raw.duration]
+                    #paramText = GenItemParams(skill)
+                    if not skill.textDescIdx or cleared:
+                        skill.textDescIdx = [self.textRendererItemSmall.NewTextObject(text, (0,0,0), (10, 25+y)) for text in textDesc]
+                        #skill.textDescIdx += [self.textRendererItemSmall.NewTextObject(text, (0,0,0), (10, 25+y)) for text in paramText]
+
+
+                    try:
+                        for textid in skill.textDescIdx:
+                            self.textRendererItemSmall.RenderOne(textid, (10, 25+y))
+                            y += 15
+                    except:
+                        pass
+                    y += 10
+
+
+
+
+                if self.selectedSkill:
+                    RenderSkillDesc(self.selectedSkill)
+
+
             if self.toolMode == TM_BOX:
                 idx = 0
                 for item in self.selectedBox:
@@ -1800,7 +1996,7 @@ class DigDigGUI(object):
 
                     RenderItem(item, idx, self.makeRealPos[0], self.makeRealPos[1])
                     idx += 1
-            elif self.toolMode == TM_TOOL:
+            if self.toolMode == TM_TOOL:
                 idx = 0
                 for item in self.makes:
                     if not item:
@@ -2908,7 +3104,7 @@ def GUIDrawMode():
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
 
-G_FAR = 20.0
+G_FAR = 10.0
 def GameDrawMode():
     glEnable(GL_CULL_FACE)
     glEnable(GL_DEPTH_TEST)
@@ -3844,6 +4040,13 @@ g_ID = 0
 MOB_SKELETON = GenId()
 
 
+MobRSt = None
+class MobRenderer(object):
+    def __init__(self):
+        global MobRSt
+        MobRSt = self
+    def RenderMob(self, pos, frame, anim):
+        pass
 class MobGL(object):
     def __init__(self, pos, bound, skin, type_, color, entity):
         self.pos = pos
@@ -4304,26 +4507,54 @@ class FightingElements(object):
             else:
                 self.params[param] = scroll.element.params[param]
 
+g_ID = 0
+SKILL_PHYSICAL = GenId()
+SKILL_FIRE = GenId()
+SKILL_ICE = GenId()
+SKILL_ELECTRIC = GenId()
+SKILL_POISON = GenId()
+SKILL_HEAL = GenId()
+SKILL_CURE = GenId()
+SKILL_STR = GenId()
+SKILL_DEX = GenId()
+SKILL_INT = GenId()
+SKILL_BASEHP = GenId()
+SKILL_BASEMP = GenId()
+SKILL_SKILL = GenId()
+g_ID = 0
+TARGET_SELF = GenId()
+TARGET_OTHER = GenId()
 class RawSkill(object):
     def __init__(self, name, params):
         self.value = params["value"]
         self.incFactor = params["incFactor"]  # 데미지는 sword스킬일경우 sword스킬레벨이 올라갈 때마다 증가한다. 여기서 정한 퍼센티지로 선형적으로 증가한다
-        self.skilltype = params["stype"] # 공격이냐 버프냐 힐이냐
+        self.skilltype = params["stype"] # 공격이냐 버프냐 힐이냐, 공격이면 물리냐 4속성이냐 등등
+        self.targettype = params["ttype"] # self나 other
+        self.targetskillname = "" # CombinedSkill의 이름
         self.name = name
+        self.duration = params["dur"] # 0이면 순간적용, 0 초과면 그만금의 초동안 적용
 
+    def SetSkillName(self, name):
+        self.targetskillname = name
     def Apply(self, user, target):
         pass
 
 class CombinedSkill(object): # 위의 생스킬을 합쳐서 스킬하나를 만든다.
-    def __init__(self, name, raws):
+    def __init__(self, name, raws, texcoord, params):
         self.raws = raws
         self.name = name
         self.minreq = params["minreq"] # 스킬을 사용할 수 있는 sword스킬레벨 제한
-    def Apply(self, user, target):
-        pass
+        self.range = params["range"]
+        self.texcoord = texcoord
+        self.skillPoint = 1.0
+        self.textTitleIdx = []
+        self.textDescIdx = []
+
+    def Apply(self, user, target): # 레인지 검사는 MobGL이나 DIgDigApp에서
+        self.skillPoint += (self.skillPoint/self.skillPoint**1.5)/10.0
 
 class FightingEntity(object):
-    def __init__(self, name, pos, params):
+    def __init__(self, name, params):
         # 복잡하게 str이 체력을 올려주고 이러지 말고
         # str은 밀리무기 공격력
         # dex는 레인지 무기 공격력
@@ -4332,7 +4563,6 @@ class FightingEntity(object):
         # 연사력은 그냥 다 똑같음?
         # 멀티는 하지 말고 싱글만 만들자.
         self.name = name
-        self.pos = pos
         self.basehp = params["hp"]
         self.basemp = params["mp"]
         self.str = params["str"]
@@ -4340,20 +4570,30 @@ class FightingEntity(object):
         self.int = params["int"]
         self.atk = params["atk"]
         self.dfn = params["dfn"]
-        self.matk = params["matk"]
-        self.mdfn = params["mdfn"]
-        self.sword = params["sword"]
-        self.mace = params["mace"]
+        self.patk = params["patk"]
+        self.eatk = params["eatk"]
+        self.iatk = params["iatk"]
+        self.fatk = params["fatk"]
+        self.pres = params["pres"]
+        self.eres = params["eres"]
+        self.ires = params["ires"]
+        self.fres = params["fres"]
+        self.sword = params["sword"] # 스트렝스, 무기는 다 스트렝스
+        self.mace = params["mace"] 
         self.spear = params["spear"]
         self.knuckle = params["knuckle"]
-        self.armor = params["armor"]
+        self.armor = params["armor"] # 덱스를 올림
         self.magic = params["magic"]
         self.swordSkills = {}
         self.maceSkills = {}
         self.spearSkills = {}
         self.knuckleSkills = {}
         self.armorSkills = {}
-        self.magicCategories = {} # 각 카테고리 안에 여러가지 각각의 스킬을 넣음. 각 카테고리는 sword, mace등과 동일한 뎁쓰레벨
+        fireEle = RawSkill("Fire", {"value": 5, "incFactor": 2, "stype": SKILL_FIRE, "ttype": TARGET_OTHER, "dur": 0})
+        iceEle = RawSkill("Ice", {"value": 5, "incFactor": 2, "stype": SKILL_ICE, "ttype": TARGET_OTHER, "dur": 0})
+        elecEle = RawSkill("Electric", {"value": 5, "incFactor": 2, "stype": SKILL_ELECTRIC, "ttype": TARGET_OTHER, "dur": 0})
+        poisonEle = RawSkill("Poison", {"value": 5, "incFactor": 2, "stype": SKILL_POISON, "ttype": TARGET_OTHER, "dur": 0})
+        self.magics = {"Fireball": CombinedSkill("Fireball", [fireEle], [4,2], {"minreq": 0, "range": 10}), "Lightning": CombinedSkill("Lightning", [elecEle], [4,3], {"minreq": 0, "range": 10}), "Poison": CombinedSkill("Poison", [poisonEle], [4,4], {"minreq": 0, "range": 10}), "Snowball": CombinedSkill("Snowball", [iceEle], [4,5], {"minreq": 0, "range": 10})}
         self.curhp = self.basehp
         self.curmp = self.basemp
         self.eqs = [] # 몹일경우 여기에 담고
@@ -4370,6 +4610,7 @@ class FightingEntity(object):
             pass
         self.ondead = A
         self.onhit = A
+        self.karma = 0 # 성향에 따라 Evil, Good, Neutral의 여러 중간단계로 나뉨? 음.... 카르마가 게임에 미치는 영향은 어떨까
 
     def BindDead(self, func):
         self.ondead = func
@@ -4380,8 +4621,26 @@ class FightingEntity(object):
     def CalculateAttack(self):
         atk = self.atk
         for item in self.eqs:
-            if "atk" in item.element:
+            if item and "atk" in item.element:
                 atk += item.element["atk"] # 보너스로 웨폰 스킬로 데미지 퍼센티지로 추가
+
+        for item in self.eqs[:1]:
+            if not item:
+                continue
+            if item.type_ == ITEM_SWORD:
+                atk *= self.sword**1.5/self.sword
+                break
+            elif item.type_ == ITEM_SPEAR:
+                atk *= self.spear**1.5/self.spear
+                break
+            elif item.type_ == ITEM_MACE:
+                atk *= self.mace**1.5/self.mace
+                break
+            elif item.type_ == ITEM_KNUCKLE:
+                atk *= self.knuckle**1.5/self.knuckle
+                break
+
+        atk *= self.str**1.8/self.str
         return atk
 
     def CalculateDmg(self, dfn):
@@ -4391,11 +4650,36 @@ class FightingEntity(object):
     def CalculateDefense(self):
         dfn = self.dfn
         for item in self.eqs:
-            if "dfn" in item.element:
+            if item and "dfn" in item.element:
                 dfn += item.element["dfn"]
+        found = False
+        for item in self.eqs:
+            if item and item.type in [ITEM_SHIELD,ITEM_HELM,ITEM_ARMOR,ITEM_BOOTS,ITEM_GLOVES]:
+                found = True
+                break
+        if found:
+            dfn *= (self.armor**1.5/self.armor)
+            self.armor += (self.armor/self.armor**1.5)/10.0
+        dfn *= (self.dex**1.8/self.dex)
         return dfn
 
     def Attack(self, other):
+        for item in self.eqs[:1]:
+            if not item:
+                continue
+            if item.type_ == ITEM_SWORD:
+                self.sword += (self.sword/self.sword**1.5)/10.0
+                break
+            elif item.type_ == ITEM_SPEAR:
+                self.spear += (self.spear/self.spear**1.5)/10.0
+                break
+            elif item.type_ == ITEM_MACE:
+                self.mace += (self.mace/self.mace**1.5)/10.0
+                break
+            elif item.type_ == ITEM_KNUCKLE:
+                self.knuckle += (self.knuckle/self.knuckle**1.5)/10.0
+                break
+
         other.curhp -= self.CalculateDmg(other.CalculateDefense())
         other.onhit(self)
         if other.IsDead():
@@ -4499,7 +4783,7 @@ class DigDigScript(object):
             (1*64.0/512.0, 1*64.0/512.0),
             (1*64.0/512.0, 1*64.0/512.0)]]
 
-        entity = FightingEntity("Mob1", AppSt.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"matk":5,"mdfn":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
+        entity = FightingEntity("Mob1", {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"patk":5,"pres":5,"eatk":5,"eres":5,"iatk":5,"ires":5,"fatk":5,"fres":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
         AppSt.mobs += [MobGL((pos[0]+0.5, pos[1]+3.0+0.5, pos[2]+0.5), [0.8,1.7,0.8], skin, MOB_SKELETON, (200,200,200,255), entity)]
 class ScriptLauncher(object):
     def __init__(self, coord):
@@ -4648,29 +4932,41 @@ class DigDigApp(object):
                 if x >= 0:
                     xx = int(x)
                 else:
-                    xx = int(x-0.5)
+                    xx = int(x-1.0)
+
                 yy = int(y-1.19)
                 if z >= 0:
                     zz = int(z)
                 else:
-                    zz = int(z-0.5)
+                    zz = int(z-1.0)
                 xxx = xx-(xx%32)
                 yyy = yy-(yy%32)
                 zzz = zz-(zz%32)
                 if (xxx,yyy,zzz) in self.stairs:
-                    print xxx,yyy,zzz,x,y,z
                     for stair in self.stairs[(xxx,yyy,zzz)]:
                         x1,y1,z1,f,b = stair
                         if x1 <= x <= x1+1.0 and z1 <= z <= z1+1.0 and y1+1.19 <= y <= y1+2.20:
                             plus = 0
                             if f == 2:
-                                plus = abs(x-int(x))
+                                x2 = x
+                                if x < 0:
+                                    x2 = 1.0 - abs(x)
+                                plus = abs(x2-int(x2))
                             if f == 3:
-                                plus = 1.0-abs(x-int(x))
+                                x2 = x
+                                if x < 0:
+                                    x2 = 1.0 - abs(x)
+                                plus = 1.0-abs(x2-int(x2))
                             if f == 4:
-                                plus = abs(z-int(z))
+                                z2 = z
+                                if z < 0:
+                                    z2 = 1.0 - abs(z)
+                                plus = abs(z2-int(z2))
                             if f == 5:
-                                plus = 1.0-abs(z-int(z))
+                                z2 = z
+                                if z < 0:
+                                    z2 = 1.0 - abs(z)
+                                plus = 1.0-abs(z2-int(z2))
                             plus *= 2
                             if plus > 1.0:
                                 plus = 1.0
@@ -5941,6 +6237,9 @@ class DigDigApp(object):
             self.RenderHPMP()
             self.gui.Render(t, m, k)
             self.gui.RenderNumber(int(self.fps.GetFPS()), 0, 0)
+            self.gui.RenderNumber(int(self.cam1.pos.x), 0, SH-20)
+            self.gui.RenderNumber(int(self.cam1.pos.y), 40, SH-20)
+            self.gui.RenderNumber(int(-self.cam1.pos.z), 80, SH-20)
             if self.digging:
                 self.RenderBlockHP()
             pygame.display.flip()
@@ -5951,7 +6250,13 @@ class DigDigApp(object):
         self.show = not self.show
         self.housing.Show(self.show)
     def OpenInventory(self, t, m, k):
-        if k.pressedKey == K_i and not self.guiMode:
+        if k.pressedKey == K_TAB:
+            self.gui.qbMode2 = not self.gui.qbMode2
+            if self.gui.qbMode2:
+                self.gui.qbar = self.gui.qbar2
+            else:
+                self.gui.qbar = self.gui.qbar1
+        elif k.pressedKey == K_i and not self.guiMode:
             self.guiMode = not self.guiMode
             self.gui.toolMode = TM_TOOL
             self.gui.ShowInventory(self.guiMode)
@@ -6028,7 +6333,7 @@ class DigDigApp(object):
         #self.inventoryV.Show(False)
         #cbg = QBBG((0,450,300,30))
         self.gui = DigDigGUI()
-        self.entity = FightingEntity("Player", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"matk":5,"mdfn":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
+        self.entity = FightingEntity("Player", {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"patk":5,"pres":5,"eatk":5,"eres":5,"iatk":5,"ires":5,"fatk":5,"fres":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
         self.entity.eqs = self.gui.eqs
         self.entity.inventory = self.gui.inventory
         self.scripts = {}
@@ -6098,7 +6403,7 @@ class DigDigApp(object):
         entity = FightingEntity("Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         """
-        entity = FightingEntity("Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"matk":5,"mdfn":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
+        entity = FightingEntity("Mob1", {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"patk":5,"pres":5,"eatk":5,"eres":5,"iatk":5,"ires":5,"fatk":5,"fres":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
         self.mobs = []
         #self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         try:
@@ -6182,6 +6487,7 @@ class DigDigApp(object):
             mob.pos = p.x+idx*1.0, p.y, (-p.z)
             idx += 1
         
+        print self.entity.CalculateAttack(), self.entity.CalculateDefense()
         #self.chunks.SaveRegion("test", (64,0,64), (127+64,127,127+64))
         while not done:
             fps.Start()
@@ -6210,7 +6516,8 @@ class DigDigApp(object):
         self.chunks.Save()
         pickle.dump(self.cam1.pos, open("./map/pos.pkl", "w"))
         pickle.dump(self.gui.inventory, open("./map/inv.pkl", "w"))
-        pickle.dump(self.gui.qbar, open("./map/qb.pkl", "w"))
+        pickle.dump(self.gui.qbar1, open("./map/qb.pkl", "w"))
+        pickle.dump(self.gui.qbar2, open("./map/qb2.pkl", "w"))
         pickle.dump(self.gui.boxes, open("./map/chests.pkl", "w"))
         pickle.dump(self.gui.codes, open("./map/codes.pkl", "w"))
         pickle.dump(self.gui.spawns, open("./map/spawns.pkl", "w"))
@@ -6705,23 +7012,45 @@ Long time ago there was a dragon named Ashu Ishtagal and he made a sword by usin
 Using that sword, a guy named Nerd K. defeated the evil magician 8th grader Jungebyung.
 But few years after the Nerd K.'s death, a trader named Dapalah came to possess the sword.
 
-So, I want you to bring me 10 cobble stone blocks.
+So, I want you to bring me 15 cobble stone blocks.
 
 
-[OK] -- user brings cobble stone blocks -- give 1 dirt block for reward, repeat indefinately
-[What does it have to do with 10 cobble stone blocks and what did Dapalah do with the sword?] ---
+[OK] -- user brings cobble stone blocks -- give stone axe, pickaxe shovel and a quest note
+[What does it have to do with 15 cobble stone blocks and what did Dapalah do with the sword?] --- Relationship +3
     OK. About the sword. Long time ago there was ....(repeat of first sentence)
-    So, I want you to bring me 10 cobble stone blocks.
-    [OK] -- repeat first
-    [OK so what does it have to do with bringing 10 cobble stone blocks]
+    So, I want you to bring me 15 cobble stone blocks.
+    [OK]
+    [OK so what does it have to do with bringing 15 cobble stone blocks]
         OK. About the cobblestone. Long time ago there was ....(repeat of first sentence)
-        So, I want you to bring me 10 cobble stone blocks.
-        [OK] -- repeat first
-        [Beat him and take his possessions] - give basic equipments and items and a quest note
+        So, I want you to bring me 15 cobble stone blocks.
+        [OK]
+        [Beat him and take his possessions] - give basic equipments and items and a quest note, Relationship -1
+
 --------------
 랜덤한 구름을 128x128짜리로 한장 만들어서
 전체 맵에 반복해서 흘러가게 한다.
 태양은 뭐 그냥 동쪽에서 위로갔다가 서쪽으로 가고
 태양을 GenQuads에 전달.
 -------------------------
+이제 스킬을 만들고 스킬 아이콘을 만든다.
+초반 마법
+Fireball
+Lightning
+Poison
+Snowball
+을 만들어 보자.
+아이콘도 만들고 효과도 만들어야 하네!
+공격 모션도 칼이나 손으로 때리는거 보여야하고. 일단 보류하고 스킬의 사용부터 하려면 아이콘부터.
+
+탭키를 누르면 퀵바가 바뀌는건 완료.
+
+스킬을 퀵바에 넣고 퀵바에서 스킬을 클릭하면 사라지고, 퀵바에 이미 스킬이 있는걸 스킬창에서 Pick하면 퀵바에 있는 스킬이 사라지고
+정도를 구현해 보자.
+스킬도 인벤토리처럼 한다. 60개의 스킬이면 충분함. 게임 끝까지 해도 남음
+
+Char모드에 스킬탭, 캐릭터탭이 있다.
+캐릭터 탭은 흰바탕에 그냥 글씨만 쓰면 될 듯. 스탯은 스킬을 쓸 때마다 제한없이 오르고 스킬수치도 무제한으로 오른다?
+스탯은 str은 공격 dex는 방어 int는 마법atk이나 dfn에 영향을.
+---------------
+미니맵과 좌표를 출력하는게 필요함
 """
