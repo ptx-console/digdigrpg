@@ -695,6 +695,7 @@ ITEM_SCROLL = GenId()
 ITEM_SENCHANTSCROLL = GenId()
 ITEM_GENCHANTSCROLL = GenId()
 ITEM_DENCHANTSCROLL = GenId()
+ITEM_SKILL = GenId()
 ITEM_NONE = 0
 TOOL_TEX_COORDS = [
         0,0,
@@ -878,6 +879,8 @@ class DigDigGUI(object):
         except:
             self.eqs = [ITEM_NONE for i in range(8)]
 
+        self.skills = [ITEM_NONE for i in range(10*6)]
+
 
         
         eqTexts = [
@@ -968,7 +971,6 @@ class DigDigGUI(object):
 
         self.eqSlotPos = []
         self.charTab = False
-        self.selectedSkill = None
         """
         무기
         방패
@@ -1111,7 +1113,6 @@ class DigDigGUI(object):
             idx = 0
             foundIdx = -1
             self.selectedContItem = ITEM_NONE
-            self.selectedSkill = None
             for pos in self.invSlotPos:
                 x,y = pos
                 if InRect(x,y,30,30,m.x,m.y):
@@ -1169,15 +1170,17 @@ class DigDigGUI(object):
                     idx += 1
 
                 if foundIdx != -1:
-                    skills = (AppSt.entity.magics.values()+AppSt.entity.swordSkills.values()+AppSt.entity.maceSkills.values()+AppSt.entity.spearSkills.values()+AppSt.entity.knuckleSkills.values())
+                    skills = self.skills
+                    
                     if idx < len(skills):
-                        self.selectedSkill = skills[idx]
+                        self.selectedContItem = skills[idx]
 
     def LDown(self, t, m, k):
-        if self.toolMode in [TM_BOX, TM_TOOL, TM_EQ]:
+        if self.toolMode in [TM_BOX, TM_TOOL, TM_EQ, TM_CHAR]:
             self.OnDown(t,m,k,False)
 
 
+ 
     def DoCont(self,x,y,cont, rmb = False):
         if self.dragging:
             #drop or swap
@@ -1292,7 +1295,7 @@ class DigDigGUI(object):
         u"Ring",]
         """
 
-        if self.draggingItem and self.draggingItem.type_ in [ITEM_SWORD, ITEM_SPEAR, ITEM_MACE, ITEM_KNUCKLE, ITEM_SHIELD, ITEM_GLOVES, ITEM_BOOTS, ITEM_GOLDRING, ITEM_GOLDNECLACE, ITEM_HELM, ITEM_ARMOR, ITEM_SILVERRING, ITEM_SILVERNECLACE, ITEM_DIAMONDRING, ITEM_DIAMONDNECLACE]:
+        if self.draggingItem and self.draggingItem.name == "Item" and self.draggingItem.type_ in [ITEM_SWORD, ITEM_SPEAR, ITEM_MACE, ITEM_KNUCKLE, ITEM_SHIELD, ITEM_GLOVES, ITEM_BOOTS, ITEM_GOLDRING, ITEM_GOLDNECLACE, ITEM_HELM, ITEM_ARMOR, ITEM_SILVERRING, ITEM_SILVERNECLACE, ITEM_DIAMONDRING, ITEM_DIAMONDNECLACE]:
             item = self.draggingItem
             def Drop():
                 self.dragging = False
@@ -1335,7 +1338,7 @@ class DigDigGUI(object):
                             Drop()
                     break
                 idx2 += 1
-        elif self.eqs[idx]:
+        elif not self.dragging and self.eqs[idx]:
             def Pick():
                 self.dragging = True
                 self.draggingItem = self.eqs[idx]
@@ -1357,7 +1360,10 @@ class DigDigGUI(object):
             if foundIdx != -1:
                 x = foundIdx % 10
                 y = (foundIdx - x) / 10
-                self.DoCont(x,y, self.inventory, rmb)
+                if not self.dragging:
+                    self.DoCont(x,y, self.inventory, rmb)
+                elif self.dragging and self.draggingItem.name != "Skill":
+                    self.DoCont(x,y, self.inventory, rmb)
 
             idx = 0
             foundIdx = -1
@@ -1402,7 +1408,12 @@ class DigDigGUI(object):
                 if foundIdx != -1:
                     x = foundIdx % 10
                     y = (foundIdx - x) / 10
-                    self.DoCont(x,y,self.selectedBox, rmb)
+
+                    if self.dragging and self.draggingItem.name != "Skill":
+                        self.DoCont(x,y,self.selectedBox, rmb)
+                    elif not self.dragging:
+                        self.DoCont(x,y,self.selectedBox, rmb)
+
             elif self.toolMode == TM_EQ:
                 idx = 0
                 foundIdx = -1
@@ -1417,6 +1428,24 @@ class DigDigGUI(object):
                     x = foundIdx % 10
                     y = (foundIdx - x) / 10
                     self.DoEquip(foundIdx)
+
+            elif self.toolMode == TM_CHAR and not self.charTab:
+                idx = 0
+                foundIdx = -1
+                for pos in self.makeSlotPos:
+                    x,y = pos
+                    if InRect(x,y,30,30,m.x,m.y):
+                        foundIdx = idx
+                        break
+                    idx += 1
+
+                if foundIdx != -1:
+                    x = foundIdx % 10
+                    y = (foundIdx - x) / 10
+                    if self.dragging and self.draggingItem.name == "Skill":
+                        self.DoCont(x,y,self.skills, rmb)
+                    elif not self.dragging:
+                        self.DoCont(x,y,self.skills, rmb)
 
 
     def GenElement(self, gentype):
@@ -1890,101 +1919,11 @@ class DigDigGUI(object):
 
             if self.toolMode == TM_CHAR and not self.charTab:
                 idx = 0
-                for skill in AppSt.entity.magics.values()+AppSt.entity.swordSkills.values()+AppSt.entity.maceSkills.values()+AppSt.entity.spearSkills.values()+AppSt.entity.knuckleSkills.values():
-                    RenderSkill(skill, idx, self.makeRealPos[0], self.makeRealPos[1])
+                for skill in self.skills:
+                    if skill:
+                        RenderSkill(skill.skill, idx, self.makeRealPos[0], self.makeRealPos[1])
                     idx += 1
                 cleared = False
-                if t - self.prevDescT >= self.areaDelay:
-                    self.prevDescT = t
-                    self.textRendererItemTitle.Clear()
-                    self.textRendererItemSmall.Clear()
-                    cleared = True
-
-                def RenderSkillDesc(skill):
-                    x,y,w,h = 5, 20, 165, 380
-                    glDisable(GL_TEXTURE_2D)
-                    glBegin(GL_QUADS)
-                    glColor4f(1.0,1.0,1.0,0.85)
-                    glVertex3f(float(x), -float(y+h), 100.0)
-                    glVertex3f(float(x+w), -float(y+h), 100.0)
-                    glVertex3f(float(x+w), -float(y), 100.0)
-                    glVertex3f(x, -float(y), 100.0)
-                    glEnd()
-
-                    glLineWidth(3.0)
-                    glBegin(GL_LINES)
-                    glColor4f(0.0,0.0,0.0,1.0)
-                    glVertex3f(float(x), -float(y+h), 100.0)
-                    glVertex3f(float(x+w), -float(y+h), 100.0)
-                    
-                    glVertex3f(float(x+w), -float(y+h), 100.0)
-                    glVertex3f(float(x+w), -float(y), 100.0)
-
-                    glVertex3f(float(x+w), -float(y), 100.0)
-                    glVertex3f(x, -float(y), 100.0)
-
-                    glVertex3f(x, -float(y), 100.0)
-                    glVertex3f(float(x), -float(y+h), 100.0)
-                    glEnd()
-                    glEnable(GL_TEXTURE_2D)
-
-                    y = 0
-                    textTitle = [skill.name]
-                    if not skill.textTitleIdx or cleared:
-                        skill.textTitleIdx = [self.textRendererItemTitle.NewTextObject(text, (0,0,0), (10, 25+y)) for text in textTitle]
-
-                    try:
-                        for idx in skill.textTitleIdx:
-                            self.textRendererItemTitle.RenderOne(idx, (10, 25+y))
-                            y += 20
-                    except:
-                        pass
-                    y += 10
-
-                    textDesc = ["Level: %d" % skill.skillPoint, "Range: %d" % skill.range]
-                    for raw in skill.raws:
-                        typetexts = {SKILL_PHYSICAL: "Physical",
-                                SKILL_FIRE: "Fire",
-                                SKILL_ICE: "Ice",
-                                SKILL_ELECTRIC: "Electric",
-                                SKILL_POISON: "Poison",
-                                SKILL_HEAL: "Heal",
-                                SKILL_CURE: "Cure Poison",
-                                SKILL_STR: "Increse Strength",
-                                SKILL_DEX: "Increase Dexterity",
-                                SKILL_INT: "Increase Intelligence",
-                                SKILL_BASEHP: "Increase Max HP",
-                                SKILL_BASEMP: "Increase Max MP",
-                                SKILL_SKILL: "Increase %s" % raw.targetskillname,}
-                        textDesc += ["Point: %d" % (raw.value*(skill.skillPoint*raw.incFactor))]
-                        textDesc += ["Type: %s" % typetexts[raw.skilltype]]
-                        if raw.targettype == TARGET_SELF:
-                            textDesc += ["Target: Self"]
-                        if raw.targettype == TARGET_OTHER:
-                            textDesc += ["Target: Enemy"]
-                        if raw.duration == 0:
-                            textDesc += ["Duration: Instant"]
-                        else:
-                            textDesc += ["Duration: %s sec." % raw.duration]
-                    #paramText = GenItemParams(skill)
-                    if not skill.textDescIdx or cleared:
-                        skill.textDescIdx = [self.textRendererItemSmall.NewTextObject(text, (0,0,0), (10, 25+y)) for text in textDesc]
-                        #skill.textDescIdx += [self.textRendererItemSmall.NewTextObject(text, (0,0,0), (10, 25+y)) for text in paramText]
-
-
-                    try:
-                        for textid in skill.textDescIdx:
-                            self.textRendererItemSmall.RenderOne(textid, (10, 25+y))
-                            y += 15
-                    except:
-                        pass
-                    y += 10
-
-
-
-
-                if self.selectedSkill:
-                    RenderSkillDesc(self.selectedSkill)
 
 
             if self.toolMode == TM_BOX:
@@ -2126,101 +2065,6 @@ class DigDigGUI(object):
 
                         idx += 1
 
-                def GenItemName(item):
-                    textTitle = ["Item"]
-                    if item.type_ == ITEM_SENCHANTSCROLL:
-                        textTitle = [u"Silver Enchant Scroll"]
-                    # 여기서 text width에 맞게 적당히 split을 하고
-                    # 접두사 접미사를 붙인다.
-                    # param에 뭐가 있느냐에 따라 접두사 접미사를..
-                    # 굉장히 귀찮을 듯.
-                    # 음.....아이템 생성에 대해서도 디아처럼 생성하면 되겠네 구조를 아니까...
-                    # 데이지서버 할 때 처럼 스탯 맞추면 될 듯.
-                    return textTitle
-                def GenItemDesc(item):
-                    textDesc = ["Desc"]
-                    if item.type_ == ITEM_SENCHANTSCROLL:
-                        textDesc = [u"Enchant"]
-                    return textDesc
-                def GenItemParams(item):
-                    textParams = str(item.element.params).replace("{","").replace("}","").split(', ')
-                    return textParams
-
-                cleared = False
-                if t - self.prevDescT >= self.areaDelay:
-                    self.prevDescT = t
-                    self.textRendererItemTitle.Clear()
-                    self.textRendererItemSmall.Clear()
-                    cleared = True
-                
-
-                def RenderItemDesc(item):
-                    if not item.element:
-                        return
-                    x,y,w,h = 5, 20, 165, 380
-                    glDisable(GL_TEXTURE_2D)
-                    glBegin(GL_QUADS)
-                    glColor4f(1.0,1.0,1.0,0.85)
-                    glVertex3f(float(x), -float(y+h), 100.0)
-                    glVertex3f(float(x+w), -float(y+h), 100.0)
-                    glVertex3f(float(x+w), -float(y), 100.0)
-                    glVertex3f(x, -float(y), 100.0)
-                    glEnd()
-
-                    glLineWidth(3.0)
-                    glBegin(GL_LINES)
-                    glColor4f(0.0,0.0,0.0,1.0)
-                    glVertex3f(float(x), -float(y+h), 100.0)
-                    glVertex3f(float(x+w), -float(y+h), 100.0)
-                    
-                    glVertex3f(float(x+w), -float(y+h), 100.0)
-                    glVertex3f(float(x+w), -float(y), 100.0)
-
-                    glVertex3f(float(x+w), -float(y), 100.0)
-                    glVertex3f(x, -float(y), 100.0)
-
-                    glVertex3f(x, -float(y), 100.0)
-                    glVertex3f(float(x), -float(y+h), 100.0)
-                    glEnd()
-                    glEnable(GL_TEXTURE_2D)
-
-                    y = 0
-                    textTitle = GenItemName(item)
-                    if not item.textTitleIdx or cleared:
-                        item.textTitleIdx = [self.textRendererItemTitle.NewTextObject(text, (0,0,0), (10, 25+y)) for text in textTitle]
-
-                    try:
-                        for idx in item.textTitleIdx:
-                            self.textRendererItemTitle.RenderOne(idx, (10, 25+y))
-                            y += 20
-                    except:
-                        pass
-                    y += 10
-
-                    textDesc = GenItemDesc(item)
-                    paramText = GenItemParams(item)
-                    if not item.textDescIdx or cleared:
-                        item.textDescIdx = [self.textRendererItemSmall.NewTextObject(text, (0,0,0), (10, 25+y)) for text in textDesc]
-                        item.textDescIdx += [self.textRendererItemSmall.NewTextObject(text, (0,0,0), (10, 25+y)) for text in paramText]
-
-
-                    try:
-                        for textid in item.textDescIdx:
-                            self.textRendererItemSmall.RenderOne(textid, (10, 25+y))
-                            y += 15
-                    except:
-                        pass
-                    y += 10
-
-
-
-                if self.selectedContItem:
-                    if self.selectedContItem.name == "Item":
-                        RenderItemDesc(self.selectedContItem)
-
-
-
-
                 if self.selectedMakeTool != -1 and self.makes[self.selectedMakeTool]:
                     x,y,w,h = 5, 20, 165, 380
                     glDisable(GL_TEXTURE_2D)
@@ -2321,12 +2165,198 @@ class DigDigGUI(object):
 
 
 
+            def GenItemName(item):
+                textTitle = ["Item"]
+                if item.type_ == ITEM_SENCHANTSCROLL:
+                    textTitle = [u"Silver Enchant Scroll"]
+                # 여기서 text width에 맞게 적당히 split을 하고
+                # 접두사 접미사를 붙인다.
+                # param에 뭐가 있느냐에 따라 접두사 접미사를..
+                # 굉장히 귀찮을 듯.
+                # 음.....아이템 생성에 대해서도 디아처럼 생성하면 되겠네 구조를 아니까...
+                # 데이지서버 할 때 처럼 스탯 맞추면 될 듯.
+                return textTitle
+            def GenItemDesc(item):
+                textDesc = ["Desc"]
+                if item.type_ == ITEM_SENCHANTSCROLL:
+                    textDesc = [u"Enchant"]
+                return textDesc
+            def GenItemParams(item):
+                textParams = str(item.element.params).replace("{","").replace("}","").split(', ')
+                return textParams
+
+            cleared = False
+            if t - self.prevDescT >= self.areaDelay:
+                self.prevDescT = t
+                self.textRendererItemTitle.Clear()
+                self.textRendererItemSmall.Clear()
+                cleared = True
+            
+
+            def RenderItemDesc(item):
+                if not item.element:
+                    return
+                x,y,w,h = 5, 20, 165, 380
+                glDisable(GL_TEXTURE_2D)
+                glBegin(GL_QUADS)
+                glColor4f(1.0,1.0,1.0,0.85)
+                glVertex3f(float(x), -float(y+h), 100.0)
+                glVertex3f(float(x+w), -float(y+h), 100.0)
+                glVertex3f(float(x+w), -float(y), 100.0)
+                glVertex3f(x, -float(y), 100.0)
+                glEnd()
+
+                glLineWidth(3.0)
+                glBegin(GL_LINES)
+                glColor4f(0.0,0.0,0.0,1.0)
+                glVertex3f(float(x), -float(y+h), 100.0)
+                glVertex3f(float(x+w), -float(y+h), 100.0)
+                
+                glVertex3f(float(x+w), -float(y+h), 100.0)
+                glVertex3f(float(x+w), -float(y), 100.0)
+
+                glVertex3f(float(x+w), -float(y), 100.0)
+                glVertex3f(x, -float(y), 100.0)
+
+                glVertex3f(x, -float(y), 100.0)
+                glVertex3f(float(x), -float(y+h), 100.0)
+                glEnd()
+                glEnable(GL_TEXTURE_2D)
+
+                y = 0
+                textTitle = GenItemName(item)
+                if not item.textTitleIdx or cleared:
+                    item.textTitleIdx = [self.textRendererItemTitle.NewTextObject(text, (0,0,0), (10, 25+y)) for text in textTitle]
+
+                try:
+                    for idx in item.textTitleIdx:
+                        self.textRendererItemTitle.RenderOne(idx, (10, 25+y))
+                        y += 20
+                except:
+                    pass
+                y += 10
+
+                textDesc = GenItemDesc(item)
+                paramText = GenItemParams(item)
+                if not item.textDescIdx or cleared:
+                    item.textDescIdx = [self.textRendererItemSmall.NewTextObject(text, (0,0,0), (10, 25+y)) for text in textDesc]
+                    item.textDescIdx += [self.textRendererItemSmall.NewTextObject(text, (0,0,0), (10, 25+y)) for text in paramText]
+
+
+                try:
+                    for textid in item.textDescIdx:
+                        self.textRendererItemSmall.RenderOne(textid, (10, 25+y))
+                        y += 15
+                except:
+                    pass
+                y += 10
+
+
+            def RenderSkillDesc(skill):
+                x,y,w,h = 5, 20, 165, 380
+                glDisable(GL_TEXTURE_2D)
+                glBegin(GL_QUADS)
+                glColor4f(1.0,1.0,1.0,0.85)
+                glVertex3f(float(x), -float(y+h), 100.0)
+                glVertex3f(float(x+w), -float(y+h), 100.0)
+                glVertex3f(float(x+w), -float(y), 100.0)
+                glVertex3f(x, -float(y), 100.0)
+                glEnd()
+
+                glLineWidth(3.0)
+                glBegin(GL_LINES)
+                glColor4f(0.0,0.0,0.0,1.0)
+                glVertex3f(float(x), -float(y+h), 100.0)
+                glVertex3f(float(x+w), -float(y+h), 100.0)
+                
+                glVertex3f(float(x+w), -float(y+h), 100.0)
+                glVertex3f(float(x+w), -float(y), 100.0)
+
+                glVertex3f(float(x+w), -float(y), 100.0)
+                glVertex3f(x, -float(y), 100.0)
+
+                glVertex3f(x, -float(y), 100.0)
+                glVertex3f(float(x), -float(y+h), 100.0)
+                glEnd()
+                glEnable(GL_TEXTURE_2D)
+
+                y = 0
+                textTitle = [skill.name]
+                if not skill.textTitleIdx or cleared:
+                    skill.textTitleIdx = [self.textRendererItemTitle.NewTextObject(text, (0,0,0), (10, 25+y)) for text in textTitle]
+
+                try:
+                    for idx in skill.textTitleIdx:
+                        self.textRendererItemTitle.RenderOne(idx, (10, 25+y))
+                        y += 20
+                except:
+                    pass
+                y += 10
+
+                textDesc = ["Level: %d" % skill.skillPoint, "Range: %d" % skill.range]
+                for raw in skill.raws:
+                    typetexts = {SKILL_PHYSICAL: "Physical",
+                            SKILL_FIRE: "Fire",
+                            SKILL_ICE: "Ice",
+                            SKILL_ELECTRIC: "Electric",
+                            SKILL_POISON: "Poison",
+                            SKILL_HEAL: "Heal",
+                            SKILL_CURE: "Cure Poison",
+                            SKILL_STR: "Increse Strength",
+                            SKILL_DEX: "Increase Dexterity",
+                            SKILL_INT: "Increase Intelligence",
+                            SKILL_BASEHP: "Increase Max HP",
+                            SKILL_BASEMP: "Increase Max MP",
+                            SKILL_SKILL: "Increase %s" % raw.targetskillname,}
+                    textDesc += ["Point: %d" % (raw.value*(skill.skillPoint*raw.incFactor))]
+                    textDesc += ["Type: %s" % typetexts[raw.skilltype]]
+                    if raw.targettype == TARGET_SELF:
+                        textDesc += ["Target: Self"]
+                    if raw.targettype == TARGET_OTHER:
+                        textDesc += ["Target: Enemy"]
+                    if raw.duration == 0:
+                        textDesc += ["Duration: Instant"]
+                    else:
+                        textDesc += ["Duration: %s sec." % raw.duration]
+                #paramText = GenItemParams(skill)
+                if not skill.textDescIdx or cleared:
+                    skill.textDescIdx = [self.textRendererItemSmall.NewTextObject(text, (0,0,0), (10, 25+y)) for text in textDesc]
+                    #skill.textDescIdx += [self.textRendererItemSmall.NewTextObject(text, (0,0,0), (10, 25+y)) for text in paramText]
+
+
+                try:
+                    for textid in skill.textDescIdx:
+                        self.textRendererItemSmall.RenderOne(textid, (10, 25+y))
+                        y += 15
+                except:
+                    pass
+                y += 10
+
+
+
+
+            if self.selectedContItem and self.selectedContItem.name == "Skill" and self.selectedContItem.skill:
+                RenderSkillDesc(self.selectedContItem.skill)
+            elif self.selectedContItem:
+                if self.selectedContItem.name == "Item":
+                    RenderItemDesc(self.selectedContItem)
+
+
+
+
+
+
+
         idx = 0
         for item in self.qbar:
             if not item:
                 idx += 1
                 continue
-            RenderItem(item, idx, self.qbarRealPos[0], self.qbarRealPos[1])
+
+            if item.name == "Skill":
+                RenderSkill(item.skill, idx, self.qbarRealPos[0], self.qbarRealPos[1])
+            else:
+                RenderItem(item, idx, self.qbarRealPos[0], self.qbarRealPos[1])
             idx += 1
 
         x = self.selectedItem%10
@@ -2354,7 +2384,10 @@ class DigDigGUI(object):
         glEnable(GL_TEXTURE_2D)
 
         if self.invShown and self.dragging:
-            RenderItem(self.draggingItem, 0, m.x-15,m.y-15)
+            if self.draggingItem.name == "Skill":
+                RenderSkill(self.draggingItem.skill, 0, m.x-15,m.y-15)
+            else:
+                RenderItem(self.draggingItem, 0, m.x-15,m.y-15)
 
 
 
@@ -3617,7 +3650,7 @@ BLOCK_SPAWNER = GenId()
 
 
 class Item(object):
-    def __init__(self, type_, count, stackable = False, name="Item", color=None, inv=None, element=None, stats=[]):
+    def __init__(self, type_, count, stackable = False, name="Item", color=None, inv=None, element=None, stats=[], skill=None):
         self.type_ = type_
         self.maxLen = 64
         self.stackable = stackable
@@ -3629,6 +3662,11 @@ class Item(object):
         self.stats = stats
         self.textTitleIdx = []
         self.textDescIdx = []
+        self.skill = skill
+
+class Skill(Item):
+    def __init__(self, skill):
+        Item.__init__(self, ITEM_SKILL, 1, False, "Skill", skill=skill)
 
 class Block(Item):
     def __init__(self, type_, count):
@@ -4549,7 +4587,6 @@ class CombinedSkill(object): # 위의 생스킬을 합쳐서 스킬하나를 만
         self.skillPoint = 1.0
         self.textTitleIdx = []
         self.textDescIdx = []
-
     def Apply(self, user, target): # 레인지 검사는 MobGL이나 DIgDigApp에서
         self.skillPoint += (self.skillPoint/self.skillPoint**1.5)/10.0
 
@@ -4593,7 +4630,8 @@ class FightingEntity(object):
         iceEle = RawSkill("Ice", {"value": 5, "incFactor": 2, "stype": SKILL_ICE, "ttype": TARGET_OTHER, "dur": 0})
         elecEle = RawSkill("Electric", {"value": 5, "incFactor": 2, "stype": SKILL_ELECTRIC, "ttype": TARGET_OTHER, "dur": 0})
         poisonEle = RawSkill("Poison", {"value": 5, "incFactor": 2, "stype": SKILL_POISON, "ttype": TARGET_OTHER, "dur": 0})
-        self.magics = {"Fireball": CombinedSkill("Fireball", [fireEle], [4,2], {"minreq": 0, "range": 10}), "Lightning": CombinedSkill("Lightning", [elecEle], [4,3], {"minreq": 0, "range": 10}), "Poison": CombinedSkill("Poison", [poisonEle], [4,4], {"minreq": 0, "range": 10}), "Snowball": CombinedSkill("Snowball", [iceEle], [4,5], {"minreq": 0, "range": 10})}
+        healEle = RawSkill("Heal", {"value": 5, "incFactor": 2, "stype": SKILL_HEAL, "ttype": TARGET_SELF, "dur": 5})
+        self.magics = {"Fireball": Skill(CombinedSkill("Fireball", [fireEle], [4,2], {"minreq": 0, "range": 10})), "Lightning": Skill(CombinedSkill("Lightning", [elecEle], [4,3], {"minreq": 0, "range": 10})), "Poison": Skill(CombinedSkill("Poison", [poisonEle], [4,4], {"minreq": 0, "range": 10})), "Snowball": Skill(CombinedSkill("Snowball", [iceEle], [4,5], {"minreq": 0, "range": 10})), "Heal": Skill(CombinedSkill("Heal", [healEle], [4,6], {"minreq": 0, "range": 0}))}
         self.curhp = self.basehp
         self.curmp = self.basemp
         self.eqs = [] # 몹일경우 여기에 담고
@@ -6336,6 +6374,11 @@ class DigDigApp(object):
         self.entity = FightingEntity("Player", {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"patk":5,"pres":5,"eatk":5,"eres":5,"iatk":5,"ires":5,"fatk":5,"fres":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
         self.entity.eqs = self.gui.eqs
         self.entity.inventory = self.gui.inventory
+        skills = (AppSt.entity.magics.values()+AppSt.entity.swordSkills.values()+AppSt.entity.maceSkills.values()+AppSt.entity.spearSkills.values()+AppSt.entity.knuckleSkills.values())
+        idx = 0
+        for skill in skills:
+            self.gui.skills[idx] = skill
+            idx += 1
         self.scripts = {}
         for coord in self.gui.codes:
             self.scripts[coord] = ScriptLauncher(coord)
