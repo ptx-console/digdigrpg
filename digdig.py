@@ -1907,7 +1907,7 @@ class DigDigGUI(object):
                         RenderItemEq(item, self.eqSlotPos[idx][0], self.eqSlotPos[idx][1])
                     idx += 1
 
-            if self.toolMode in [TM_BOX, TM_TOOL, TM_EQ]:
+            if self.toolMode in [TM_BOX, TM_TOOL, TM_EQ, TM_CHAR]:
                 idx = 0
                 for item in self.inventory:
                     if not item:
@@ -2294,6 +2294,7 @@ class DigDigGUI(object):
                 y += 10
 
                 textDesc = ["Level: %d" % skill.skillPoint, "Range: %d" % skill.range]
+                textDesc += ["Cost: %d" % (skill.cost*(skill.skillPoint*0.5))]
                 for raw in skill.raws:
                     typetexts = {SKILL_PHYSICAL: "Physical",
                             SKILL_FIRE: "Fire",
@@ -2308,7 +2309,18 @@ class DigDigGUI(object):
                             SKILL_BASEHP: "Increase Max HP",
                             SKILL_BASEMP: "Increase Max MP",
                             SKILL_SKILL: "Increase %s" % raw.targetskillname,}
-                    textDesc += ["Point: %d" % (raw.value*(skill.skillPoint*raw.incFactor))]
+                    if raw.skilltype == SKILL_FIRE:
+                        textDesc += ["Point: %d" % (((AppSt.entity.fatk+raw.value*(skill.skillPoint*raw.incFactor)))*(AppSt.entity.int**1.8/AppSt.entity.int))]
+                    elif raw.skilltype == SKILL_PHYSICAL:
+                        textDesc += ["Point: %d" % (((AppSt.entity.atk+raw.value*(skill.skillPoint*raw.incFactor)))*(AppSt.entity.int**1.8/AppSt.entity.int))]
+                    elif raw.skilltype == SKILL_ICE:
+                        textDesc += ["Point: %d" % (((AppSt.entity.iatk+raw.value*(skill.skillPoint*raw.incFactor)))*(AppSt.entity.int**1.8/AppSt.entity.int))]
+                    elif raw.skilltype == SKILL_POISON:
+                        textDesc += ["Point: %d" % (((AppSt.entity.patk+raw.value*(skill.skillPoint*raw.incFactor)))*(AppSt.entity.int**1.8/AppSt.entity.int))]
+                    elif raw.skilltype == SKILL_ELECTRIC:
+                        textDesc += ["Point: %d" % (((AppSt.entity.eatk+raw.value*(skill.skillPoint*raw.incFactor)))*(AppSt.entity.int**1.8/AppSt.entity.int))]
+                    else:
+                        textDesc += ["Point: %d" % (((raw.value*(skill.skillPoint*raw.incFactor)))*(AppSt.entity.int**1.8/AppSt.entity.int))]
                     textDesc += ["Type: %s" % typetexts[raw.skilltype]]
                     if raw.targettype == TARGET_SELF:
                         textDesc += ["Target: Self"]
@@ -4574,8 +4586,73 @@ class RawSkill(object):
 
     def SetSkillName(self, name):
         self.targetskillname = name
-    def Apply(self, user, target):
-        pass
+
+    def CalculateMagicDefense(self, target, stype):
+        dfn = 0
+        if stype == SKILL_PHYSICAL:
+            dfn = target.dfn
+        if stype == SKILL_ICE:
+            dfn = target.ires
+        if stype == SKILL_FIRE:
+            dfn = target.fres
+        if stype == SKILL_POISON:
+            dfn = target.pres
+        if stype == SKILL_ELECTRIC:
+            dfn = target.eres
+        for item in target.eqs:
+            if item:
+                if "dfn" in item.element:
+                    if stype == SKILL_PHYSICAL:
+                        dfn += item.element["dfn"]
+                if "ires" in item.element:
+                    if stype == SKILL_ICE:
+                        dfn += item.element["ires"]
+                if "fres" in item.element:
+                    if stype == SKILL_FIRE:
+                        dfn += item.element["fres"]
+                if "pres" in item.element:
+                    if stype == SKILL_POISON:
+                        dfn += item.element["pres"]
+                if "eres" in item.element:
+                    if stype == SKILL_ELECTRIC:
+                        dfn += item.element["eres"]
+        dfn *= (target.int**1.8/target.int)
+        return dfn
+
+    def Apply(self, user, target, skill):
+        if self.targettype == TARGET_SELF:
+            if self.skilltype == SKILL_HEAL:
+                user.curhp += (self.value*(skill.skillPoint*self.incFactor))*(user.int**1.8/user.int)
+                if user.curhp > user.basehp:
+                    user.curhp = user.basehp
+        elif self.targettype == TARGET_OTHER and target:
+            if self.skilltype == SKILL_PHYSICAL:
+                target.curhp -= ((user.atk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
+                target.onhit(user)
+                if target.curhp < 0:
+                    target.ondead(user)
+            if self.skilltype == SKILL_FIRE:
+                target.curhp -= ((user.fatk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
+                target.onhit(user)
+                if target.curhp < 0:
+                    target.ondead(user)
+            if self.skilltype == SKILL_ICE:
+                target.curhp -= ((user.iatk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
+                target.onhit(user)
+                if target.curhp < 0:
+                    target.ondead(user)
+            if self.skilltype == SKILL_ELECTRIC:
+                target.curhp -= ((user.eatk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
+                target.onhit(user)
+                if target.curhp < 0:
+                    target.ondead(user)
+            if self.skilltype == SKILL_POISON:
+                target.curhp -= ((user.patk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
+                target.onhit(user)
+                if target.curhp < 0:
+                    target.ondead(user)
+
+
 
 class CombinedSkill(object): # 위의 생스킬을 합쳐서 스킬하나를 만든다.
     def __init__(self, name, raws, texcoord, params):
@@ -4583,12 +4660,19 @@ class CombinedSkill(object): # 위의 생스킬을 합쳐서 스킬하나를 만
         self.name = name
         self.minreq = params["minreq"] # 스킬을 사용할 수 있는 sword스킬레벨 제한
         self.range = params["range"]
+        self.cost = params["cost"]
         self.texcoord = texcoord
         self.skillPoint = 1.0
         self.textTitleIdx = []
         self.textDescIdx = []
     def Apply(self, user, target): # 레인지 검사는 MobGL이나 DIgDigApp에서
-        self.skillPoint += (self.skillPoint/self.skillPoint**1.5)/10.0
+        mpcost = (self.cost*(self.skillPoint*0.5))
+        if user.curmp > mpcost:
+            user.curmp -= mpcost
+            for raw in self.raws:
+                raw.Apply(user, target, self)
+            self.skillPoint += (self.skillPoint/self.skillPoint**1.5)/10.0
+            user.magic += (user.magic/user.magic**1.5)/10.0
 
 class FightingEntity(object):
     def __init__(self, name, params):
@@ -4631,7 +4715,7 @@ class FightingEntity(object):
         elecEle = RawSkill("Electric", {"value": 5, "incFactor": 2, "stype": SKILL_ELECTRIC, "ttype": TARGET_OTHER, "dur": 0})
         poisonEle = RawSkill("Poison", {"value": 5, "incFactor": 2, "stype": SKILL_POISON, "ttype": TARGET_OTHER, "dur": 0})
         healEle = RawSkill("Heal", {"value": 5, "incFactor": 2, "stype": SKILL_HEAL, "ttype": TARGET_SELF, "dur": 5})
-        self.magics = {"Fireball": Skill(CombinedSkill("Fireball", [fireEle], [4,2], {"minreq": 0, "range": 10})), "Lightning": Skill(CombinedSkill("Lightning", [elecEle], [4,3], {"minreq": 0, "range": 10})), "Poison": Skill(CombinedSkill("Poison", [poisonEle], [4,4], {"minreq": 0, "range": 10})), "Snowball": Skill(CombinedSkill("Snowball", [iceEle], [4,5], {"minreq": 0, "range": 10})), "Heal": Skill(CombinedSkill("Heal", [healEle], [4,6], {"minreq": 0, "range": 0}))}
+        self.magics = {"Fireball": Skill(CombinedSkill("Fireball", [fireEle], [4,2], {"minreq": 0, "range": 10, "cost": 2})), "Lightning": Skill(CombinedSkill("Lightning", [elecEle], [4,3], {"minreq": 0, "range": 10, "cost": 2})), "Poison": Skill(CombinedSkill("Poison", [poisonEle], [4,4], {"minreq": 0, "range": 10, "cost": 2})), "Snowball": Skill(CombinedSkill("Snowball", [iceEle], [4,5], {"minreq": 0, "range": 10, "cost": 2})), "Heal": Skill(CombinedSkill("Heal", [healEle], [4,6], {"minreq": 0, "range": 0, "cost": 2}))}
         self.curhp = self.basehp
         self.curmp = self.basemp
         self.eqs = [] # 몹일경우 여기에 담고
@@ -5122,6 +5206,12 @@ class DigDigApp(object):
                 self.OnMobRHit(mob, t)
                 self.chColor = self.BLUE_CH
                 return
+        item = self.gui.qbar[self.gui.selectedItem]
+        if item and item.name == "Skill":
+            if t - self.prevAttack > self.attackDelay:
+                self.prevAttack = t
+                item.skill.Apply(self.entity, None)
+            return
         if not self.lastBlock:
             return
         x,y,z,f,b = self.lastBlock
@@ -5581,8 +5671,12 @@ class DigDigApp(object):
             self.sounds["Hit"].play()
 
     def OnMobRHit(self, mob, t):
+        if t - self.prevAttack > self.attackDelay:
+            self.prevAttack = t
+            item = self.gui.qbar[self.gui.selectedItem]
+            item.skill.Apply(self.entity, mob[0].entity)
         # XXX 여기서 마법 또는 상점 인터랙션?
-        pass
+        # 마법 연사력을 결정해서 딜레이를 줘야함
 
     def IsStairThere(self, x,y,z):
         x1 = x-(x%32)
@@ -6375,10 +6469,27 @@ class DigDigApp(object):
         self.entity.eqs = self.gui.eqs
         self.entity.inventory = self.gui.inventory
         skills = (AppSt.entity.magics.values()+AppSt.entity.swordSkills.values()+AppSt.entity.maceSkills.values()+AppSt.entity.spearSkills.values()+AppSt.entity.knuckleSkills.values())
+
         idx = 0
         for skill in skills:
             self.gui.skills[idx] = skill
             idx += 1
+
+        for item in self.gui.qbar1:
+            sIdx = 0
+            for skill in self.gui.skills[:]:
+                if item and item.name == "Skill" and skill and item.skill.name == skill.skill.name:
+                    self.gui.skills[sIdx] = ITEM_NONE
+                    break
+                sIdx += 1
+        for item in self.gui.qbar2:
+            sIdx = 0
+            for skill in self.gui.skills[:]:
+                if item and item.name == "Skill" and skill and item.skill.name == skill.skill.name:
+                    self.gui.skills[sIdx] = ITEM_NONE
+                    break
+                sIdx += 1
+
         self.scripts = {}
         for coord in self.gui.codes:
             self.scripts[coord] = ScriptLauncher(coord)
@@ -6446,9 +6557,9 @@ class DigDigApp(object):
         entity = FightingEntity("Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         """
-        entity = FightingEntity("Mob1", {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"patk":5,"pres":5,"eatk":5,"eres":5,"iatk":5,"ires":5,"fatk":5,"fres":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
+        entity = FightingEntity("Mob1", {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":10,"dfn":5,"patk":5,"pres":5,"eatk":5,"eres":5,"iatk":5,"ires":5,"fatk":5,"fres":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
         self.mobs = []
-        #self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
+        self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         try:
             self.stairs = pickle.load(open("./map/stairs.pkl", "r"))
         except:
