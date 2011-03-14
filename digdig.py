@@ -876,6 +876,8 @@ class DigDigGUI(object):
         self.areaDelay = 500
         self.numbers = [self.textRenderer.NewTextObject(`i`, (255,255,255), True, (0,0,0)) for i in range(10)]
         self.numbers += [self.textRenderer.NewTextObject("-", (255,255,255), True, (0,0,0))]
+        self.numbersS = [self.textRendererSmall.NewTextObject(`i`, (0,0,0), False, (0,0,0)) for i in range(10)]
+        self.numbersS += [self.textRendererSmall.NewTextObject("-", (0,0,0), False, (0,0,0))]
 
 
 
@@ -1004,6 +1006,25 @@ class DigDigGUI(object):
         self.makes[58] = MakeTool(u"Gold Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_GENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[59] = MakeTool(u"Diamond\nEnchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_DENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.recipeTextID = self.textRenderer.NewTextObject(u"Recipe:", (0,0,0))
+        self.charTabID = self.textRendererSmall.NewTextObject(u"Char", (0,0,0))
+        self.strID = self.textRendererSmall.NewTextObject(u"Str:", (0,0,0))
+        self.dexID = self.textRendererSmall.NewTextObject(u"Dex:", (0,0,0))
+        self.intID = self.textRendererSmall.NewTextObject(u"Int:", (0,0,0))
+        self.skillTabID = self.textRendererSmall.NewTextObject(u"Skills", (0,0,0))
+        self.swordID = self.textRendererSmall.NewTextObject(u"Sword:", (0,0,0))
+        self.maceID = self.textRendererSmall.NewTextObject(u"Mace:", (0,0,0))
+        self.spearID = self.textRendererSmall.NewTextObject(u"Spear:", (0,0,0))
+        self.knuckleID = self.textRendererSmall.NewTextObject(u"Knuckle:", (0,0,0))
+        self.armorID = self.textRendererSmall.NewTextObject(u"Armor:", (0,0,0))
+        self.magicID = self.textRendererSmall.NewTextObject(u"Magic:", (0,0,0))
+        self.atkID = self.textRendererSmall.NewTextObject(u"Melee:", (0,0,0))
+        self.dfnID = self.textRendererSmall.NewTextObject(u"Defense:", (0,0,0))
+        self.patkID = self.textRendererSmall.NewTextObject(u"Poison:", (0,0,0))
+        self.iatkID = self.textRendererSmall.NewTextObject(u"Ice:", (0,0,0))
+        self.fatkID = self.textRendererSmall.NewTextObject(u"Fire:", (0,0,0))
+        self.eatkID = self.textRendererSmall.NewTextObject(u"Electric:", (0,0,0))
+        self.resID = self.textRendererSmall.NewTextObject(u"- Resist -", (0,0,0))
+
 
         self.invSlotPos = []
         invX, invY = self.invRealPos
@@ -1024,7 +1045,8 @@ class DigDigGUI(object):
                 self.makeSlotPos += [(invX+x*30, invY+y*30)]
 
         self.eqSlotPos = []
-        self.charTab = False
+        self.charTab = True
+
         """
         무기
         방패
@@ -1230,6 +1252,8 @@ class DigDigGUI(object):
                         self.selectedContItem = skills[idx]
 
     def LDown(self, t, m, k):
+        if self.toolMode == TM_CHAR:
+            pass # XXX:#
         if self.toolMode in [TM_BOX, TM_TOOL, TM_EQ, TM_CHAR]:
             self.OnDown(t,m,k,False)
 
@@ -1622,6 +1646,16 @@ class DigDigGUI(object):
         if k.pressedKey == K_0:
             self.selectedItem = 9
 
+    def RenderNumberS(self, num, x, y):
+        count = str(num)
+        x = x
+        y = y
+        for c in count:
+            if c == "-":
+                self.textRendererSmall.RenderText(self.numbersS[10], (x, y))
+            else:
+                self.textRendererSmall.RenderText(self.numbersS[int(c)], (x, y))
+            x += 9
     def RenderNumber(self, num, x, y):
         count = str(num)
         x = x
@@ -1686,8 +1720,6 @@ class DigDigGUI(object):
             glTexCoord2f(0.0, 200.0/512.0)
             glVertex3f(x, -float(y), 100.0)
 
-
-
         if self.invShown and self.toolMode in [TM_BOX, TM_TOOL]:
             x,y = self.invPos
             glTexCoord2f(0.0, float(186)/512.0)
@@ -1714,6 +1746,7 @@ class DigDigGUI(object):
 
             glTexCoord2f(0.0, 0.0)
             glVertex3f(x, -float(y), 100.0)
+
 
         if self.invShown and self.toolMode == TM_CHAR and not self.charTab:
             x,y = self.invPos
@@ -1758,6 +1791,138 @@ class DigDigGUI(object):
         glVertex3f(x, -float(y), 100.0)
 
         glEnd()
+            # XXX: 여기다가 출력
+            # 출력은 어찌하나.스탯이 오를 때마다 업뎃?
+            # 켤 때마다 업뎃하게 하면 된다. 켠 상태에서 스킬이 올라도 걍 표시하지 않는다?
+            # 아...숫자니까 글자는 스태틱, 숫자는 숫자 렌더러로..
+            # 소수점자리는 표시하지 않음.
+        if self.invShown and self.toolMode == TM_CHAR and self.charTab:
+            glBegin(GL_QUADS)
+            x,y = self.invPos
+            glTexCoord2f(0.0, float(186)/512.0)
+            glVertex3f(float(x), -float(y+186), 100.0)
+
+            glTexCoord2f(float(306)/512.0, float(186)/512.0)
+            glVertex3f(float(x+306), -float(y+186), 100.0)
+
+            glTexCoord2f(float(306)/512.0, 0.0)
+            glVertex3f(float(x+306), -float(y), 100.0)
+
+            glTexCoord2f(0.0, 0.0)
+            glVertex3f(x, -float(y), 100.0)
+            glEnd()
+
+
+            x,y = self.makePos
+            DrawQuad(x,y,306,186, (205,209,184,255), (205,209,184,255))
+            x += 3
+            orgx = x
+            y += 3
+            self.textRendererSmall.RenderText(self.strID, (x,y))
+            x += 25
+            self.RenderNumberS(int(AppSt.entity.str), x,y)
+            x += 30
+            self.textRendererSmall.RenderText(self.dexID, (x,y))
+            x += 25
+            self.RenderNumberS(int(AppSt.entity.dex), x,y)
+            x += 30
+            self.textRendererSmall.RenderText(self.intID, (x,y))
+            x += 25
+            self.RenderNumberS(int(AppSt.entity.int), x,y)
+
+            x = orgx
+            y += 20
+            self.textRendererSmall.RenderText(self.atkID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.atk), x,y)
+            x += 100
+            self.textRendererSmall.RenderText(self.dfnID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.dfn), x,y)
+
+
+            x = orgx
+            y += 15
+            self.textRendererSmall.RenderText(self.swordID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.sword), x,y)
+            x += 100
+            self.textRendererSmall.RenderText(self.maceID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.mace), x,y)
+
+
+            x = orgx
+            y += 15
+            self.textRendererSmall.RenderText(self.spearID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.spear), x,y)
+            x += 100
+            self.textRendererSmall.RenderText(self.knuckleID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.knuckle), x,y)
+
+
+            x = orgx
+            y += 15
+            self.textRendererSmall.RenderText(self.armorID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.armor), x,y)
+            x += 100
+            self.textRendererSmall.RenderText(self.magicID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.magic), x,y)
+
+
+            x = orgx
+            y += 20
+            self.textRendererSmall.RenderText(self.patkID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.patk), x,y)
+            x += 100
+            self.textRendererSmall.RenderText(self.iatkID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.iatk), x,y)
+
+
+            x = orgx
+            y += 15
+            self.textRendererSmall.RenderText(self.eatkID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.eatk), x,y)
+            x += 100
+            self.textRendererSmall.RenderText(self.fatkID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.fatk), x,y)
+
+            x = orgx
+            y += 20
+            self.textRendererSmall.RenderText(self.resID, (x,y))
+
+
+            x = orgx
+            y += 15
+            self.textRendererSmall.RenderText(self.patkID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.pres), x,y)
+            x += 100
+            self.textRendererSmall.RenderText(self.iatkID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.ires), x,y)
+
+
+            x = orgx
+            y += 15
+            self.textRendererSmall.RenderText(self.eatkID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.eres), x,y)
+            x += 100
+            self.textRendererSmall.RenderText(self.fatkID, (x,y))
+            x += 50
+            self.RenderNumberS(int(AppSt.entity.fres), x,y)
+
+
+
         if self.invShown and self.toolMode == TM_EQ:
             idx = 0
             for pos in self.eqSlotPos[:4]:
@@ -4300,6 +4465,7 @@ class MobGL(object):
 
     def OnDead(self, attacker):
         AppSt.mobs.remove(self)
+        AppSt.gui.msgBox.AddText("Mob is dead.", (68,248,93), (8,29,1))
     def OnHit(self, attacker):
         self.animstate = ANIM_HIT
         self.prevHit = pygame.time.get_ticks()
@@ -4795,14 +4961,11 @@ class RawSkill(object):
         if self.targettype == TARGET_SELF:
             if self.skilltype == SKILL_HEAL:
                 heal = (self.value*(skill.skillPoint*self.incFactor))*(user.int**1.8/user.int)
-                heal *= user.magic**1.5/user.magic
+                heal *= user.magic**1.2/user.magic
                 user.curhp += heal
-                if user.curhp > user.basehp:
-                    user.curhp = user.basehp
-                if user == AppSt.entity:
-                    AppSt.gui.msgBox.AddText("You heal yourself: %d" % heal, (68,248,93), (8,29,1))
-                else:
-                    AppSt.gui.msgBox.AddText("Mob uses heal: %d" % heal, (248,98,68), (73,16,5))
+                if user.curhp > user.CalcMaxHP():
+                    user.curhp = user.CalcMaxHP()
+                return heal
 
 
         elif self.targettype == TARGET_OTHER and target:
@@ -4817,11 +4980,16 @@ class RawSkill(object):
             if self.skilltype == SKILL_POISON:
                 dmg = ((user.patk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
 
-            dmg *= user.magic**1.5/user.magic
+
+            dmg *= user.magic**1.2/user.magic
             target.curhp -= dmg
             target.onhit(user)
             if target.curhp < 0:
                 target.ondead(user)
+                if AppSt.curAttackingMob == target:
+                    AppSt.curAttackingMob = None
+            return dmg
+        return 0
 
 
 
@@ -4840,10 +5008,25 @@ class CombinedSkill(object): # 위의 생스킬을 합쳐서 스킬하나를 만
         mpcost = (self.cost*(self.skillPoint*0.5))
         if user.curmp > mpcost:
             user.curmp -= mpcost
+            dmg = 0
             for raw in self.raws:
-                raw.Apply(user, target, self)
+                dmg += raw.Apply(user, target, self)
             self.skillPoint += (self.skillPoint/self.skillPoint**1.5)/10.0
             user.magic += (user.magic/user.magic**1.5)/10.0
+            user.int += (user.int/user.int**1.5)/10.0
+            print user.int
+            if self.name == "Heal":
+                if user == AppSt.entity:
+                    AppSt.gui.msgBox.AddText("You heal yourself: %d" % dmg, (68,248,93), (8,29,1))
+                else:
+                    AppSt.gui.msgBox.AddText("Mob uses heal: %d" % dmg, (248,98,68), (73,16,5))
+            else:
+                magicT = self.name
+                if user == AppSt.entity:
+                    AppSt.gui.msgBox.AddText("You use %s: %d" % (magicT, dmg), (68,248,93), (8,29,1))
+                else:
+                    AppSt.gui.msgBox.AddText("Mob uses %s: %d" % (magicT, dmg), (248,98,68), (73,16,5))
+
 
 class FightingEntity(object):
     def __init__(self, name, params):
@@ -4881,14 +5064,14 @@ class FightingEntity(object):
         self.spearSkills = {}
         self.knuckleSkills = {}
         self.armorSkills = {}
-        fireEle = RawSkill("Fire", {"value": 5, "incFactor": 2, "stype": SKILL_FIRE, "ttype": TARGET_OTHER, "dur": 0})
-        iceEle = RawSkill("Ice", {"value": 5, "incFactor": 2, "stype": SKILL_ICE, "ttype": TARGET_OTHER, "dur": 0})
-        elecEle = RawSkill("Electric", {"value": 5, "incFactor": 2, "stype": SKILL_ELECTRIC, "ttype": TARGET_OTHER, "dur": 0})
-        poisonEle = RawSkill("Poison", {"value": 5, "incFactor": 2, "stype": SKILL_POISON, "ttype": TARGET_OTHER, "dur": 0})
-        healEle = RawSkill("Heal", {"value": 5, "incFactor": 2, "stype": SKILL_HEAL, "ttype": TARGET_SELF, "dur": 5})
+        fireEle = RawSkill("Fire", {"value": 5, "incFactor": 1.2, "stype": SKILL_FIRE, "ttype": TARGET_OTHER, "dur": 0})
+        iceEle = RawSkill("Ice", {"value": 5, "incFactor": 1.2, "stype": SKILL_ICE, "ttype": TARGET_OTHER, "dur": 0})
+        elecEle = RawSkill("Electric", {"value": 5, "incFactor": 1.2, "stype": SKILL_ELECTRIC, "ttype": TARGET_OTHER, "dur": 0})
+        poisonEle = RawSkill("Poison", {"value": 5, "incFactor": 1.2, "stype": SKILL_POISON, "ttype": TARGET_OTHER, "dur": 0})
+        healEle = RawSkill("Heal", {"value": 5, "incFactor": 1.2, "stype": SKILL_HEAL, "ttype": TARGET_SELF, "dur": 5})
         self.magics = {"Fireball": Skill(CombinedSkill("Fireball", [fireEle], [4,2], {"minreq": 0, "range": 10, "cost": 2})), "Lightning": Skill(CombinedSkill("Lightning", [elecEle], [4,3], {"minreq": 0, "range": 10, "cost": 2})), "Poison": Skill(CombinedSkill("Poison", [poisonEle], [4,4], {"minreq": 0, "range": 10, "cost": 2})), "Snowball": Skill(CombinedSkill("Snowball", [iceEle], [4,5], {"minreq": 0, "range": 10, "cost": 2})), "Heal": Skill(CombinedSkill("Heal", [healEle], [4,6], {"minreq": 0, "range": 0, "cost": 2}))}
-        self.curhp = self.basehp
-        self.curmp = self.basemp
+        self.curhp = self.CalcMaxHP()
+        self.curmp = self.CalcMaxMP()
         self.eqs = [] # 몹일경우 여기에 담고
         self.inventory = [] # 플레이어일경우 그냥 링크일 뿐
         # 순수하게 element만 담으면 뭔가 퍼즐이 맞을 거 같지만 아이템 자체를 담아야함.
@@ -4905,6 +5088,10 @@ class FightingEntity(object):
         self.onhit = A
         self.karma = 0 # 성향에 따라 Evil, Good, Neutral의 여러 중간단계로 나뉨? 음.... 카르마가 게임에 미치는 영향은 어떨까
 
+    def CalcMaxHP(self):
+        return self.basehp + (self.str**1.5/self.str)*25
+    def CalcMaxMP(self):
+        return self.basemp + (self.int**1.5/self.int)*25
     def BindDead(self, func):
         self.ondead = func
 
@@ -4921,19 +5108,20 @@ class FightingEntity(object):
             if not item:
                 continue
             if item.type_ == ITEM_SWORD:
-                atk *= self.sword**1.5/self.sword
+                atk *= self.sword**1.2/self.sword
                 break
             elif item.type_ == ITEM_SPEAR:
-                atk *= self.spear**1.5/self.spear
+                atk *= self.spear**1.2/self.spear
                 break
             elif item.type_ == ITEM_MACE:
-                atk *= self.mace**1.5/self.mace
+                atk *= self.mace**1.2/self.mace
                 break
             elif item.type_ == ITEM_KNUCKLE:
-                atk *= self.knuckle**1.5/self.knuckle
+                atk *= self.knuckle**1.2/self.knuckle
                 break
 
-        atk *= self.str**1.8/self.str
+        atk *= self.str**1.2/self.str
+        self.str += (self.str/self.str**1.5)/10.0
         return atk
 
     def CalculateDmg(self, dfn):
@@ -4951,9 +5139,10 @@ class FightingEntity(object):
                 found = True
                 break
         if found:
-            dfn *= (self.armor**1.5/self.armor)
+            dfn *= (self.armor**1.2/self.armor)
             self.armor += (self.armor/self.armor**1.5)/10.0
-        dfn *= (self.dex**1.8/self.dex)
+        dfn *= (self.dex**1.2/self.dex)
+        self.dex += (self.dex/self.dex**1.5)/10.0
         return dfn
 
     def Attack(self, other):
@@ -4983,6 +5172,8 @@ class FightingEntity(object):
         other.onhit(self)
         if other.IsDead():
             other.ondead(self)
+            if AppSt.curAttackingMob == other:
+                AppSt.curAttackingMob = None
 
     def IsDead(self):
         if self.curhp <= 0:
@@ -5663,6 +5854,44 @@ class DigDigApp(object):
 
         glEnable(GL_TEXTURE_2D)
 
+    def RenderMobHP(self):
+        if self.curAttackingMob:
+            glDisable(GL_DEPTH_TEST)
+            glDisable(GL_TEXTURE_2D)
+            glDisable(GL_CULL_FACE)
+            glLineWidth(4.0)
+            x = float((SW-145)/2.0)
+            y = 30
+            width = (float(self.curAttackingMob.curhp)/float(self.curAttackingMob.CalcMaxHP()))*145
+            if width < 0.0:
+                width = 0.0
+
+            glBegin(GL_LINES)
+            w = 145.0
+            glColor4f(0.0,0.0,0.0,1.0)
+            glVertex3f(x-2, -y, 145.0)
+            glVertex3f(x+w+2, -y, 145.0)
+
+            glVertex3f(x+w, -y, 145.0)
+            glVertex3f(x+w, -(y+15.0), 145.0)
+
+            glVertex3f(x+w+2, -(y+15.0), 145.0)
+            glVertex3f(x-2, -(y+15.0), 145.0)
+
+            glVertex3f(x, -(y+15.0), 145.0)
+            glVertex3f(x, -y, 145.0)
+            glEnd()
+            glBegin(GL_QUADS)
+            glColor4ub(189,45,6,255)
+            glVertex3f(x, -y, 145.0)
+            glVertex3f(x+width, -y, 145.0)
+            glVertex3f(x+width, -(y+15.0), 145.0)
+            glVertex3f(x, -(y+15.0), 145.0)
+            glEnd()
+
+
+            glEnable(GL_TEXTURE_2D)
+
     def RenderHPMP(self):
         glDisable(GL_DEPTH_TEST)
         glDisable(GL_TEXTURE_2D)
@@ -5670,7 +5899,7 @@ class DigDigApp(object):
         glLineWidth(4.0)
         x = float((SW-300)/2.0)
         y = SH-67
-        width = float(self.entity.curhp)/float(self.entity.basehp)*145
+        width = float(self.entity.curhp)/float(self.entity.CalcMaxHP())*145
         if width < 0.0:
             width = 0.0
 
@@ -5698,7 +5927,7 @@ class DigDigApp(object):
         glEnd()
 
         x = x + 155
-        width = float(self.entity.curmp)/float(self.entity.basemp)*145
+        width = float(self.entity.curmp)/float(self.entity.CalcMaxMP())*145
         if width < 0.0:
             width = 0.0
         w = 145.0
@@ -5841,6 +6070,7 @@ class DigDigApp(object):
         self.chColor = self.WHITE_CH
 
     def OnMobHit(self, mob, t):
+        self.curAttackingMob = mob[0].entity
         # 여기서 대화 또는 공격 XXX
         if t - self.prevAttack > self.attackDelay:
             self.prevAttack = t
@@ -5848,11 +6078,13 @@ class DigDigApp(object):
             self.sounds["Hit"].play()
 
     def OnMobRHit(self, mob, t):
+        self.curAttackingMob = mob[0].entity
         if t - self.prevAttack > self.attackDelay:
             self.prevAttack = t
             item = self.gui.qbar[self.gui.selectedItem]
             if item and item.name == "Skill":
                 item.skill.Apply(self.entity, mob[0].entity)
+
         # XXX 여기서 마법 또는 상점 인터랙션?
         # 마법 연사력을 결정해서 딜레이를 줘야함
 
@@ -5898,7 +6130,10 @@ class DigDigApp(object):
                 c = Vector(*coord[:3])
                 if (c-pos).Length() < (Vector(*lowest[1])-pos).Length():
                     lowest = mobcoord
-            return lowest
+            stair, coord = lowest
+            c = Vector(*coord[:3])
+            if (c-pos).Length() < 3.0:
+                return lowest
         return None
 
     def LPressing(self, t, m, k):
@@ -6547,6 +6782,7 @@ class DigDigApp(object):
             #self.RenderWeapon(0,1,(255,0,0,255), False)
             self.RenderCrossHair()
             self.RenderHPMP()
+            self.RenderMobHP()
             self.gui.Render(t, m, k)
             self.gui.RenderNumber(int(self.fps.GetFPS()), 0, 0)
             self.gui.RenderNumber(int(self.cam1.pos.x), 0, SH-20)
@@ -6562,6 +6798,8 @@ class DigDigApp(object):
         self.show = not self.show
         self.housing.Show(self.show)
     def OpenInventory(self, t, m, k):
+        if k.pressedKey == K_c:
+            self.gui.charTab = not self.gui.charTab
         if k.pressedKey == K_TAB:
             self.gui.qbMode2 = not self.gui.qbMode2
             if self.gui.qbMode2:
@@ -6614,6 +6852,7 @@ class DigDigApp(object):
         self.RED_CH = (189,45,6,160)
         self.BLUE_CH = (6,118,189,160)
         self.chColor = self.WHITE_CH
+        self.curAttackingMob = None
 
         glViewport(0, 0, SW, SH)
         self.cam1 = Camera()
@@ -6739,7 +6978,7 @@ class DigDigApp(object):
         entity = FightingEntity("Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         """
-        entity = FightingEntity("Mob1", {"hp": 99999999999, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":10,"dfn":5,"patk":5,"pres":5,"eatk":5,"eres":5,"iatk":5,"ires":5,"fatk":5,"fres":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
+        entity = FightingEntity("Mob1", {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":10,"dfn":5,"patk":5,"pres":5,"eatk":5,"eres":5,"iatk":5,"ires":5,"fatk":5,"fres":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
         self.mobs = []
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         try:
@@ -7393,4 +7632,8 @@ Char모드에 스킬탭, 캐릭터탭이 있다.
 효과가 없으니까 텍스트 창에다가 공격 내용을 출력한다.
 텍스트창도 만들고 퀘스트창도 하자
 음............그 뭐냐... 몹 애니메이션 하자.
+----------
+이제 퀘스트창이랑 현재 때리는 몹의 HP표시
+-------
+이제 캐릭터창. 스탯, 스킬을 그냥 표시하기만 함. 뭐 스탯도 쓰다보면 오르고 그럼
 """
