@@ -414,7 +414,7 @@ class TextArea(object):
     def Update(self, renderer):
         y = 0
         for text in self.lines:
-            renderer.NewTextObject(text, self.color, (self.rect[0], self.rect[1]+y))
+            renderer.NewTextObject(text, self.color, (self.rect[0], self.rect[1]+y), border=True, borderColor = (128,128,128))
             y += self.lineH
             if y > self.rect[3]:
                 return
@@ -813,10 +813,10 @@ class DigDigGUI(object):
         self.textRendererArea = DynamicTextRenderer(self.font3)
         self.textRendererItemTitle = DynamicTextRenderer(self.font)
         self.textRendererItemSmall = DynamicTextRenderer(self.font2)
-        #self.testText = TextArea(0,30,640,400, 16, 16)
+        self.testText = TextArea(0,SH-190,SW,100, 9, 14)
         self.testFile = FileSelector("./scripts")
         self.testEdit = SpawnerGUI((SW-400)/2,(SH-50)/2,400,50,14)
-        #self.testText.SetText(u"asdhoihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhrrㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱrrㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ가가가가\nadsasd")
+        self.testText.SetText(u"asdhoihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhrrㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱrrㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ가가가가\nadsasd")
         self.prevAreaT = 0
         self.prevDescT = 0
         self.areaDelay = 500
@@ -1582,19 +1582,21 @@ class DigDigGUI(object):
     def Render(self, t, m, k):
         if t - self.prevAreaT >= self.areaDelay:
             if self.invShown:
-                self.prevAreaT = t
                 self.textRendererArea.Clear()
-                #self.testText.Update(self.textRendererArea)
+                self.prevAreaT = t
+                self.testText.Update(self.textRendererArea)
                 if self.toolMode == TM_CODE:
                     self.testFile.Update(self.textRendererArea)
                 elif self.toolMode == TM_SPAWN:
                     self.testEdit.Update(self.textRendererArea)
+        if self.invShown and self.toolMode == TM_CODE:
+            self.testFile.Render()
+        elif self.invShown and self.toolMode == TM_SPAWN:
+            self.testEdit.Render()
         if self.invShown:
-            if self.toolMode == TM_CODE:
-                self.testFile.Render()
-            elif self.toolMode == TM_SPAWN:
-                self.testEdit.Render()
             self.textRendererArea.Render()
+            # XXX: 이거를 음....텍스트 에어리어에 텍스트가 꽉 찼을 때만 업뎃하게 하고 나머지는 그냥
+            # 위로 한칸씩 올리면서 추가하기만 한다.
 
         glBindTexture(GL_TEXTURE_2D, self.inventex)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
@@ -4080,23 +4082,118 @@ def DrawCube(pos,bound, color, tex1,tex2,tex3,tex4,tex5,tex6, texid, flipX = Fal
         glVertex( v[v1] )
         glEnd()
 
-g_ID = 0
+g_id = 0
 ANIM_IDLE = GenId()
 ANIM_WALK = GenId()
 ANIM_ATTACK = GenId()
 ANIM_HIT = GenId()
 
-g_ID = 0
+g_id = 0
 MOB_SKELETON = GenId()
 
 
 MobRSt = None
 class MobRenderer(object):
-    def __init__(self):
+    def __init__(self, skins):
         global MobRSt
         MobRSt = self
-    def RenderMob(self, pos, frame, anim):
-        pass
+        self.dLists = {}
+        self.skins = skins
+    def RenderMob(self, mobType, pos, bound, angle, frame, anim):
+        x,y,z = pos
+        y -= bound[1]
+        glPushMatrix()
+        glTranslatef(x,y,z)
+        glRotatef(-angle+90, 0.0, 1.0, 0.0)
+        glCallList(self.dLists[mobType][anim][frame])
+        glPopMatrix()
+    def RebuildMobs(self, bound):
+        """
+        factor = self.animIdx/self.animMax
+        """
+
+        w,h,l = bound
+        animstate = 0
+        self.color = (255,255,255,255)
+        for mob in self.skins:
+            self.dLists[mob] = [[glGenLists(1) for j in range(60)] for k in range(4)]
+            while animstate < 4:
+                animIdx = -30
+                while animIdx < 30:
+                    factor = float(animIdx)/30.0
+                    tex1,tex2,tex3,tex4,tex5,tex6 = self.skins[mob][0]
+                    glNewList(self.dLists[mob][animstate][animIdx+30], GL_COMPILE)
+                    glPushMatrix()
+                    h = 1.5
+                    top = h-(0.25)+0.5
+                    glTranslatef(0,top,0)
+                    if animstate == ANIM_HIT:
+                        glRotatef(-30, 1.0, 0.0, 0.0)
+                    DrawCube((0,0,0), (0.25, 0.25, 0.15), self.color, tex1,tex2,tex3,tex4,tex5,tex6, AppSt.mobtex) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+                    glPopMatrix()
+
+                    tex1,tex2,tex3,tex4,tex5,tex6 = self.skins[mob][1]
+                    glPushMatrix()
+                    mid = h-(0.25)+0.25/2-(0.5)+0.5
+                    glTranslatef(0,0+mid,0)
+                    glRotatef(0, 0.0, 1.0, 0.0)
+                    DrawCube((0,0,0),(0.4, 0.5, 0.25), self.color, tex1,tex2,tex3,tex4,tex5,tex6, AppSt.mobtex) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+                    glPopMatrix()
+
+                    tex1,tex2,tex3,tex4,tex5,tex6 = self.skins[mob][2]
+                    glPushMatrix()
+                    glTranslatef(0-0.25,0+mid+0.25,0)
+                    if animstate == ANIM_WALK:
+                        glRotatef(factor*45, 1.0, 0.0, 0.0)
+                    elif animstate == ANIM_IDLE:
+                        pass
+                    elif animstate == ANIM_ATTACK:
+                        glRotatef(-90, 1.0, 0.0, 0.0)
+                        glRotatef(factor*45, 1.0, 0.0, 0.0)
+                        glRotatef(factor*45, 0.0, 0.0, 1.0)
+                    elif animstate == ANIM_HIT:
+                        glRotatef(-30, 1.0, 0.0, 0.0)
+
+                    DrawCubeArm((0,0,0),(0.1, 0.5, 0.1), self.color, tex1,tex2,tex3,tex4,tex5,tex6, AppSt.mobtex) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+                    glPopMatrix() # 오른팔
+
+                    tex1,tex2,tex3,tex4,tex5,tex6 = self.skins[mob][3]
+                    glPushMatrix()
+                    glTranslatef(0+0.25,0+mid+0.25,0)
+                    if animstate == ANIM_WALK:
+                        glRotatef(-factor*45, 1.0, 0.0, 0.0)
+                    elif animstate == ANIM_IDLE:
+                        pass
+                    elif animstate == ANIM_HIT:
+                        glRotatef(-30, 1.0, 0.0, 0.0)
+                    DrawCubeArm((0,0,0),(0.1, 0.5, 0.1), self.color, tex1,tex2,tex3,tex4,tex5,tex6, AppSt.mobtex) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+                    glPopMatrix() # 왼팔
+
+                    tex1,tex2,tex3,tex4,tex5,tex6 = self.skins[mob][4]
+                    glPushMatrix()
+                    glTranslatef(0-0.075,0+mid-0.5+0.25,0)
+                    if animstate == ANIM_WALK:
+                        glRotatef(-factor*45, 1.0, 0.0, 0.0)
+                    elif animstate == ANIM_IDLE:
+                        pass
+                    DrawCubeArm((0,0,0),(0.15, 0.5, 0.15), self.color, tex1,tex2,tex3,tex4,tex5,tex6, AppSt.mobtex) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+                    glPopMatrix() # 오른발
+
+                    tex1,tex2,tex3,tex4,tex5,tex6 = self.skins[mob][5]
+                    glPushMatrix()
+                    glTranslatef(0+0.075,0+mid-0.5+0.25,0)
+                    if animstate == ANIM_WALK:
+                        glRotatef(factor*45, 1.0, 0.0, 0.0)
+                    elif animstate == ANIM_IDLE:
+                        pass
+                    DrawCubeArm((0,0,0),(0.15, 0.5, 0.15), self.color, tex1,tex2,tex3,tex4,tex5,tex6, AppSt.mobtex, True) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+                    glPopMatrix() # 왼발
+                    glEndList()
+
+                    animIdx += 1
+
+                animstate += 1
+
 class MobGL(object):
     def __init__(self, pos, bound, skin, type_, color, entity):
         self.pos = pos
@@ -4108,8 +4205,8 @@ class MobGL(object):
         self.color = color
         self.entity = entity
 
-        self.animstate = ANIM_WALK
-        self.animMax = 60.0
+        self.animstate = ANIM_IDLE
+        self.animMax = 30.0
         self.animIdx = -self.animMax
         self.t = 0
         self.fps = 15.0/6.0
@@ -4149,7 +4246,6 @@ class MobGL(object):
 
     def OnDead(self, attacker):
         AppSt.mobs.remove(self)
-        print 'dead'
     def OnHit(self, attacker):
         self.animstate = ANIM_HIT
         self.prevHit = pygame.time.get_ticks()
@@ -4277,14 +4373,35 @@ class MobGL(object):
     def SetAnimState(self, s):
         self.animstate = s
     def Render2(self, nameRenderer, cam, t):
+        """
         if not self.genDone or AppSt.regenTex:
             self.dList = [glGenLists(1) for i in range(6)]
+        """
         glBindTexture(GL_TEXTURE_2D, AppSt.mobtex)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
         glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
+        idx = int(self.animIdx)+30
+        if idx > 59:
+            idx = 59
+        if idx < 0:
+            idx = 0
+        MobRSt.RenderMob(self.type_, self.pos, self.bound, self.angle, idx, self.animstate)
+
+        if self.t and self.flip:
+            self.animIdx -= (t-self.t)/float(self.fps)
+        elif self.t:
+            self.animIdx += (t-self.t)/float(self.fps)
+        if self.animIdx > self.animMax:
+            self.animIdx = self.animMax
+            self.flip = True
+        elif self.animIdx < -self.animMax:
+            self.animIdx = -self.animMax
+            self.flip = False
+        self.t = t
 
 
+        """
 
         x,y,z = self.pos
         y -= self.bound[1]
@@ -4408,6 +4525,7 @@ class MobGL(object):
         self.t = t
 
         glPopMatrix()
+        """
     def Render(self, nameRenderer, cam, t):
         if not self.genDone or AppSt.regenTex:
             self.dList = [glGenLists(1) for i in range(6)]
@@ -4557,7 +4675,7 @@ class FightingElements(object):
             else:
                 self.params[param] = scroll.element.params[param]
 
-g_ID = 0
+g_id = 0
 SKILL_PHYSICAL = GenId()
 SKILL_FIRE = GenId()
 SKILL_ICE = GenId()
@@ -4571,7 +4689,7 @@ SKILL_INT = GenId()
 SKILL_BASEHP = GenId()
 SKILL_BASEMP = GenId()
 SKILL_SKILL = GenId()
-g_ID = 0
+g_id = 0
 TARGET_SELF = GenId()
 TARGET_OTHER = GenId()
 class RawSkill(object):
@@ -4622,35 +4740,28 @@ class RawSkill(object):
     def Apply(self, user, target, skill):
         if self.targettype == TARGET_SELF:
             if self.skilltype == SKILL_HEAL:
-                user.curhp += (self.value*(skill.skillPoint*self.incFactor))*(user.int**1.8/user.int)
+                heal = (self.value*(skill.skillPoint*self.incFactor))*(user.int**1.8/user.int)
+                heal *= user.magic**1.5/user.magic
+                user.curhp += heal
                 if user.curhp > user.basehp:
                     user.curhp = user.basehp
         elif self.targettype == TARGET_OTHER and target:
             if self.skilltype == SKILL_PHYSICAL:
-                target.curhp -= ((user.atk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
-                target.onhit(user)
-                if target.curhp < 0:
-                    target.ondead(user)
+                dmg = ((user.atk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
             if self.skilltype == SKILL_FIRE:
-                target.curhp -= ((user.fatk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
-                target.onhit(user)
-                if target.curhp < 0:
-                    target.ondead(user)
+                dmg = ((user.fatk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
             if self.skilltype == SKILL_ICE:
-                target.curhp -= ((user.iatk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
-                target.onhit(user)
-                if target.curhp < 0:
-                    target.ondead(user)
+                dmg = ((user.iatk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
             if self.skilltype == SKILL_ELECTRIC:
-                target.curhp -= ((user.eatk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
-                target.onhit(user)
-                if target.curhp < 0:
-                    target.ondead(user)
+                dmg = ((user.eatk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
             if self.skilltype == SKILL_POISON:
-                target.curhp -= ((user.patk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
-                target.onhit(user)
-                if target.curhp < 0:
-                    target.ondead(user)
+                dmg = ((user.patk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
+
+            dmg *= user.magic**1.5/user.magic
+            target.curhp -= dmg
+            target.onhit(user)
+            if target.curhp < 0:
+                target.ondead(user)
 
 
 
@@ -4743,7 +4854,7 @@ class FightingEntity(object):
     def CalculateAttack(self):
         atk = self.atk
         for item in self.eqs:
-            if item and "atk" in item.element:
+            if item and item.element and "atk" in item.element:
                 atk += item.element["atk"] # 보너스로 웨폰 스킬로 데미지 퍼센티지로 추가
 
         for item in self.eqs[:1]:
@@ -4772,11 +4883,11 @@ class FightingEntity(object):
     def CalculateDefense(self):
         dfn = self.dfn
         for item in self.eqs:
-            if item and "dfn" in item.element:
+            if item and item.element and "dfn" in item.element:
                 dfn += item.element["dfn"]
         found = False
         for item in self.eqs:
-            if item and item.type in [ITEM_SHIELD,ITEM_HELM,ITEM_ARMOR,ITEM_BOOTS,ITEM_GLOVES]:
+            if item and item.type_ in [ITEM_SHIELD,ITEM_HELM,ITEM_ARMOR,ITEM_BOOTS,ITEM_GLOVES]:
                 found = True
                 break
         if found:
@@ -4802,7 +4913,9 @@ class FightingEntity(object):
                 self.knuckle += (self.knuckle/self.knuckle**1.5)/10.0
                 break
 
-        other.curhp -= self.CalculateDmg(other.CalculateDefense())
+        dmg = self.CalculateDmg(other.CalculateDefense())
+        print dmg
+        other.curhp -= dmg
         other.onhit(self)
         if other.IsDead():
             other.ondead(self)
@@ -5674,7 +5787,8 @@ class DigDigApp(object):
         if t - self.prevAttack > self.attackDelay:
             self.prevAttack = t
             item = self.gui.qbar[self.gui.selectedItem]
-            item.skill.Apply(self.entity, mob[0].entity)
+            if item and item.name == "Skill":
+                item.skill.Apply(self.entity, mob[0].entity)
         # XXX 여기서 마법 또는 상점 인터랙션?
         # 마법 연사력을 결정해서 딜레이를 줘야함
 
@@ -6127,6 +6241,8 @@ class DigDigApp(object):
                     updateFrame = True
                 else:
                     updateFrame = False
+                if self.regenTex:
+                    MobRSt.RebuildMobs(self.bound)
                 for mob in self.mobs:
                     if self.chunks.CubeInFrustumPy(*(mob.pos+(0.5,frustum))):
                         mob.Render2(None, self.cam1, t) # 이것도 C로 옮기면 빨라질지도 모른다네
@@ -6552,12 +6668,14 @@ class DigDigApp(object):
             (1*64.0/512.0, 1*64.0/512.0),
             (1*64.0/512.0, 1*64.0/512.0)]]
 
+        skins = {MOB_SKELETON: skin}
+        self.mobR = MobRenderer(skins)
 
         """
         entity = FightingEntity("Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         """
-        entity = FightingEntity("Mob1", {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":10,"dfn":5,"patk":5,"pres":5,"eatk":5,"eres":5,"iatk":5,"ires":5,"fatk":5,"fres":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
+        entity = FightingEntity("Mob1", {"hp": 99999999999, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":10,"dfn":5,"patk":5,"pres":5,"eatk":5,"eres":5,"iatk":5,"ires":5,"fatk":5,"fres":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
         self.mobs = []
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         try:
@@ -6625,6 +6743,7 @@ class DigDigApp(object):
         teximg = pygame.image.tostring(image, "RGBA", 0) 
         glBindTexture(GL_TEXTURE_2D, texture)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 512, 512, 0, GL_RGBA, GL_UNSIGNED_BYTE, teximg)
+        MobRSt.RebuildMobs(self.bound)
 
 
 
@@ -6641,7 +6760,6 @@ class DigDigApp(object):
             mob.pos = p.x+idx*1.0, p.y, (-p.z)
             idx += 1
         
-        print self.entity.CalculateAttack(), self.entity.CalculateDefense()
         #self.chunks.SaveRegion("test", (64,0,64), (127+64,127,127+64))
         while not done:
             fps.Start()
@@ -7209,4 +7327,6 @@ Char모드에 스킬탭, 캐릭터탭이 있다.
 미니맵과 좌표를 출력하는게 필요함
 -----------
 효과가 없으니까 텍스트 창에다가 공격 내용을 출력한다.
+텍스트창도 만들고 퀘스트창도 하자
+음............그 뭐냐... 몹 애니메이션 하자.
 """
