@@ -419,6 +419,59 @@ class TextArea(object):
             if y > self.rect[3]:
                 return
 
+class MsgBox(object):
+    def __init__(self):
+        self.font3 = pygame.font.Font("./fonts/Fanwood.ttf", 15)
+        self.textRendererArea = DynamicTextRenderer(self.font3)
+        self.lines = []
+        self.rect = 0,SH-170,SW,100
+        self.letterW = 9
+        self.lineH = 15
+        self.color = (255,255,255)
+        self.lineCut = True
+        self.renderedLines = []
+    def AddText(self, text, color, bcolor):
+        lenn = len(self.lines)
+        if self.lineCut:
+            leng = 0
+            offset = self.rect[2]/self.letterW
+            while leng < len(text):
+                newtext = text[leng:leng+offset]
+                self.lines += newtext.split("\n")
+                leng += offset
+        else:
+            self.lines += text.split("\n")
+
+        
+        for text in self.lines[lenn:]:
+            self.renderedLines += [self.textRendererArea.NewTextObject(text, color, (0, 0), border=True, borderColor = bcolor)]
+
+    def Clear(self):
+        self.lines = []
+    def Render(self):
+        toDrawLines = self.rect[3]/self.lineH
+        if len(self.renderedLines) > 120:
+            self.renderedLines = self.renderedLines[-toDrawLines:]
+            self.lines = self.lines[-120:]
+
+        if len(self.renderedLines) >= toDrawLines:
+            toDraw = self.renderedLines[-toDrawLines:]
+        else:
+            toDraw = self.renderedLines[:]
+
+        y = 0
+        for textid in toDraw:
+            pos = self.rect[0], self.rect[1]+y
+            self.textRendererArea.RenderOne(textid, pos)
+            y += self.lineH
+            if y > self.rect[3]:
+                break
+
+        # 다이나믹 렌더러를 가지고있고, AddNew로 텍스트가 추가될 때마다 추가하고
+        # 한개씩 렌더링하고
+        # 라인수가 일정 이상을 넘어서면 플러시
+
+
 class DynamicTextRenderer(object):
     # 한 씬에 렌더할 텍스트를 모아두고 한번에 렌더링을 하며
     # 0.25초당 한번씩 업데이트 된다.
@@ -813,10 +866,11 @@ class DigDigGUI(object):
         self.textRendererArea = DynamicTextRenderer(self.font3)
         self.textRendererItemTitle = DynamicTextRenderer(self.font)
         self.textRendererItemSmall = DynamicTextRenderer(self.font2)
-        self.testText = TextArea(0,SH-190,SW,100, 9, 14)
+        self.msgBox = MsgBox()
+        #self.testText = TextArea(0,SH-190,SW,100, 9, 14)
         self.testFile = FileSelector("./scripts")
         self.testEdit = SpawnerGUI((SW-400)/2,(SH-50)/2,400,50,14)
-        self.testText.SetText(u"asdhoihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhrrㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱrrㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ가가가가\nadsasd")
+        #self.testText.SetText(u"asdhoihhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhrrㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱrrㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱㄱ가가가가\nadsasd")
         self.prevAreaT = 0
         self.prevDescT = 0
         self.areaDelay = 500
@@ -1584,7 +1638,6 @@ class DigDigGUI(object):
             if self.invShown:
                 self.textRendererArea.Clear()
                 self.prevAreaT = t
-                self.testText.Update(self.textRendererArea)
                 if self.toolMode == TM_CODE:
                     self.testFile.Update(self.textRendererArea)
                 elif self.toolMode == TM_SPAWN:
@@ -1595,6 +1648,7 @@ class DigDigGUI(object):
             self.testEdit.Render()
         if self.invShown:
             self.textRendererArea.Render()
+        self.msgBox.Render()
             # XXX: 이거를 음....텍스트 에어리어에 텍스트가 꽉 찼을 때만 업뎃하게 하고 나머지는 그냥
             # 위로 한칸씩 올리면서 추가하기만 한다.
 
@@ -4745,6 +4799,12 @@ class RawSkill(object):
                 user.curhp += heal
                 if user.curhp > user.basehp:
                     user.curhp = user.basehp
+                if user == AppSt.entity:
+                    AppSt.gui.msgBox.AddText("You heal yourself: %d" % heal, (68,248,93), (8,29,1))
+                else:
+                    AppSt.gui.msgBox.AddText("Mob uses heal: %d" % heal, (248,98,68), (73,16,5))
+
+
         elif self.targettype == TARGET_OTHER and target:
             if self.skilltype == SKILL_PHYSICAL:
                 dmg = ((user.atk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
@@ -4914,7 +4974,11 @@ class FightingEntity(object):
                 break
 
         dmg = self.CalculateDmg(other.CalculateDefense())
-        print dmg
+        if other == AppSt.entity:
+            AppSt.gui.msgBox.AddText("Mob attacks you: %d" % dmg, (248,98,68), (73,16,5))
+        else:
+            AppSt.gui.msgBox.AddText("You attack mob: %d" % dmg, (68,248,93), (8,29,1))
+
         other.curhp -= dmg
         other.onhit(self)
         if other.IsDead():
