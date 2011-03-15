@@ -6784,7 +6784,7 @@ class DigDigApp(object):
             mob.Tick(t,m,k)
 
         updateFrameCounter = 0
-        fogMode=GL_EXP#GL_LINEAR# { GL_EXP, GL_EXP2, GL_LINEAR };	// Storage For Three Types Of Fog
+        fogMode=GL_LINEAR# { GL_EXP, GL_EXP2, GL_LINEAR };	// Storage For Three Types Of Fog
         fogfilter= 0				#	// Which Fog To Use
         fogColor= [0.5, 0.5, 0.5, 1.0]#;		// Fog Color
 
@@ -6802,7 +6802,7 @@ class DigDigApp(object):
             self.renderPrevTime = t
             glFogi(GL_FOG_MODE, fogMode)#;		// Fog Mode
             glFogfv(GL_FOG_COLOR, fogColor)#;			// Set Fog Color
-            glFogf(GL_FOG_DENSITY, 0.02)#;				// How Dense Will The Fog Be
+            glFogf(GL_FOG_DENSITY, 0.1)#;				// How Dense Will The Fog Be
             glHint(GL_FOG_HINT, GL_DONT_CARE)#;			// Fog Hint Value
             glFogf(GL_FOG_START, G_FAR-1.0)#;				// Fog Start Depth
             glFogf(GL_FOG_END, G_FAR+5.0)#;				// Fog End Depth
@@ -6927,7 +6927,7 @@ class DigDigApp(object):
             glEnd()
             glEnable(GL_DEPTH_TEST)
 
-            glEnable(GL_FOG)#;	
+            #glEnable(GL_FOG)#;	
             mat = ViewingMatrix()
             if mat is not None:
                 frustum = NormalizeFrustum(GetFrustum(mat))
