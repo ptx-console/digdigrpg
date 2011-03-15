@@ -419,6 +419,61 @@ class TextArea(object):
             if y > self.rect[3]:
                 return
 
+class TalkBox(object):
+    def __init__(self):
+        self.font3 = pygame.font.Font("./fonts/Fanwood.ttf", 15)
+        self.textRendererArea = DynamicTextRenderer(self.font3)
+        self.lines = []
+        self.rect = 0,SH-170,SW,100
+        self.letterW = 9
+        self.lineH = 15
+        self.color = (255,255,255)
+        self.lineCut = True
+        self.renderedLines = []
+        # 텍스트를 배경과 함께 출력하고
+        # 텍스트, 클릭가능한 선택지
+        # 다음화면으로 넘어가는거 등등을 해야한다.
+        # 화면 넘어갈 때마다 텍스쳐를 업뎃하자
+    def AddText(self, text, color, bcolor):
+        lenn = len(self.lines)
+        if self.lineCut:
+            leng = 0
+            offset = self.rect[2]/self.letterW
+            while leng < len(text):
+                newtext = text[leng:leng+offset]
+                self.lines += newtext.split("\n")
+                leng += offset
+        else:
+            self.lines += text.split("\n")
+
+        
+        for text in self.lines[lenn:]:
+            self.renderedLines += [self.textRendererArea.NewTextObject(text, color, (0, 0), border=True, borderColor = bcolor)]
+
+    def Clear(self):
+        self.lines = []
+    def Render(self):
+        toDrawLines = self.rect[3]/self.lineH
+        if len(self.renderedLines) > 120:
+            self.renderedLines = self.renderedLines[-toDrawLines:]
+            self.lines = self.lines[-120:]
+
+        if len(self.renderedLines) >= toDrawLines:
+            toDraw = self.renderedLines[-toDrawLines:]
+        else:
+            toDraw = self.renderedLines[:]
+
+        y = 0
+        for textid in toDraw:
+            pos = self.rect[0], self.rect[1]+y
+            self.textRendererArea.RenderOne(textid, pos)
+            y += self.lineH
+            if y > self.rect[3]:
+                break
+
+        # 다이나믹 렌더러를 가지고있고, AddNew로 텍스트가 추가될 때마다 추가하고
+        # 한개씩 렌더링하고
+        # 라인수가 일정 이상을 넘어서면 플러시
 class MsgBox(object):
     def __init__(self):
         self.font3 = pygame.font.Font("./fonts/Fanwood.ttf", 15)
@@ -1357,8 +1412,8 @@ class DigDigGUI(object):
 
     def ApplyEnchantScroll(self, item, scroll):
         if not item.element:
-            item.element = FightingElements("Test", (0,0,0), {})
-        item.element.ApplyEnchantScroll(scroll)
+            item.element = FightingElements("Item", (0,0,0), {})
+        item.element.ApplyEnchantScroll(item.type_, scroll)
     def DoEquip(self, idx):
         # dragging이 있으면 그걸 입을수있는지 검사
         # 없으면 언이큅
@@ -1526,8 +1581,85 @@ class DigDigGUI(object):
                         self.DoCont(x,y,self.skills, rmb)
 
 
-    def GenElement(self, gentype):
-        return FightingElements("test", (0,0,0), {"atk": 5,"hp":5}) # 여기서 아이템을 제작하는 코드가 다있다. XXX:
+    def GenElement(self, gentype): # 스킬 레벨이 높을수록 보너스도 더 높은게 나온다.
+        # 최대 현재 스킬 레벨과 같은 수준의 인챈트 스크롤이 나올 수 있다. 간단함
+        if gentype == ITEM_SENCHANTSCROLL:
+            skills = [skill.skill for skill in AppSt.entity.magics.itervalues()]
+            skills += [skill.skill for skill in AppSt.entity.swordSkills.itervalues()]
+            skills += [skill.skill for skill in AppSt.entity.maceSkills.itervalues()]
+            skills += [skill.skill for skill in AppSt.entity.spearSkills.itervalues()]
+            skills += [skill.skill for skill in AppSt.entity.knuckleSkills.itervalues()]
+            bonusSkills = {}
+            for skill in skills:
+                bonusSkills[skill.name] = random.randint(1, int(skill.skillPoint))
+
+            selected = [bonusSkills.keys()[random.randint(0, len(bonusSkills.values())-1)] for i in range(3)]
+            params = {}
+            for selectedKey in selected:
+                if selectedKey in params:
+                    params[selectedKey] += bonusSkills[selectedKey]
+                else:
+                    params[selectedKey] = bonusSkills[selectedKey]
+            element = FightingElements("Silver", (0,0,0), params) # 여기서 아이템을 제작하는 코드가 다있다. XXX:
+        if gentype == ITEM_GENCHANTSCROLL:
+            basehp = random.randint(1, int(AppSt.entity.basehp))
+            basemp = random.randint(1, int(AppSt.entity.basemp))
+            str = random.randint(1, int(AppSt.entity.str))
+            dex = random.randint(1, int(AppSt.entity.dex))
+            int_ = random.randint(1, int(AppSt.entity.int))
+            atk = random.randint(1, int(AppSt.entity.atk))
+            dfn = random.randint(1, int(AppSt.entity.dfn))
+            fatk = random.randint(1, int(AppSt.entity.fatk))
+            eatk = random.randint(1, int(AppSt.entity.eatk))
+            iatk = random.randint(1, int(AppSt.entity.iatk))
+            patk = random.randint(1, int(AppSt.entity.patk))
+            fres = random.randint(1, int(AppSt.entity.fres))
+            eres = random.randint(1, int(AppSt.entity.eres))
+            ires = random.randint(1, int(AppSt.entity.ires))
+            pres = random.randint(1, int(AppSt.entity.pres))
+            stats = {
+                    "HP": basehp,
+                    "MP": basemp,
+                    "Str":str,
+                    "Dex":dex,
+                    "Int":int_,
+                    "Melee Damage":atk,
+                    "Defense":dfn,
+                    "Fire Damage":fatk,
+                    "eatk":eatk,
+                    "Ice Damage":iatk,
+                    "Poison Damage":patk,
+                    "Fire Resist":fres,
+                    "Electric Resist":eres,
+                    "Ice Resist":ires,
+                    "Poison Resist":pres}
+            selected = [stats.keys()[random.randint(0, len(stats.values())-1)] for i in range(3)]
+            params = {}
+            for selectedKey in selected:
+                if selectedKey in params:
+                    params[selectedKey] += stats[selectedKey]
+                else:
+                    params[selectedKey] = stats[selectedKey]
+
+            element = FightingElements("Gold", (0,0,0), params)
+
+        if gentype == ITEM_DENCHANTSCROLL:
+            sword = random.randint(1, int(AppSt.entity.sword))
+            mace = random.randint(1, int(AppSt.entity.mace))
+            spear = random.randint(1, int(AppSt.entity.spear))
+            knuckle = random.randint(1, int(AppSt.entity.knuckle))
+            armor = random.randint(1, int(AppSt.entity.armor))
+            magic = random.randint(1, int(AppSt.entity.magic))
+            skills = {"Sword Skill": sword, "Mace Skill": mace, "Spear Skill": spear, "Knuckle Skill": knuckle, "Armor Skill": armor, "Magic Skill": magic}
+            selected = [skills.keys()[random.randint(0, len(skills.values())-1)] for i in range(3)]
+            params = {}
+            for selectedKey in selected:
+                if selectedKey in params:
+                    params[selectedKey] += skills[selectedKey]
+                else:
+                    params[selectedKey] = skills[selectedKey]
+            element = FightingElements("Diamond", (0,0,0), params)
+        return element
         # 음..... maxenchant횟수를 5번으로 적용하고
         # 만약 스크롤에 maxenchant횟수를 늘리는 게 있다면 그만큼 늘려주고 뭐 이런다.
         # 맥스인챈트 늘려수는 횟수가 가끔씩 랜덤하게 나온다.
@@ -2398,9 +2530,13 @@ class DigDigGUI(object):
                 # 데이지서버 할 때 처럼 스탯 맞추면 될 듯.
                 return textTitle
             def GenItemDesc(item):
-                textDesc = ["Desc"]
+                textDesc = ["Enchant"]
                 if item.type_ == ITEM_SENCHANTSCROLL:
-                    textDesc = [u"Enchant"]
+                    textDesc = [u"Individual Skills"]
+                if item.type_ == ITEM_GENCHANTSCROLL:
+                    textDesc = [u"Stats"]
+                if item.type_ == ITEM_DENCHANTSCROLL:
+                    textDesc = [u"Skill Levels"]
                 return textDesc
             def GenItemParams(item):
                 textParams = str(item.element.params).replace("{","").replace("}","").split(', ')
@@ -4586,6 +4722,49 @@ class MobGL(object):
                     x,y,z = AppSt.chunks.FixPos(Vector(x,y,z), Vector(x,y-(self.speed),z), self.bound)
                     factor -= 1.0
                 x,y,z = AppSt.chunks.FixPos(Vector(x,y,z), Vector(x,y-(self.speed*factor),z), self.bound)
+                if x >= 0:
+                    xx = int(x)
+                else:
+                    xx = int(x-1.0)
+
+                yy = int(y-1.19)
+                if z >= 0:
+                    zz = int(z)
+                else:
+                    zz = int(z-1.0)
+                xxx = xx-(xx%32)
+                yyy = yy-(yy%32)
+                zzz = zz-(zz%32)
+                if (xxx,yyy,zzz) in AppSt.stairs:
+                    for stair in AppSt.stairs[(xxx,yyy,zzz)]:
+                        x1,y1,z1,f,b = stair
+                        if x1 <= x <= x1+1.0 and z1 <= z <= z1+1.0 and y1+1.19 <= y <= y1+2.20:
+                            plus = 0
+                            if f == 2:
+                                x2 = x
+                                if x < 0:
+                                    x2 = 1.0 - abs(x)
+                                plus = abs(x2-int(x2))
+                            if f == 3:
+                                x2 = x
+                                if x < 0:
+                                    x2 = 1.0 - abs(x)
+                                plus = 1.0-abs(x2-int(x2))
+                            if f == 4:
+                                z2 = z
+                                if z < 0:
+                                    z2 = 1.0 - abs(z)
+                                plus = abs(z2-int(z2))
+                            if f == 5:
+                                z2 = z
+                                if z < 0:
+                                    z2 = 1.0 - abs(z)
+                                plus = 1.0-abs(z2-int(z2))
+                            plus *= 2
+                            if plus > 1.0:
+                                plus = 1.0
+                            x,y,z = AppSt.chunks.FixPos(Vector(x,y,z), Vector(x,float(y1)+1.20+plus,z), self.bound)
+
                 self.pos = x,y,z
                 self.CheckJump(y)
             self.prevFall = t
@@ -4888,8 +5067,10 @@ class FightingElements(object):
     def OnAttack(self, attacker, defenders):
         # 이렇게 하지 말고 일단 전투를 구현한 다음에 하나하나 유틸라이즈하자.
         pass
-    def ApplyEnchantScroll(self, scroll):
+    def ApplyEnchantScroll(self, type_, scroll):
         for param in scroll.element.params:
+            if param == "Melee Damage" and type_ == ITEM_SPEAR:
+                scroll.element.params[param] *= 2
             if param in self.params:
                 self.params[param] += scroll.element.params[param]
             else:
@@ -4939,29 +5120,38 @@ class RawSkill(object):
             dfn = target.eres
         for item in target.eqs:
             if item:
-                if "dfn" in item.element:
+                if "Defense" in item.element.params:
                     if stype == SKILL_PHYSICAL:
-                        dfn += item.element["dfn"]
-                if "ires" in item.element:
+                        dfn += item.element.params["Defense"]
+                if "Ice Resist" in item.element.params:
                     if stype == SKILL_ICE:
-                        dfn += item.element["ires"]
-                if "fres" in item.element:
+                        dfn += item.element.params["Ice Resist"]
+                if "Fire Resist" in item.element.params:
                     if stype == SKILL_FIRE:
-                        dfn += item.element["fres"]
-                if "pres" in item.element:
+                        dfn += item.element.params["Fire Resist"]
+                if "Poison Resist" in item.element.params:
                     if stype == SKILL_POISON:
-                        dfn += item.element["pres"]
-                if "eres" in item.element:
+                        dfn += item.element.params["Poison Resist"]
+                if "Electric Resist" in item.element.params:
                     if stype == SKILL_ELECTRIC:
-                        dfn += item.element["eres"]
+                        dfn += item.element.params["Electric Resist"]
         dfn *= (target.int**1.8/target.int)
         return dfn
 
-    def Apply(self, user, target, skill):
+    def Apply(self, user, target, skill, skillBonus):
+        intBonus = 0
+        for item in user.eqs:
+            if item and item.element and "Int" in item.element.params:
+                intBonus += item.element.params["Int"]
+        magicBonus = 0
+        for item in user.eqs:
+            if item and item.element and "Magic Skill" in item.element.params:
+                magicBonus += item.element.params["Magic Skill"]
+
         if self.targettype == TARGET_SELF:
             if self.skilltype == SKILL_HEAL:
-                heal = (self.value*(skill.skillPoint*self.incFactor))*(user.int**1.8/user.int)
-                heal *= user.magic**1.2/user.magic
+                heal = (self.value*((skill.skillPoint+skillBonus)*self.incFactor))*((intBonus+user.int)**1.8/(user.int+intBonus))
+                heal *= (magicBonus+user.magic)**1.2/(magicBonus+user.magic)
                 user.curhp += heal
                 if user.curhp > user.CalcMaxHP():
                     user.curhp = user.CalcMaxHP()
@@ -4970,18 +5160,49 @@ class RawSkill(object):
 
         elif self.targettype == TARGET_OTHER and target:
             if self.skilltype == SKILL_PHYSICAL:
-                dmg = ((user.atk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
+                atkBonus = 0
+                for item in user.eqs:
+                    if item and item.element and "Melee Damage" in item.element.params:
+                        atkBonus += item.element.params["Melee Damage"]
+
+                dmg = ((atkBonus+user.atk+self.value*((skill.skillPoint+skillBonus)*self.incFactor)))*((intBonus+user.int)**1.8/(user.int+intBonus))
+                user.atk += ((user.atk)**1.5/(user.atk))/10.0
+                target.dfn += (target.dfn**1.5/target.dfn)/10.0 # 타겟은 기본적으로 정의되어있지 아이템이 입은게 아니므로 그냥 한다.
             if self.skilltype == SKILL_FIRE:
-                dmg = ((user.fatk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
+                fatkBonus = 0
+                for item in user.eqs:
+                    if item and item.element and "Fire Damage" in item.element.params:
+                        fatkBonus += item.element.params["Fire Damage"]
+                dmg = ((fatkBonus+user.fatk+self.value*((skill.skillPoint+skillBonus)*self.incFactor)))*((intBonus+user.int)**1.8/(user.int+intBonus))
+                user.fatk += ((user.fatk)**1.5/(user.fatk))/10.0
+                target.fres += (target.fres**1.5/target.fres)/10.0
             if self.skilltype == SKILL_ICE:
-                dmg = ((user.iatk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
+                fatkBonus = 0
+                for item in user.eqs:
+                    if item and item.element and "Ice Damage" in item.element.params:
+                        fatkBonus += item.element.params["Ice Damage"]
+                dmg = ((fatkBonus+user.iatk+self.value*((skill.skillPoint+skillBonus)*self.incFactor)))*((intBonus+user.int)**1.8/(user.int+intBonus))
+                user.iatk += (user.iatk**1.5/user.iatk)/10.0
+                target.ires += (user.fres**1.5/user.ires)/10.0
             if self.skilltype == SKILL_ELECTRIC:
-                dmg = ((user.eatk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
+                fatkBonus = 0
+                for item in user.eqs:
+                    if item and item.element and "Electric Damage" in item.element.params:
+                        fatkBonus += item.element.params["Electric Damage"]
+                dmg = ((fatkBonus+user.eatk+self.value*((skill.skillPoint+skillBonus)*self.incFactor)))*((intBonus+user.int)**1.8/(user.int+intBonus))
+                user.eatk += (user.eatk**1.5/user.eatk)/10.0
+                target.eres += (target.eres**1.5/target.eres)/10.0
             if self.skilltype == SKILL_POISON:
-                dmg = ((user.patk+self.value*(skill.skillPoint*self.incFactor)))*(user.int**1.8/user.int)
+                fatkBonus = 0
+                for item in user.eqs:
+                    if item and item.element and "Poison Damage" in item.element.params:
+                        fatkBonus += item.element.params["Poison Damage"]
+                dmg = ((fatkBonus+user.patk+self.value*((skill.skillPoint+skillBonus)*self.incFactor)))*((intBonus+user.int)**1.8/(user.int+intBonus))
+                user.patk += (user.patk**1.5/user.patk)/10.0
+                target.pres += (target.pres**1.5/target.pres)/10.0
 
 
-            dmg *= user.magic**1.2/user.magic
+            dmg *= (magicBonus+user.magic)**1.2/(magicBonus+user.magic)
             target.curhp -= dmg
             target.onhit(user)
             if target.curhp < 0:
@@ -5009,12 +5230,16 @@ class CombinedSkill(object): # 위의 생스킬을 합쳐서 스킬하나를 만
         if user.curmp > mpcost:
             user.curmp -= mpcost
             dmg = 0
+            skillBonus = 0
+            for item in user.eqs:
+                if item and item.element and self.name in item.element.params:
+                    skillBonus += item.element.params[self.name]
+
             for raw in self.raws:
-                dmg += raw.Apply(user, target, self)
+                dmg += raw.Apply(user, target, self, skillBonus)
             self.skillPoint += (self.skillPoint/self.skillPoint**1.5)/10.0
             user.magic += (user.magic/user.magic**1.5)/10.0
             user.int += (user.int/user.int**1.5)/10.0
-            print user.int
             if self.name == "Heal":
                 if user == AppSt.entity:
                     AppSt.gui.msgBox.AddText("You heal yourself: %d" % dmg, (68,248,93), (8,29,1))
@@ -5038,27 +5263,27 @@ class FightingEntity(object):
         # 연사력은 그냥 다 똑같음?
         # 멀티는 하지 말고 싱글만 만들자.
         self.name = name
-        self.basehp = params["hp"]
-        self.basemp = params["mp"]
-        self.str = params["str"]
-        self.dex = params["dex"]
-        self.int = params["int"]
-        self.atk = params["atk"]
-        self.dfn = params["dfn"]
-        self.patk = params["patk"]
+        self.basehp = params["HP"]
+        self.basemp = params["MP"]
+        self.str = params["Str"]
+        self.dex = params["Dex"]
+        self.int = params["Int"]
+        self.atk = params["Melee Damage"]
+        self.dfn = params["Defense"]
+        self.patk = params["Poison Damage"]
         self.eatk = params["eatk"]
-        self.iatk = params["iatk"]
-        self.fatk = params["fatk"]
-        self.pres = params["pres"]
-        self.eres = params["eres"]
-        self.ires = params["ires"]
-        self.fres = params["fres"]
-        self.sword = params["sword"] # 스트렝스, 무기는 다 스트렝스
-        self.mace = params["mace"] 
-        self.spear = params["spear"]
-        self.knuckle = params["knuckle"]
-        self.armor = params["armor"] # 덱스를 올림
-        self.magic = params["magic"]
+        self.iatk = params["Ice Damage"]
+        self.fatk = params["Fire Damage"]
+        self.pres = params["Poison Resist"]
+        self.eres = params["Electric Resist"]
+        self.ires = params["Ice Resist"]
+        self.fres = params["Fire Resist"]
+        self.sword = params["Sword Skill"] # 스트렝스, 무기는 다 스트렝스
+        self.mace = params["Mace Skill"] 
+        self.spear = params["Spear Skill"]
+        self.knuckle = params["Knuckle Skill"]
+        self.armor = params["Armor Skill"] # 덱스를 올림
+        self.magic = params["Magic Skill"]
         self.swordSkills = {}
         self.maceSkills = {}
         self.spearSkills = {}
@@ -5070,10 +5295,10 @@ class FightingEntity(object):
         poisonEle = RawSkill("Poison", {"value": 5, "incFactor": 1.2, "stype": SKILL_POISON, "ttype": TARGET_OTHER, "dur": 0})
         healEle = RawSkill("Heal", {"value": 5, "incFactor": 1.2, "stype": SKILL_HEAL, "ttype": TARGET_SELF, "dur": 5})
         self.magics = {"Fireball": Skill(CombinedSkill("Fireball", [fireEle], [4,2], {"minreq": 0, "range": 10, "cost": 2})), "Lightning": Skill(CombinedSkill("Lightning", [elecEle], [4,3], {"minreq": 0, "range": 10, "cost": 2})), "Poison": Skill(CombinedSkill("Poison", [poisonEle], [4,4], {"minreq": 0, "range": 10, "cost": 2})), "Snowball": Skill(CombinedSkill("Snowball", [iceEle], [4,5], {"minreq": 0, "range": 10, "cost": 2})), "Heal": Skill(CombinedSkill("Heal", [healEle], [4,6], {"minreq": 0, "range": 0, "cost": 2}))}
-        self.curhp = self.CalcMaxHP()
-        self.curmp = self.CalcMaxMP()
         self.eqs = [] # 몹일경우 여기에 담고
         self.inventory = [] # 플레이어일경우 그냥 링크일 뿐
+        self.curhp = self.CalcMaxHP()
+        self.curmp = self.CalcMaxMP()
         # 순수하게 element만 담으면 뭔가 퍼즐이 맞을 거 같지만 아이템 자체를 담아야함.
         # 아이템의 속성에 texture뭘쓸건지도 나중에 넣어줘야함. 종류가 많아지면 후덜덜...XXX:
         # 하여간에 그리하여 공격 방어는 entity끼리 싸우게 된다.
@@ -5089,9 +5314,17 @@ class FightingEntity(object):
         self.karma = 0 # 성향에 따라 Evil, Good, Neutral의 여러 중간단계로 나뉨? 음.... 카르마가 게임에 미치는 영향은 어떨까
 
     def CalcMaxHP(self):
-        return self.basehp + (self.str**1.5/self.str)*25
+        strBonus = 0
+        for item in self.eqs:
+            if item and item.element and "Str" in item.element.params:
+                strBonus += item.element.params["Str"]
+        return self.basehp + ((self.str+strBonus)**1.5/(self.str+strBonus))*25
     def CalcMaxMP(self):
-        return self.basemp + (self.int**1.5/self.int)*25
+        intBonus = 0
+        for item in self.eqs:
+            if item and item.element and "Int" in item.element.params:
+                intBonus += item.element.params["Int"]
+        return self.basemp + ((self.int+intBonus)**1.5/(self.int+intBonus))*25
     def BindDead(self, func):
         self.ondead = func
 
@@ -5101,27 +5334,48 @@ class FightingEntity(object):
     def CalculateAttack(self):
         atk = self.atk
         for item in self.eqs:
-            if item and item.element and "atk" in item.element:
-                atk += item.element["atk"] # 보너스로 웨폰 스킬로 데미지 퍼센티지로 추가
+            if item and item.element and "Melee Damage" in item.element.params:
+                atk += item.element.params["Melee Damage"] # 보너스로 웨폰 스킬로 데미지 퍼센티지로 추가
 
-        for item in self.eqs[:1]:
+        for item in self.eqs[:2]:
             if not item:
                 continue
             if item.type_ == ITEM_SWORD:
-                atk *= self.sword**1.2/self.sword
+                swordBonus = 0
+                for item in self.eqs:
+                    if item and item.element and "Sword Skill" in item.element.params:
+                        swordBonus += item.element.params["Sword Skill"] # 보너스로 웨폰 스킬로 데미지 퍼센티지로 추가
+                atk *= (self.sword+swordBonus)**1.2/(self.sword+swordBonus)
                 break
             elif item.type_ == ITEM_SPEAR:
-                atk *= self.spear**1.2/self.spear
+                spearBonus = 0
+                for item in self.eqs:
+                    if item and item.element and "Spear Skill" in item.element.params:
+                        spearBonus += item.element.params["Spear Skill"] # 보너스로 웨폰 스킬로 데미지 퍼센티지로 추가
+                atk *= (self.spear+spearBonus)**1.2/(self.spear+spearBonus)
                 break
             elif item.type_ == ITEM_MACE:
-                atk *= self.mace**1.2/self.mace
+                maceBonus = 0
+                for item in self.eqs:
+                    if item and item.element and "Mace Skill" in item.element.params:
+                        maceBonus += item.element.params["Mace Skill"] # 보너스로 웨폰 스킬로 데미지 퍼센티지로 추가
+                atk *= (self.mace+maceBonus)**1.2/(self.mace+maceBonus)
                 break
             elif item.type_ == ITEM_KNUCKLE:
-                atk *= self.knuckle**1.2/self.knuckle
+                knuckleBonus = 0
+                for item in self.eqs:
+                    if item and item.element and "Knuckle Skill" in item.element.params:
+                        knuckleBonus += item.element.params["Knuckle Skill"] # 보너스로 웨폰 스킬로 데미지 퍼센티지로 추가
+                atk *= (self.knuckle+knuckleBonus)**1.2/(self.knuckle+knuckleBonus)
                 break
+        strBonus = 0
+        for item in self.eqs:
+            if item and item.element and "Str" in item.element.params:
+                strBonus += item.element.params["Str"]
 
-        atk *= self.str**1.2/self.str
+        atk *= (self.str+strBonus)**1.2/(self.str+strBonus)
         self.str += (self.str/self.str**1.5)/10.0
+        self.atk += (self.atk/self.atk**1.5)/10.0
         return atk
 
     def CalculateDmg(self, dfn):
@@ -5130,19 +5384,29 @@ class FightingEntity(object):
 
     def CalculateDefense(self):
         dfn = self.dfn
+        armorBonus = 0
         for item in self.eqs:
-            if item and item.element and "dfn" in item.element:
-                dfn += item.element["dfn"]
+            if item and item.element and "Defense" in item.element.params:
+                dfn += item.element.params["Defense"]
+            if item and item.element and "Armor Skill" in item.element.params:
+                armorBonus += item.element.params["Armor Skill"]
         found = False
         for item in self.eqs:
             if item and item.type_ in [ITEM_SHIELD,ITEM_HELM,ITEM_ARMOR,ITEM_BOOTS,ITEM_GLOVES]:
                 found = True
                 break
         if found:
-            dfn *= (self.armor**1.2/self.armor)
+            dfn *= ((armorBonus+self.armor)**1.2/(armorBonus+self.armor))
             self.armor += (self.armor/self.armor**1.5)/10.0
-        dfn *= (self.dex**1.2/self.dex)
+
+        dexBonus = 0
+        for item in self.eqs:
+            if item and item.element and "Dex" in item.element.params:
+                dexBonus += item.element.params["Dex"]
+
+        dfn *= (self.dex+dexBonus)**1.2/(self.dex+dexBonus)
         self.dex += (self.dex/self.dex**1.5)/10.0
+        self.dfn += (self.dfn/self.dfn**1.5)/10.0
         return dfn
 
     def Attack(self, other):
@@ -5273,7 +5537,7 @@ class DigDigScript(object):
             (1*64.0/512.0, 1*64.0/512.0),
             (1*64.0/512.0, 1*64.0/512.0)]]
 
-        entity = FightingEntity("Mob1", {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"patk":5,"pres":5,"eatk":5,"eres":5,"iatk":5,"ires":5,"fatk":5,"fres":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
+        entity = FightingEntity("Mob1", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":5,"Defense":5,"Poison Damage":5,"Poison Resist":5,"eatk":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
         AppSt.mobs += [MobGL((pos[0]+0.5, pos[1]+3.0+0.5, pos[2]+0.5), [0.8,1.7,0.8], skin, MOB_SKELETON, (200,200,200,255), entity)]
 class ScriptLauncher(object):
     def __init__(self, coord):
@@ -6884,7 +7148,7 @@ class DigDigApp(object):
         #self.inventoryV.Show(False)
         #cbg = QBBG((0,450,300,30))
         self.gui = DigDigGUI()
-        self.entity = FightingEntity("Player", {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":5,"dfn":5,"patk":5,"pres":5,"eatk":5,"eres":5,"iatk":5,"ires":5,"fatk":5,"fres":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
+        self.entity = FightingEntity("Player", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":5,"Defense":5,"Poison Damage":5,"Poison Resist":5,"eatk":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
         self.entity.eqs = self.gui.eqs
         self.entity.inventory = self.gui.inventory
         skills = (AppSt.entity.magics.values()+AppSt.entity.swordSkills.values()+AppSt.entity.maceSkills.values()+AppSt.entity.spearSkills.values()+AppSt.entity.knuckleSkills.values())
@@ -6975,10 +7239,10 @@ class DigDigApp(object):
         self.mobR = MobRenderer(skins)
 
         """
-        entity = FightingEntity("Mob1", self.cam1.pos, {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5})
+        entity = FightingEntity("Mob1", self.cam1.pos, {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5})
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         """
-        entity = FightingEntity("Mob1", {"hp": 100, "mp": 100, "str": 5, "dex": 5, "int": 5, "atk":10,"dfn":5,"patk":5,"pres":5,"eatk":5,"eres":5,"iatk":5,"ires":5,"fatk":5,"fres":5,"sword":5,"mace":5,"spear":5,"knuckle":5,"armor":5,"magic":5})
+        entity = FightingEntity("Mob1", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":10,"Defense":5,"Poison Damage":5,"Poison Resist":5,"eatk":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
         self.mobs = []
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         try:
@@ -7636,4 +7900,6 @@ Char모드에 스킬탭, 캐릭터탭이 있다.
 이제 퀘스트창이랑 현재 때리는 몹의 HP표시
 -------
 이제 캐릭터창. 스탯, 스킬을 그냥 표시하기만 함. 뭐 스탯도 쓰다보면 오르고 그럼
+---------
+몹도 계단을 적용시켜야함
 """
