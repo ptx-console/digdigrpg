@@ -7845,26 +7845,6 @@ begin안에 드어가니까
 
 스크롤을 넣는 창과 아이템을 넣는 창이 있고, 넣고 버튼을 누르면 인챈트가 완료?
 그러지 말고, 인챈트 스크롤을 집고 그걸 무기 위에 오른쪽 버튼으로 드랍하면 인챈트가 적용? ㅇㅇ
-------------------------------
-Intro 
-Long time ago there was a dragon named Ashu Ishtagal and he made a sword by using his magic and sword's name was Gajyo-wa.
-Using that sword, a guy named Nerd K. defeated the evil magician 8th grader Jungebyung.
-But few years after the Nerd K.'s death, a trader named Dapalah came to possess the sword.
-
-So, I want you to bring me 15 cobble stone blocks.
-
-
-[OK] -- user brings cobble stone blocks -- give stone axe, pickaxe shovel and a quest note
-[What does it have to do with 15 cobble stone blocks and what did Dapalah do with the sword?] --- Relationship +3
-    OK. About the sword. Long time ago there was ....(repeat of first sentence)
-    So, I want you to bring me 15 cobble stone blocks.
-    [OK]
-    [OK so what does it have to do with bringing 15 cobble stone blocks]
-        OK. About the cobblestone. Long time ago there was ....(repeat of first sentence)
-        So, I want you to bring me 15 cobble stone blocks.
-        [OK]
-        [Beat him and take his possessions] - give basic equipments and items and a quest note, Relationship -1
-
 --------------
 랜덤한 구름을 128x128짜리로 한장 만들어서
 전체 맵에 반복해서 흘러가게 한다.
