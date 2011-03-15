@@ -424,17 +424,24 @@ class TalkBox(object):
         self.font3 = pygame.font.Font("./fonts/Fanwood.ttf", 15)
         self.textRendererArea = DynamicTextRenderer(self.font3)
         self.lines = []
-        self.rect = 0,SH-170,SW,100
+        self.lines2 = []
+        self.rect = (SW-500)/2,30,500,300
         self.letterW = 9
         self.lineH = 15
         self.color = (255,255,255)
         self.lineCut = True
         self.renderedLines = []
+        self.renderedLines2 = []
+        self.binds = {}
+        self.mousePos = []
+        self.selectedPos = None
+        EMgrSt.BindMotion(self.Motion)
         # 텍스트를 배경과 함께 출력하고
         # 텍스트, 클릭가능한 선택지
         # 다음화면으로 넘어가는거 등등을 해야한다.
         # 화면 넘어갈 때마다 텍스쳐를 업뎃하자
-    def AddText(self, text, color, bcolor):
+    def AddText(self, text, color, bcolor): # 여기에 현재 텍스트를 추가하고 콜백을 추가하고
+        # 선택지가 나오면 다시 클리어하고 현재텍스트를 추가하고 이런다
         lenn = len(self.lines)
         if self.lineCut:
             leng = 0
@@ -449,23 +456,81 @@ class TalkBox(object):
         
         for text in self.lines[lenn:]:
             self.renderedLines += [self.textRendererArea.NewTextObject(text, color, (0, 0), border=True, borderColor = bcolor)]
+    def AddSelection(self, text, color, bcolor):
+        lenn = len(self.lines2)
+        if self.lineCut:
+            leng = 0
+            offset = self.rect[2]/self.letterW
+            while leng < len(text):
+                newtext = text[leng:leng+offset]
+                self.lines2 += newtext.split("\n")
+                leng += offset
+        else:
+            self.lines2 += text.split("\n")
+
+        
+        for text in self.lines2[lenn:]:
+            self.renderedLines2 += [self.textRendererArea.NewTextObject(text, color, (0, 0), border=True, borderColor = bcolor)]
 
     def Clear(self):
         self.lines = []
-    def Render(self):
-        toDrawLines = self.rect[3]/self.lineH
-        if len(self.renderedLines) > 120:
-            self.renderedLines = self.renderedLines[-toDrawLines:]
-            self.lines = self.lines[-120:]
+        self.lines2 = []
+        self.renderedLines = []
+        self.renderesLines2 = []
+        self.textRendererArea.Clear()
+        self.binds = {}
 
+    def Motion(self, t, m, k):
+        toDrawLines = self.rect[3]/self.lineH
         if len(self.renderedLines) >= toDrawLines:
             toDraw = self.renderedLines[-toDrawLines:]
         else:
             toDraw = self.renderedLines[:]
 
+        if len(self.renderedLines2) >= toDrawLines:
+            toDraw2 = self.renderedLines2[-toDrawLines:]
+        else:
+            toDraw2 = self.renderedLines2[:]
+
+        y = self.lineH*(len(toDraw)+1)
+        self.selectedPos = None
+        self.selectedIdx = -1
+        for i in range(len(toDraw2)):
+            xx,yy = self.rect[0], self.rect[1]+y
+            if InRect(xx,yy+5,self.rect[2], self.lineH, m.x, m.y):
+                self.selectedPos = (xx,yy+5)
+                self.selectedIdx = i
+                break
+            y += self.lineH
+
+    def BindOnSelect(self, idx, func):
+        self.binds[idx] = func
+    def Render(self):
+        DrawQuad(*(self.rect+((205,209,184,255), (205,209,184,255))))
+        if self.selectedPos:
+            DrawQuad(*(self.selectedPos+(self.rect[2], self.lineH)+((100,100,90,255), (100,100,90,255))))
+        toDrawLines = self.rect[3]/self.lineH
+        if len(self.renderedLines) >= toDrawLines:
+            toDraw = self.renderedLines[-toDrawLines:]
+        else:
+            toDraw = self.renderedLines[:]
+
+        if len(self.renderedLines2) >= toDrawLines:
+            toDraw2 = self.renderedLines2[-toDrawLines:]
+        else:
+            toDraw2 = self.renderedLines2[:]
+
         y = 0
         for textid in toDraw:
-            pos = self.rect[0], self.rect[1]+y
+            pos = self.rect[0]+5, self.rect[1]+y+5
+            self.textRendererArea.RenderOne(textid, pos)
+            y += self.lineH
+            if y > self.rect[3]:
+                break
+
+        y += self.lineH
+        for textid in toDraw2:
+            pos = self.rect[0]+5, self.rect[1]+y+5
             self.textRendererArea.RenderOne(textid, pos)
             y += self.lineH
             if y > self.rect[3]:
@@ -506,7 +571,10 @@ class MsgBox(object):
     def Render(self):
         toDrawLines = self.rect[3]/self.lineH
         if len(self.renderedLines) > 120:
-            self.renderedLines = self.renderedLines[-toDrawLines:]
+            self.textRendererArea.Clear()
+            self.renderedLines = []
+            for text in self.lines[-toDrawLines:]:
+                self.renderedLines += [self.textRendererArea.NewTextObject(text, color, (0, 0), border=True, borderColor = bcolor)]
             self.lines = self.lines[-120:]
 
         if len(self.renderedLines) >= toDrawLines:
@@ -875,8 +943,7 @@ TM_BOX = GenId()
 TM_CODE = GenId()
 TM_SPAWN = GenId()
 TM_CHAR = GenId()
-TM_SKILL = GenId()
-TM_ENCHANT = GenId()
+TM_TALK = GenId()
 
 
 class MakeTool(object):
@@ -922,6 +989,9 @@ class DigDigGUI(object):
         self.textRendererItemTitle = DynamicTextRenderer(self.font)
         self.textRendererItemSmall = DynamicTextRenderer(self.font2)
         self.msgBox = MsgBox()
+        self.talkBox = TalkBox()
+        self.talkBox.AddText("aaaa", (68,248,93), (8,29,1))
+        self.talkBox.AddSelection("aaaa", (68,248,93), (8,29,1))
         #self.testText = TextArea(0,SH-190,SW,100, 9, 14)
         self.testFile = FileSelector("./scripts")
         self.testEdit = SpawnerGUI((SW-400)/2,(SH-50)/2,400,50,14)
@@ -1814,6 +1884,8 @@ class DigDigGUI(object):
             self.testEdit.Render()
         if self.invShown:
             self.textRendererArea.Render()
+        if self.invShown and self.toolMode == TM_TALK:
+            self.talkBox.Render()
         self.msgBox.Render()
             # XXX: 이거를 음....텍스트 에어리어에 텍스트가 꽉 찼을 때만 업뎃하게 하고 나머지는 그냥
             # 위로 한칸씩 올리면서 추가하기만 한다.
