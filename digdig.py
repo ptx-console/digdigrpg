@@ -56,6 +56,16 @@ class Text:
     def __init__(self):
         pass
             #rects += Text.Write(font, "text", (0, 0), THE_SCREEN)
+    def GetSurfDS(self, font, text, pos, color=(255,255,255), shadow=False, shadowColor=(255,255,255)): # drop shadow
+        surf = font.render(text, True, color)
+        if shadow:
+            border = font.render(text,True,shadowColor)
+            base = pygame.Surface((border.get_rect().width,border.get_rect().height), flags=SRCALPHA)
+            base.blit(border, pygame.Rect(1,1,base.get_rect().width,base.get_rect().height))
+            base.blit(surf, pygame.Rect(0,0,base.get_rect().width,base.get_rect().height))
+            surf = base
+        rect = pygame.Rect(pos[0], pos[1], surf.get_rect().width, surf.get_rect().height)
+        return surf, rect
     def GetSurf(self, font, text, pos, color=(255,255,255), border=False, borderColor=(255,255,255)):
         surf = font.render(text, True, color)
         if border:
@@ -421,11 +431,11 @@ class TextArea(object):
 
 class TalkBox(object):
     def __init__(self):
-        self.font3 = pygame.font.Font("./fonts/Fanwood.ttf", 15)
+        self.font3 = pygame.font.Font("./fonts/GoudyBookletter1911.ttf", 15)
         self.textRendererArea = DynamicTextRenderer(self.font3)
         self.lines = []
         self.lines2 = []
-        self.rect = (SW-500)/2,30,500,300
+        self.rect = (SW-500)/2,30,500,280
         self.letterW = 9
         self.lineH = 15
         self.color = (255,255,255)
@@ -436,10 +446,12 @@ class TalkBox(object):
         self.mousePos = []
         self.selectedPos = None
         EMgrSt.BindMotion(self.Motion)
+        EMgrSt.BindLDown(self.LDown)
         # 텍스트를 배경과 함께 출력하고
         # 텍스트, 클릭가능한 선택지
         # 다음화면으로 넘어가는거 등등을 해야한다.
         # 화면 넘어갈 때마다 텍스쳐를 업뎃하자
+        self.active = False
     def AddText(self, text, color, bcolor): # 여기에 현재 텍스트를 추가하고 콜백을 추가하고
         # 선택지가 나오면 다시 클리어하고 현재텍스트를 추가하고 이런다
         lenn = len(self.lines)
@@ -456,7 +468,7 @@ class TalkBox(object):
         
         for text in self.lines[lenn:]:
             self.renderedLines += [self.textRendererArea.NewTextObject(text, color, (0, 0), border=True, borderColor = bcolor)]
-    def AddSelection(self, text, color, bcolor):
+    def AddSelection(self, text, bind, color, bcolor):
         lenn = len(self.lines2)
         if self.lineCut:
             leng = 0
@@ -472,6 +484,8 @@ class TalkBox(object):
         for text in self.lines2[lenn:]:
             self.renderedLines2 += [self.textRendererArea.NewTextObject(text, color, (0, 0), border=True, borderColor = bcolor)]
 
+        self.binds[lenn] = bind
+
     def Clear(self):
         self.lines = []
         self.lines2 = []
@@ -480,6 +494,9 @@ class TalkBox(object):
         self.textRendererArea.Clear()
         self.binds = {}
 
+    def LDown(self, t, m, k):
+        if self.selectedIdx != -1 and self.active:
+            self.binds[self.selectedIdx]()
     def Motion(self, t, m, k):
         toDrawLines = self.rect[3]/self.lineH
         if len(self.renderedLines) >= toDrawLines:
@@ -497,14 +514,12 @@ class TalkBox(object):
         self.selectedIdx = -1
         for i in range(len(toDraw2)):
             xx,yy = self.rect[0], self.rect[1]+y
-            if InRect(xx,yy+5,self.rect[2], self.lineH, m.x, m.y):
-                self.selectedPos = (xx,yy+5)
+            if InRect(xx,yy+5+2,self.rect[2], self.lineH, m.x, m.y):
+                self.selectedPos = (xx,yy+5+2)
                 self.selectedIdx = i
                 break
             y += self.lineH
 
-    def BindOnSelect(self, idx, func):
-        self.binds[idx] = func
     def Render(self):
         DrawQuad(*(self.rect+((205,209,184,255), (205,209,184,255))))
         if self.selectedPos:
@@ -541,7 +556,7 @@ class TalkBox(object):
         # 라인수가 일정 이상을 넘어서면 플러시
 class MsgBox(object):
     def __init__(self):
-        self.font3 = pygame.font.Font("./fonts/Fanwood.ttf", 15)
+        self.font3 = pygame.font.Font("./fonts/GoudyBookletter1911.ttf", 15)
         self.textRendererArea = DynamicTextRenderer(self.font3)
         self.lines = []
         self.rect = 0,SH-170,SW,100
@@ -564,7 +579,7 @@ class MsgBox(object):
 
         
         for text in self.lines[lenn:]:
-            self.renderedLines += [self.textRendererArea.NewTextObject(text, color, (0, 0), border=True, borderColor = bcolor)]
+            self.renderedLines += [(self.textRendererArea.NewTextObject(text, color, (0, 0), border=True, borderColor = bcolor), color, bcolor)]
 
     def Clear(self):
         self.lines = []
@@ -572,10 +587,13 @@ class MsgBox(object):
         toDrawLines = self.rect[3]/self.lineH
         if len(self.renderedLines) > 120:
             self.textRendererArea.Clear()
-            self.renderedLines = []
+            self.renderedLines = self.renderedLines[-toDrawLines:]
+            idx  = 0
             for text in self.lines[-toDrawLines:]:
-                self.renderedLines += [self.textRendererArea.NewTextObject(text, color, (0, 0), border=True, borderColor = bcolor)]
-            self.lines = self.lines[-120:]
+                old, color, bcolor = self.renderedLines[idx]
+                self.renderedLines[idx] = [self.textRendererArea.NewTextObject(text, color, (0, 0), border=True, borderColor = bcolor)]
+                idx += 1
+            self.lines = self.lines[-toDrawLines:]
 
         if len(self.renderedLines) >= toDrawLines:
             toDraw = self.renderedLines[-toDrawLines:]
@@ -585,7 +603,7 @@ class MsgBox(object):
         y = 0
         for textid in toDraw:
             pos = self.rect[0], self.rect[1]+y
-            self.textRendererArea.RenderOne(textid, pos)
+            self.textRendererArea.RenderOne(textid[0], pos)
             y += self.lineH
             if y > self.rect[3]:
                 break
@@ -983,6 +1001,7 @@ class DigDigGUI(object):
         self.font = pygame.font.Font("./fonts/Fanwood.ttf", 18)
         self.font2 = pygame.font.Font("./fonts/FanwoodText-Italic.ttf", 13)
         self.font3 = pygame.font.Font("./fonts/Fanwood.ttf", 14)
+        
         self.textRenderer = StaticTextRenderer(self.font)
         self.textRendererSmall = StaticTextRenderer(self.font2)
         self.textRendererArea = DynamicTextRenderer(self.font3)
@@ -991,7 +1010,9 @@ class DigDigGUI(object):
         self.msgBox = MsgBox()
         self.talkBox = TalkBox()
         self.talkBox.AddText("aaaa", (68,248,93), (8,29,1))
-        self.talkBox.AddSelection("aaaa", (68,248,93), (8,29,1))
+        def ppp():
+            print 'aaaa'
+        self.talkBox.AddSelection("aaaa", ppp, (68,248,93), (8,29,1))
         #self.testText = TextArea(0,SH-190,SW,100, 9, 14)
         self.testFile = FileSelector("./scripts")
         self.testEdit = SpawnerGUI((SW-400)/2,(SH-50)/2,400,50,14)
@@ -999,7 +1020,7 @@ class DigDigGUI(object):
         self.prevAreaT = 0
         self.prevDescT = 0
         self.areaDelay = 500
-        self.numbers = [self.textRenderer.NewTextObject(`i`, (255,255,255), True, (0,0,0)) for i in range(10)]
+        self.numbers = [self.textRenderer.NewTextObject(`i`, (255,255,255), True, (50,50,50)) for i in range(10)]
         self.numbers += [self.textRenderer.NewTextObject("-", (255,255,255), True, (0,0,0))]
         self.numbersS = [self.textRendererSmall.NewTextObject(`i`, (0,0,0), False, (0,0,0)) for i in range(10)]
         self.numbersS += [self.textRendererSmall.NewTextObject("-", (0,0,0), False, (0,0,0))]
@@ -1696,7 +1717,7 @@ class DigDigGUI(object):
                     "Melee Damage":atk,
                     "Defense":dfn,
                     "Fire Damage":fatk,
-                    "eatk":eatk,
+                    "Electric Damage":eatk,
                     "Ice Damage":iatk,
                     "Poison Damage":patk,
                     "Fire Resist":fres,
@@ -1884,7 +1905,9 @@ class DigDigGUI(object):
             self.testEdit.Render()
         if self.invShown:
             self.textRendererArea.Render()
+        self.talkBox.active = False
         if self.invShown and self.toolMode == TM_TALK:
+            self.talkBox.active = True
             self.talkBox.Render()
         self.msgBox.Render()
             # XXX: 이거를 음....텍스트 에어리어에 텍스트가 꽉 찼을 때만 업뎃하게 하고 나머지는 그냥
@@ -5343,7 +5366,7 @@ class FightingEntity(object):
         self.atk = params["Melee Damage"]
         self.dfn = params["Defense"]
         self.patk = params["Poison Damage"]
-        self.eatk = params["eatk"]
+        self.eatk = params["Electric Damage"]
         self.iatk = params["Ice Damage"]
         self.fatk = params["Fire Damage"]
         self.pres = params["Poison Resist"]
@@ -5379,12 +5402,12 @@ class FightingEntity(object):
         # 하지만 토치 상자등이나 코드블럭 스포너 아이템등은 설명이 필요하다.
         # 코드와 스포너를 잘써서 타워디펜스를 만들 수도 있을 것이고 상점을 만들 수도 있을 것이고 뭐....
         # NPC는 또다른 코드블럭이다. 단지, npc는 스포너가 없고 메뉴 인터랙션으로 출력을 하는 정도?
-        def A(other):
-            pass
-        self.ondead = A
-        self.onhit = A
+        self.ondead = self.OnDead
+        self.onhit = self.OnDead
         self.karma = 0 # 성향에 따라 Evil, Good, Neutral의 여러 중간단계로 나뉨? 음.... 카르마가 게임에 미치는 영향은 어떨까
 
+    def OnDead(self, other):
+        pass
     def CalcMaxHP(self):
         strBonus = 0
         for item in self.eqs:
@@ -5609,7 +5632,7 @@ class DigDigScript(object):
             (1*64.0/512.0, 1*64.0/512.0),
             (1*64.0/512.0, 1*64.0/512.0)]]
 
-        entity = FightingEntity("Mob1", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":5,"Defense":5,"Poison Damage":5,"Poison Resist":5,"eatk":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
+        entity = FightingEntity("Mob1", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":5,"Defense":5,"Poison Damage":5,"Poison Resist":5,"Electric Damage":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
         AppSt.mobs += [MobGL((pos[0]+0.5, pos[1]+3.0+0.5, pos[2]+0.5), [0.8,1.7,0.8], skin, MOB_SKELETON, (200,200,200,255), entity)]
 class ScriptLauncher(object):
     def __init__(self, coord):
@@ -5908,6 +5931,13 @@ class DigDigApp(object):
             mob = self.GetMob()
             if mob:
                 self.OnMobRHit(mob, t)
+                self.OnNPCRHit(mob, t)
+                self.chColor = self.BLUE_CH
+                return
+        if not self.gui.invShown:
+            mob = self.GetNPC()
+            if mob:
+                self.OnNPCRHit(mob, t)
                 self.chColor = self.BLUE_CH
                 return
         item = self.gui.qbar[self.gui.selectedItem]
@@ -6328,6 +6358,30 @@ class DigDigApp(object):
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_TEXTURE_2D)
 
+    def GetNPC(self):
+        mobIntersects = []
+        for mob in self.npcs:
+            pos = self.cam1.pos
+            pos = (pos.x, pos.y, -pos.z)
+            dir_ = self.cam1.GetDirV().Normalized().MultScalar(3.0)
+            dir_ = (dir_.x, dir_.y, -dir_.z)
+            x,y,z = mob.pos
+            min = x-mob.bound[0]/2,y-mob.bound[1],z-mob.bound[2]/2
+            max = x+mob.bound[0]/2,y,z+mob.bound[2]/2
+            intersects, coord = self.chunks.HitBoundingBox(min,max,pos,dir_)
+            if intersects:
+                mobIntersects += [(mob, coord)]
+        if mobIntersects:
+            pos = self.cam1.pos
+            pos = Vector(pos.x, pos.y, -pos.z)
+            lowest = mobIntersects[0]
+            for mobcoord in mobIntersects[1:]:
+                mob, coord = mobcoord
+                c = Vector(*coord)
+                if (c-pos).Length() < (Vector(*lowest[1])-pos).Length():
+                    lowest = mobcoord
+            return lowest
+        return None
     def GetMob(self):
         mobIntersects = []
         for mob in self.mobs:
@@ -6412,6 +6466,12 @@ class DigDigApp(object):
             self.prevAttack = t
             self.entity.Attack(mob[0].entity)
             self.sounds["Hit"].play()
+
+    def OnNPCRHit(self, mob, t):
+        self.guiMode = True
+        self.gui.toolMode = TM_TALK
+        self.gui.ShowInventory(self.guiMode)
+
 
     def OnMobRHit(self, mob, t):
         self.curAttackingMob = mob[0].entity
@@ -7220,9 +7280,14 @@ class DigDigApp(object):
         #self.inventoryV.Show(False)
         #cbg = QBBG((0,450,300,30))
         self.gui = DigDigGUI()
-        self.entity = FightingEntity("Player", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":5,"Defense":5,"Poison Damage":5,"Poison Resist":5,"eatk":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
+        try:
+            self.entity = pickle.load(open("./map/player.pkl", "r"))
+        except:
+            self.entity = FightingEntity("Player", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":5,"Defense":5,"Poison Damage":5,"Poison Resist":5,"Electric Damage":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
         self.entity.eqs = self.gui.eqs
         self.entity.inventory = self.gui.inventory
+        self.entity.onhit = self.entity.OnDead
+        self.entity.ondead = self.entity.OnDead
         skills = (AppSt.entity.magics.values()+AppSt.entity.swordSkills.values()+AppSt.entity.maceSkills.values()+AppSt.entity.spearSkills.values()+AppSt.entity.knuckleSkills.values())
 
         idx = 0
@@ -7234,6 +7299,7 @@ class DigDigApp(object):
             sIdx = 0
             for skill in self.gui.skills[:]:
                 if item and item.name == "Skill" and skill and item.skill.name == skill.skill.name:
+                    item.skill = self.gui.skills[sIdx].skill
                     self.gui.skills[sIdx] = ITEM_NONE
                     break
                 sIdx += 1
@@ -7241,6 +7307,7 @@ class DigDigApp(object):
             sIdx = 0
             for skill in self.gui.skills[:]:
                 if item and item.name == "Skill" and skill and item.skill.name == skill.skill.name:
+                    item.skill = self.gui.skills[sIdx].skill
                     self.gui.skills[sIdx] = ITEM_NONE
                     break
                 sIdx += 1
@@ -7314,9 +7381,10 @@ class DigDigApp(object):
         entity = FightingEntity("Mob1", self.cam1.pos, {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5})
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         """
-        entity = FightingEntity("Mob1", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":10,"Defense":5,"Poison Damage":5,"Poison Resist":5,"eatk":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
+        entity = FightingEntity("Mob1", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":10,"Defense":5,"Poison Damage":5,"Poison Resist":5,"Electric Damage":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
         self.mobs = []
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
+        self.npcs = []
         try:
             self.stairs = pickle.load(open("./map/stairs.pkl", "r"))
         except:
@@ -7434,6 +7502,11 @@ class DigDigApp(object):
         pickle.dump(self.gui.spawns, open("./map/spawns.pkl", "w"))
         pickle.dump(self.gui.eqs, open("./map/eqs.pkl", "w"))
         pickle.dump(self.stairs, open("./map/stairs.pkl", "w"))
+        self.entity.ondead = None
+        self.entity.onhit = None
+        self.entity.eqs = None
+        self.entity.inventory = None
+        pickle.dump(self.entity, open("./map/player.pkl", "w"))
 
 
 
@@ -7954,4 +8027,27 @@ Char모드에 스킬탭, 캐릭터탭이 있다.
 이제 캐릭터창. 스탯, 스킬을 그냥 표시하기만 함. 뭐 스탯도 쓰다보면 오르고 그럼
 ---------
 몹도 계단을 적용시켜야함
+------------------------
+이제 몹, 블럭 필드 아이템, npc, 스포너, 코드등을 계단처럼 청크별로 저장해야함
+--------------------------
+맵 락 기능을 넣고 NPC를 하나 넣어서 대화를 하게 해본다.
+물흐르기 라바흐르면서 데미지입기 등을 구현하고 뭐 포지라던가 그런 자원을 모아서 쓸 수 있게 하는 게 필요함
+-------------
+이제 npc를 어떻게 추가할까?
+블럭을 하나 만들고 npc블럭? 스포너를 깔고 그 옆에 npc가 스폰되도록 하기? 그게 젤 좋겠다. npc스폰되고 관련 코드도 스포너에 다 들어있고.
+스포너는 바닥을 파고 바닥에 깔면 그 바로 위에 npc가 스폰되는 걸로 하자.
+스포너의 스킨을 바꿀까? 걍 쓸까. 음 플레이어가 코드의 일정 거리 안에 들어오면 코드가 실행되도록 해야
+자동 스폰이 된다.
+
+대화 세트를 뭔가 딕셔너리로 스크립트에서 만들어서 보내주면
+대화 내용을 얻고
+뉴 퀘스트라던가 그런걸로 새로운 퀘스트를 추가
+퀘스트 완료 확인도 하고
+OnQuestComplete라는게 있고 뭐....
+
+
+OnTalk -- 대화를 하느냐, 퀘스트를 완료했는가를 체크해서 리워드를 주거나 퀘스트를 완료하고 다음 대화를 보여주고 이런다.
+OnSelectMenuItem - 다음 대화를 보여주느냐, 어떤 상태값을 체크하느냐, 퀘스트를 받느냐를 체크
+잠깐만. 선택지를 주고 마구 꼬으면 만들기가 힘들다. 만들기가 쉬워야 하니까
+대화창을 주고 선택지 없이 퀘스트를 받거나 안받거나 완료하거나 안하거나 간단하게 한다.
 """
