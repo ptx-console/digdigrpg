@@ -4584,6 +4584,7 @@ ANIM_HIT = GenId()
 
 g_id = 0
 MOB_SKELETON = GenId()
+MOB_NPC = GenId()
 
 
 MobRSt = None
@@ -4607,10 +4608,10 @@ class MobRenderer(object):
         """
 
         w,h,l = bound
-        animstate = 0
         self.color = (255,255,255,255)
         for mob in self.skins:
             self.dLists[mob] = [[glGenLists(1) for j in range(60)] for k in range(4)]
+            animstate = 0
             while animstate < 4:
                 animIdx = -30
                 while animIdx < 30:
@@ -4767,8 +4768,10 @@ class MobGL(object):
                 self.animIdx = -self.animMax
                 self.flip = False
                 self.animstate = ANIM_IDLE
-        if t - self.prevHit > self.hitRecovery:
-            AIAttacker()
+        print self.type_
+        if self.type_ == MOB_SKELETON:
+            if t - self.prevHit > self.hitRecovery:
+                AIAttacker()
             self.prevWalk = t
         self.FallOrJump(t)
 
@@ -6060,6 +6063,10 @@ class DigDigApp(object):
                 return
 
             item = self.gui.qbar[self.gui.selectedItem]
+            for mob in self.npcs:
+                if self.chunks.CheckCollide(x,y,z,Vector(mob.pos[0], mob.pos[1]-mob.bound[1], mob.pos[2]),mob.bound):
+                    # 몹과 충돌을 한다면 바로 return한다.
+                    return
             for mob in self.mobs:
                 if self.chunks.CheckCollide(x,y,z,Vector(mob.pos[0], mob.pos[1]-mob.bound[1], mob.pos[2]),mob.bound):
                     # 몹과 충돌을 한다면 바로 return한다.
@@ -6533,6 +6540,7 @@ class DigDigApp(object):
         pos = self.cam1.pos
         pos = Vector(pos.x, pos.y, -pos.z)
         mpos = Vector(*mob[0].pos)
+        mob[0].UpdateDirection()
         if (mpos-pos).Length() < 3:
             self.guiMode = True
             self.gui.toolMode = TM_TALK
@@ -6853,6 +6861,8 @@ class DigDigApp(object):
     def Render(self, t, m, k):
         for mob in self.mobs:
             mob.Tick(t,m,k)
+        for mob in self.npcs:
+            mob.Tick(t,m,k)
 
         updateFrameCounter = 0
         fogMode=GL_LINEAR# { GL_EXP, GL_EXP2, GL_LINEAR };	// Storage For Three Types Of Fog
@@ -7009,6 +7019,9 @@ class DigDigApp(object):
                     updateFrame = False
                 if self.regenTex:
                     MobRSt.RebuildMobs(self.bound)
+                for npc in self.npcs:
+                    if self.chunks.CubeInFrustumPy(*(npc.pos+(0.5,frustum))):
+                        npc.Render2(None, self.cam1, t)
                 for mob in self.mobs:
                     if self.chunks.CubeInFrustumPy(*(mob.pos+(0.5,frustum))):
                         mob.Render2(None, self.cam1, t) # 이것도 C로 옮기면 빨라질지도 모른다네
@@ -7445,17 +7458,19 @@ class DigDigApp(object):
             (1*64.0/512.0, 1*64.0/512.0),
             (1*64.0/512.0, 1*64.0/512.0)]]
 
-        skins = {MOB_SKELETON: skin}
+        skins = {MOB_SKELETON: skin, MOB_NPC: skin}
         self.mobR = MobRenderer(skins)
 
         """
         entity = FightingEntity("Mob1", self.cam1.pos, {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5})
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
         """
+
+
         entity = FightingEntity("Mob1", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":10,"Defense":5,"Poison Damage":5,"Poison Resist":5,"Electric Damage":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
         self.mobs = []
         self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
-        self.npcs = []
+
         try:
             self.stairs = pickle.load(open("./map/stairs.pkl", "r"))
         except:
@@ -7538,6 +7553,46 @@ class DigDigApp(object):
             mob.pos = p.x+idx*1.0, p.y, (-p.z)
             idx += 1
         
+        """
+        quests = [
+        {
+            "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+            "CheckQuestDone": args, # args = [(questText, QUEST_KILLMOB, number, mobid), (questText, QUEST_GATHER, number, itemid, itemtype), (questText, QUEST_REQUIREDQUEST, questid, npcname)]
+            "OnRequestQuest": [text, givequestfunc], # questText는 퀘스트의 내용이 퀘스트로그에 표시되는 텍스트
+            "OnQuestDone": [donetext, donequestfunc]},
+        {
+            "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+            "CheckQuestDone": args, # args = [(QUEST_KILLMOB, number, mobid)]
+            "OnRequestQuest": [text, givequestfunc],
+            "OnQuestDone": [donetext, donequestfunc]},
+        {
+            "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+            "CheckQuestDone": args, # args = [(QUEST_KILLMOB, number, mobid)]
+            "OnRequestQuest": [text, givequestfunc],
+            "OnQuestDone": [donetext, donequestfunc]},
+        {
+            "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+            "CheckQuestDone": args, # args = [(QUEST_KILLMOB, number, mobid)]
+            "OnRequestQuest": [text, givequestfunc],
+            "OnQuestDone": [donetext, donequestfunc]},
+        {
+            "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+            "CheckQuestDone": args, # args = [(QUEST_KILLMOB, number, mobid)]
+            "OnRequestQuest": [text, givequestfunc],
+            "OnQuestDone": [donetext, donequestfunc]},
+        ]
+        questIdx = 0
+        quests[questIdx]
+
+        SpawnNPC("name", "SpawnerName", quests)
+        """
+
+
+
+        p = self.cam1.pos+(self.cam1.GetDirV().MultScalar(2.0))
+        self.npcs = [MobGL((p.x,p.y,-p.z), self.bound, skin, MOB_NPC, (200,200,200,255), entity) for i in range(1)]
+
+
         #self.chunks.SaveRegion("test", (64,0,64), (127+64,127,127+64))
         while not done:
             fps.Start()
