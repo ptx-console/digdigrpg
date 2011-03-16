@@ -1139,8 +1139,8 @@ class DigDigGUI(object):
         self.makes[44] = MakeTool(u"Shield", u"A shield\n- Shield -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107))], (ITEM_SHIELD, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[45] = MakeTool(u"Helm", u"A Helm\n- Helm -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107))], (ITEM_HELM, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[46] = MakeTool(u"Armor", u"A body armor\n- Armor -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107))], (ITEM_ARMOR, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[47] = MakeTool(u"Gloves", u"A pair of gloves\n- Gloves -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107))], (ITEM_GLOVES, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[48] = MakeTool(u"Boots", u"A pair of boots\n- Boots -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107))], (ITEM_BOOTS, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[47] = MakeTool(u"Gloves", u"A pair of gloves\n- Gloves -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107))], (ITEM_GLOVES, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[48] = MakeTool(u"Boots", u"A pair of boots\n- Boots -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107))], (ITEM_BOOTS, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[50] = MakeTool(u"Silver Ring", u"A silver ring\n- Ring -", (201,201,201), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (ITEM_SILVERRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[51] = MakeTool(u"Silver Necklace", u"A silver necklace\n- Necklace -", (201,201,201), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (ITEM_SILVERNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[52] = MakeTool(u"Gold Ring", u"A gold ring\n- Ring -", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101))], (ITEM_GOLDRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
@@ -1152,6 +1152,8 @@ class DigDigGUI(object):
         self.makes[58] = MakeTool(u"Gold Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_GENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[59] = MakeTool(u"Diamond\nEnchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_DENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.recipeTextID = self.textRenderer.NewTextObject(u"Recipe:", (0,0,0))
+        self.enchantTextID = self.textRenderer.NewTextObject(u"Enchant Count / Max Enchant Count", (0,0,0))
+        self.enchantSlashTextID = self.textRenderer.NewTextObject(u"/", (0,0,0))
         self.charTabID = self.textRendererSmall.NewTextObject(u"Char", (0,0,0))
         self.strID = self.textRendererSmall.NewTextObject(u"Str:", (0,0,0))
         self.dexID = self.textRendererSmall.NewTextObject(u"Dex:", (0,0,0))
@@ -1433,11 +1435,13 @@ class DigDigGUI(object):
                     Swap()
                 else:
                     if self.draggingItem.type_ in [ITEM_SENCHANTSCROLL, ITEM_GENCHANTSCROLL, ITEM_DENCHANTSCROLL] and cont[y*10+x].type_ in [ITEM_SWORD, ITEM_SPEAR, ITEM_MACE, ITEM_KNUCKLE, ITEM_SHIELD,ITEM_HELM,ITEM_ARMOR,ITEM_BOOTS,ITEM_GLOVES,ITEM_SILVERNECLACE, ITEM_GOLDNECLACE, ITEM_DIAMONDNECLACE,ITEM_SILVERRING, ITEM_GOLDRING, ITEM_DIAMONDRING]:
-                        self.ApplyEnchantScroll(cont[y*10+x], self.draggingItem)
-                        self.dragging = False
-                        self.draggingItem = None
-                        self.dragPos = None
-                        self.dragCont = None
+                        item = cont[y*10+x]
+                        if item.enchantCount < item.maxEnchant:
+                            self.ApplyEnchantScroll(cont[y*10+x], self.draggingItem)
+                            self.dragging = False
+                            self.draggingItem = None
+                            self.dragPos = None
+                            self.dragCont = None
                     elif self.draggingItem.type_ == cont[y*10+x].type_ and self.draggingItem.name == cont[y*10+x].name and self.draggingItem.stackable:
                         if self.draggingItem.count > 1:
                             half = self.draggingItem.count / 2
@@ -1505,6 +1509,7 @@ class DigDigGUI(object):
         if not item.element:
             item.element = FightingElements("Item", (0,0,0), {})
         item.element.ApplyEnchantScroll(item.type_, scroll)
+        item.enchantCount += 1
     def DoEquip(self, idx):
         # dragging이 있으면 그걸 입을수있는지 검사
         # 없으면 언이큅
@@ -1775,6 +1780,38 @@ class DigDigGUI(object):
                 #인챈트 스크롤 복사하는 아이템이 고급 몬스터에게서 떨어진다. XXX:
                 element = self.GenElement(type_)
                 returneditem = Item(type_, 1, color=tool.color, element=element)
+            elif type_ in [ITEM_GOLDRING, ITEM_GOLDNECLACE, ITEM_HELM, ITEM_ARMOR, ITEM_SILVERRING, ITEM_SILVERNECLACE, ITEM_DIAMONDRING, ITEM_DIAMONDNECLACE]:
+                returneditem = Item(type_, 1, color=tool.color, stats=stats)
+                if type_ in [ITEM_SILVERNECLACE, ITEM_SILVERRING]:
+                    returneditem.maxEnchant += 2
+                if type_ in [ITEM_GOLDNECLACE, ITEM_GOLDRING]:
+                    returneditem.maxEnchant += 4
+                if type_ in [ITEM_DIAMONDNECLACE, ITEM_DIAMONDRING]:
+                    returneditem.maxEnchant += 6
+            elif type_ in [ITEM_SWORD, ITEM_SPEAR, ITEM_MACE, ITEM_KNUCKLE]:
+                returneditem = Item(type_, 1, color=tool.color, stats=stats)
+                if type_ == ITEM_SPEAR:
+                    returneditem.element = FightingElements("Weapon", (0,0,0), {"atk":20})
+                else:
+                    returneditem.element = FightingElements("Weapon", (0,0,0), {"atk":10})
+            elif type_ in [ITEM_SHIELD]:
+                returneditem = Item(type_, 1, color=tool.color, stats=stats)
+                returneditem.element = FightingElements("Shield", (0,0,0), {"dfn":10})
+            elif type_ in [ITEM_HELM]:
+                returneditem = Item(type_, 1, color=tool.color, stats=stats)
+                returneditem.element = FightingElements("Helm", (0,0,0), {"dfn":5})
+            elif type_ in [ITEM_ARMOR]:
+                returneditem = Item(type_, 1, color=tool.color, stats=stats)
+                returneditem.element = FightingElements("Armor", (0,0,0), {"dfn":10})
+            elif type_ in [ITEM_BOOTS]:
+                returneditem = Item(type_, 1, color=tool.color, stats=stats)
+                returneditem.element = FightingElements("Boots", (0,0,0), {"dfn":5})
+            elif type_ in [ITEM_GLOVES]:
+                returneditem = Item(type_, 1, color=tool.color, stats=stats)
+                returneditem.element = FightingElements("Gloves", (0,0,0), {"dfn":5})
+
+            # 무기나 방어구에 알맞는 기본 atk, dfn등을 넣어야 한다.
+            # 이용자의 스킬에 따라 더 높은 속성을 넣을 수도 있다?
             else:
                 if count == 0:
                     returneditem = Item(type_, 999, color=tool.color, stats=stats)
@@ -2702,6 +2739,11 @@ class DigDigGUI(object):
                 except:
                     pass
                 y += 10
+                self.textRenderer.RenderText(self.enchantTextID, (10, 25+y))
+                y += 10
+                self.RenderNumber(item.enchantCount, 10, 25+y)
+                self.textRenderer.RenderText(self.enchantSlashTextID, (30, 25+y))
+                self.RenderNumber(item.maxEnchant, 35, 25+y)
 
 
             def RenderSkillDesc(skill):
@@ -4127,6 +4169,8 @@ class Item(object):
         self.textTitleIdx = []
         self.textDescIdx = []
         self.skill = skill
+        self.enchantCount = 0
+        self.maxEnchant = 3
 
 class Skill(Item):
     def __init__(self, skill):
@@ -8138,5 +8182,9 @@ def bind():
 ---------------
 광산을 만들고 오어를 캐는 순간 리젠되게 하면 울온처럼 할 수 있다.
 땅을 팔 수는 없고, 자기가 구입한 땅 영역 안에만 블럭을 사서 쌓을 수 있도록 하면 땡
-그럼 아파트처럼도 할 수 있고 뭐....
+상자는 아무데나 놓을 수 없고, 자기 땅 안에만 놓을 수 있다.
+--------------------
+잉여 인챈트 스크롤은 어따쓰게할까.
+
+링류나 목걸이류는 인챈트 횟수가 10번 15번(골드) 20번(다이아)
 """
