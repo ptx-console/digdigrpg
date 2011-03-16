@@ -407,15 +407,17 @@ class TextArea(object):
         self.lineCut = lineCut
     def SetText(self, text):
         if text:
+            lenn = len(self.lines)
             if self.lineCut:
-                leng = 0
                 offset = self.rect[2]/self.letterW
-                while leng < len(text):
-                    newtext = text[leng:leng+offset]
-                    self.lines += newtext.split("\n")
-                    leng += offset
+                for textt in text.split("\n"):
+                    leng = 0
+                    while leng < len(textt):
+                        newtext = textt[leng:leng+offset]
+                        self.lines += [newtext]
+                        leng += offset
             else:
-                self.lines = text.split("\n")
+                self.lines += text.split("\n")
         else:
             self.lines = []
 
@@ -431,7 +433,7 @@ class TextArea(object):
 
 class TalkBox(object):
     def __init__(self):
-        self.font3 = pygame.font.Font("./fonts/GoudyBookletter1911.ttf", 15)
+        self.font3 = pygame.font.Font("./fonts/Fanwood.ttf", 15)
         self.textRendererArea = DynamicTextRenderer(self.font3)
         self.lines = []
         self.lines2 = []
@@ -456,25 +458,26 @@ class TalkBox(object):
         # 선택지가 나오면 다시 클리어하고 현재텍스트를 추가하고 이런다
         lenn = len(self.lines)
         if self.lineCut:
-            leng = 0
             offset = self.rect[2]/self.letterW
-            while leng < len(text):
-                newtext = text[leng:leng+offset]
-                self.lines += newtext.split("\n")
-                leng += offset
+            for textt in text.split("\n"):
+                leng = 0
+                while leng < len(textt):
+                    newtext = textt[leng:leng+offset]
+                    self.lines += [newtext]
+                    leng += offset
         else:
             self.lines += text.split("\n")
 
         
         for text in self.lines[lenn:]:
-            self.renderedLines += [self.textRendererArea.NewTextObject(text, color, (0, 0), border=True, borderColor = bcolor)]
+            self.renderedLines += [self.textRendererArea.NewTextObject(text, color, (0, 0), border=False, borderColor = bcolor)]
     def AddSelection(self, text, bind, color, bcolor):
         lenn = len(self.lines2)
         self.lines2 += [text]
 
         
         for text in self.lines2[lenn:]:
-            self.renderedLines2 += [self.textRendererArea.NewTextObject(text, color, (0, 0), border=True, borderColor = bcolor)]
+            self.renderedLines2 += [self.textRendererArea.NewTextObject(text, color, (0, 0), border=False, borderColor = bcolor)]
 
         self.binds[lenn] = bind
 
@@ -560,12 +563,13 @@ class MsgBox(object):
     def AddText(self, text, color, bcolor):
         lenn = len(self.lines)
         if self.lineCut:
-            leng = 0
             offset = self.rect[2]/self.letterW
-            while leng < len(text):
-                newtext = text[leng:leng+offset]
-                self.lines += newtext.split("\n")
-                leng += offset
+            for textt in text.split("\n"):
+                leng = 0
+                while leng < len(textt):
+                    newtext = textt[leng:leng+offset]
+                    self.lines += [newtext]
+                    leng += offset
         else:
             self.lines += text.split("\n")
 
@@ -956,6 +960,10 @@ TM_CHAR = GenId()
 TM_TALK = GenId()
 
 
+g_id = 0
+QUEST_REQUIREDQUEST = GenId()
+QUEST_GATHER = GenId()
+QUEST_KILLMOB = GenId()
 class MakeTool(object):
     def __init__(self, name, desc, color, needs, returns, textRenderer, textRendererSmall):
         self.name = name
@@ -1672,6 +1680,13 @@ class DigDigGUI(object):
 
     def GenElement(self, gentype): # 스킬 레벨이 높을수록 보너스도 더 높은게 나온다.
         # 최대 현재 스킬 레벨과 같은 수준의 인챈트 스크롤이 나올 수 있다. 간단함
+        # 음 스킬이 더럽게 안오르니까 몹을 캐릭터의 수준에 맞춰서 생성하고 그러자....
+        # 굴곡이 좀 있어서 한 번 생성된 몹 중 강한놈 못잡으면 나중에 잡을 수 있도록 하고 강한 몹이라면 더 좋은 걸 줘야겠지....
+        # 울온엔 장식용 아이템이 참 많다. 심즈처럼 많지는 않지만 그정도 수준이다. 음...........
+        #
+        # 아 여러 지역을 두고 그 지역에는 어떤 특정한 몹이 나오도록 뭐 그렇게 해볼까.
+        # 무한 맵이라고 해서 맵을 넓게 쓸 필요가 없음;
+        # 미니맵이나 전체지도 만들어야함 XXX:
         if gentype == ITEM_SENCHANTSCROLL:
             skills = [skill.skill for skill in AppSt.entity.magics.itervalues()]
             skills += [skill.skill for skill in AppSt.entity.swordSkills.itervalues()]
@@ -5692,6 +5707,8 @@ class DigDigScript(object):
             (1*64.0/512.0, 1*64.0/512.0)]]
 
         entity = FightingEntity("Mob1", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":5,"Defense":5,"Poison Damage":5,"Poison Resist":5,"Electric Damage":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
+        entity.curhp = entity.CalcMaxHP()
+        entity.curmp = entity.CalcMaxMP()
         AppSt.mobs += [MobGL((pos[0]+0.5, pos[1]+3.0+0.5, pos[2]+0.5), [0.8,1.7,0.8], skin, MOB_SKELETON, (200,200,200,255), entity)]
 class ScriptLauncher(object):
     def __init__(self, coord):
@@ -6545,11 +6562,11 @@ class DigDigApp(object):
             # 퀘스트를 이미 받았고 퀘스트를 완료했다면 퀘스트 완료를 하고 idx += 1을 하고 리워드를 준다.
             self.gui.talkBox.Clear()
             oktext, notoktext = self.quests[mob[0].name][self.questIdxes[mob[0].name]]["OnRequestQuest"]
-            self.gui.talkBox.AddText(oktext, (200,200,200), (8,29,1))
+            self.gui.talkBox.AddText(oktext, (30,30,30), (8,29,1))
             def Close():
                 self.guiMode = False
                 self.gui.ShowInventory(self.guiMode)
-            self.gui.talkBox.AddSelection("OK", Close, (68,248,93), (8,29,1))
+            self.gui.talkBox.AddSelection("OK", Close, (8,29,1), (8,29,1))
 
             self.guiMode = True
             self.gui.toolMode = TM_TALK
@@ -7377,6 +7394,8 @@ class DigDigApp(object):
             self.entity = pickle.load(open("./map/player.pkl", "r"))
         except:
             self.entity = FightingEntity("Player", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":5,"Defense":5,"Poison Damage":5,"Poison Resist":5,"Electric Damage":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
+            entity.curhp = entity.CalcMaxHP()
+            entity.curmp = entity.CalcMaxMP()
         self.entity.eqs = self.gui.eqs
         self.entity.inventory = self.gui.inventory
         self.entity.onhit = self.entity.OnDead
@@ -7570,12 +7589,12 @@ class DigDigApp(object):
         """
 
 
-        checkargs = ()
-        doneargs = ()
-        oktext = "I need 10 Cobblestone blocks... Would you bring me 10 Cobblestone blocks?"
+        checkargs = []
+        doneargs = [("Bring 10 Cobblestone blocks", QUEST_GATHER, 10, BLOCK_COBBLESTONE, "Block")]
+        oktext = "I need 10 Cobblestone blocks...\nWould you bring me 10 Cobblestone blocks?"
         notoktext = "Hi"
         donetext = "Thank you sir! Here's your reward."
-        rewards = ((ITEM_SILVER, 1, "Item"))# 아이템이 한가지인경우 그냥생성, 아이템이 인챈트스크롤인 경우 함수로 생성
+        rewards = [(ITEM_SENCHANTSCROLL, 5, "Item"), (ITEM_SILVER, 1, "Item")] # 아이템이 한가지인경우 그냥생성, 아이템이 인챈트스크롤인 경우 함수로 생성
 
         quests = [
         {
