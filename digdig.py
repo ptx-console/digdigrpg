@@ -5261,40 +5261,40 @@ class RawSkill(object):
                         atkBonus += item.element.params["Melee Damage"]
 
                 dmg = ((atkBonus+user.atk+self.value*((skill.skillPoint+skillBonus)*self.incFactor)))*((intBonus+user.int)**1.8/(user.int+intBonus))
-                user.atk += ((user.atk)**1.5/(user.atk))/10.0
-                target.dfn += (target.dfn**1.5/target.dfn)/10.0 # 타겟은 기본적으로 정의되어있지 아이템이 입은게 아니므로 그냥 한다.
+                user.atk += ((user.atk)**1.5/(user.atk))/100.0
+                target.dfn += (target.dfn**1.5/target.dfn)/100.0 # 타겟은 기본적으로 정의되어있지 아이템이 입은게 아니므로 그냥 한다.
             if self.skilltype == SKILL_FIRE:
                 fatkBonus = 0
                 for item in user.eqs:
                     if item and item.element and "Fire Damage" in item.element.params:
                         fatkBonus += item.element.params["Fire Damage"]
                 dmg = ((fatkBonus+user.fatk+self.value*((skill.skillPoint+skillBonus)*self.incFactor)))*((intBonus+user.int)**1.8/(user.int+intBonus))
-                user.fatk += ((user.fatk)**1.5/(user.fatk))/10.0
-                target.fres += (target.fres**1.5/target.fres)/10.0
+                user.fatk += ((user.fatk)**1.5/(user.fatk))/100.0
+                target.fres += (target.fres**1.5/target.fres)/100.0
             if self.skilltype == SKILL_ICE:
                 fatkBonus = 0
                 for item in user.eqs:
                     if item and item.element and "Ice Damage" in item.element.params:
                         fatkBonus += item.element.params["Ice Damage"]
                 dmg = ((fatkBonus+user.iatk+self.value*((skill.skillPoint+skillBonus)*self.incFactor)))*((intBonus+user.int)**1.8/(user.int+intBonus))
-                user.iatk += (user.iatk**1.5/user.iatk)/10.0
-                target.ires += (user.fres**1.5/user.ires)/10.0
+                user.iatk += (user.iatk**1.5/user.iatk)/100.0
+                target.ires += (user.fres**1.5/user.ires)/100.0
             if self.skilltype == SKILL_ELECTRIC:
                 fatkBonus = 0
                 for item in user.eqs:
                     if item and item.element and "Electric Damage" in item.element.params:
                         fatkBonus += item.element.params["Electric Damage"]
                 dmg = ((fatkBonus+user.eatk+self.value*((skill.skillPoint+skillBonus)*self.incFactor)))*((intBonus+user.int)**1.8/(user.int+intBonus))
-                user.eatk += (user.eatk**1.5/user.eatk)/10.0
-                target.eres += (target.eres**1.5/target.eres)/10.0
+                user.eatk += (user.eatk**1.5/user.eatk)/100.0
+                target.eres += (target.eres**1.5/target.eres)/100.0
             if self.skilltype == SKILL_POISON:
                 fatkBonus = 0
                 for item in user.eqs:
                     if item and item.element and "Poison Damage" in item.element.params:
                         fatkBonus += item.element.params["Poison Damage"]
                 dmg = ((fatkBonus+user.patk+self.value*((skill.skillPoint+skillBonus)*self.incFactor)))*((intBonus+user.int)**1.8/(user.int+intBonus))
-                user.patk += (user.patk**1.5/user.patk)/10.0
-                target.pres += (target.pres**1.5/target.pres)/10.0
+                user.patk += (user.patk**1.5/user.patk)/100.0
+                target.pres += (target.pres**1.5/target.pres)/100.0
 
 
             dmg *= (magicBonus+user.magic)**1.2/(magicBonus+user.magic)
@@ -5332,9 +5332,9 @@ class CombinedSkill(object): # 위의 생스킬을 합쳐서 스킬하나를 만
 
             for raw in self.raws:
                 dmg += raw.Apply(user, target, self, skillBonus)
-            self.skillPoint += (self.skillPoint/self.skillPoint**1.5)/10.0
-            user.magic += (user.magic/user.magic**1.5)/10.0
-            user.int += (user.int/user.int**1.5)/10.0
+            self.skillPoint += (self.skillPoint/self.skillPoint**1.5)/100.0
+            user.magic += (user.magic/user.magic**1.5)/100.0
+            user.int += (user.int/user.int**1.5)/100.0
             if self.name == "Heal":
                 if user == AppSt.entity:
                     AppSt.gui.msgBox.AddText("You heal yourself: %d" % dmg, (68,248,93), (8,29,1))
@@ -5469,8 +5469,8 @@ class FightingEntity(object):
                 strBonus += item.element.params["Str"]
 
         atk *= (self.str+strBonus)**1.2/(self.str+strBonus)
-        self.str += (self.str/self.str**1.5)/10.0
-        self.atk += (self.atk/self.atk**1.5)/10.0
+        self.str += (self.str/self.str**1.5)/100.0
+        self.atk += (self.atk/self.atk**1.5)/100.0
         return atk
 
     def CalculateDmg(self, dfn):
@@ -5492,7 +5492,7 @@ class FightingEntity(object):
                 break
         if found:
             dfn *= ((armorBonus+self.armor)**1.2/(armorBonus+self.armor))
-            self.armor += (self.armor/self.armor**1.5)/10.0
+            self.armor += (self.armor/self.armor**1.5)/100.0
 
         dexBonus = 0
         for item in self.eqs:
@@ -5500,8 +5500,8 @@ class FightingEntity(object):
                 dexBonus += item.element.params["Dex"]
 
         dfn *= (self.dex+dexBonus)**1.2/(self.dex+dexBonus)
-        self.dex += (self.dex/self.dex**1.5)/10.0
-        self.dfn += (self.dfn/self.dfn**1.5)/10.0
+        self.dex += (self.dex/self.dex**1.5)/100.0
+        self.dfn += (self.dfn/self.dfn**1.5)/100.0
         return dfn
 
     def Attack(self, other):
@@ -5509,16 +5509,16 @@ class FightingEntity(object):
             if not item:
                 continue
             if item.type_ == ITEM_SWORD:
-                self.sword += (self.sword/self.sword**1.5)/10.0
+                self.sword += (self.sword/self.sword**1.5)/100.0
                 break
             elif item.type_ == ITEM_SPEAR:
-                self.spear += (self.spear/self.spear**1.5)/10.0
+                self.spear += (self.spear/self.spear**1.5)/100.0
                 break
             elif item.type_ == ITEM_MACE:
-                self.mace += (self.mace/self.mace**1.5)/10.0
+                self.mace += (self.mace/self.mace**1.5)/100.0
                 break
             elif item.type_ == ITEM_KNUCKLE:
-                self.knuckle += (self.knuckle/self.knuckle**1.5)/10.0
+                self.knuckle += (self.knuckle/self.knuckle**1.5)/100.0
                 break
 
         dmg = self.CalculateDmg(other.CalculateDefense())
@@ -5587,6 +5587,19 @@ class DigDigScript(object):
         # 아예 어드민의 용도로만 사용하게 하도록 하자 그냥;;
         # XXX: 이제 부수지 못하도록 스포너 2개로 Lockdown거는 것을 구현하자. 락다운을 걸면 땅의 주인만 락다운을 풀 수가 있음
         # 땅의 소유지를 결정하는 것도 스포너 2개로.
+
+    def QuestDoneCheck(self, *args):
+        # 각각의 arg는 함수, 파라메터의 2개짜리 튜플이나 리스트
+        pass
+    def CheckKillMob(self, mobid, number):
+        pass
+    def CheckGatherItem(self, itemtype, itemid, number):
+        pass
+    def CheckQuestFlag(self, questid, npcname):
+        pass
+    def SpawnNPC(self, name, pos, quest):
+        # 같은 이름의 npc가 없다면 스폰 있으면 스킵
+        pass
     def SpawnMob(self, pos):
         assert type(pos) in [str, unicode]
         spawners = {}
@@ -6371,6 +6384,7 @@ class DigDigApp(object):
             intersects, coord = self.chunks.HitBoundingBox(min,max,pos,dir_)
             if intersects:
                 mobIntersects += [(mob, coord)]
+
         if mobIntersects:
             pos = self.cam1.pos
             pos = Vector(pos.x, pos.y, -pos.z)
@@ -6464,22 +6478,35 @@ class DigDigApp(object):
         # 여기서 대화 또는 공격 XXX
         if t - self.prevAttack > self.attackDelay:
             self.prevAttack = t
-            self.entity.Attack(mob[0].entity)
-            self.sounds["Hit"].play()
+            pos = self.cam1.pos
+            pos = Vector(pos.x, pos.y, -pos.z)
+            mpos = Vector(*mob[0].pos)
+            if (mpos-pos).Length() < 1.2:
+                self.entity.Attack(mob[0].entity)
+                self.sounds["Hit"].play()
 
     def OnNPCRHit(self, mob, t):
-        self.guiMode = True
-        self.gui.toolMode = TM_TALK
-        self.gui.ShowInventory(self.guiMode)
+        pos = self.cam1.pos
+        pos = Vector(pos.x, pos.y, -pos.z)
+        mpos = Vector(*mob[0].pos)
+        if (mpos-pos).Length() < 3:
+            self.guiMode = True
+            self.gui.toolMode = TM_TALK
+            self.gui.ShowInventory(self.guiMode)
 
 
     def OnMobRHit(self, mob, t):
         self.curAttackingMob = mob[0].entity
         if t - self.prevAttack > self.attackDelay:
             self.prevAttack = t
+
             item = self.gui.qbar[self.gui.selectedItem]
             if item and item.name == "Skill":
-                item.skill.Apply(self.entity, mob[0].entity)
+                pos = self.cam1.pos
+                pos = Vector(pos.x, pos.y, -pos.z)
+                mpos = Vector(*mob[0].pos)
+                if (mpos-pos).Length() < item.skill.range:
+                    item.skill.Apply(self.entity, mob[0].entity)
 
         # XXX 여기서 마법 또는 상점 인터랙션?
         # 마법 연사력을 결정해서 딜레이를 줘야함
@@ -8050,4 +8077,66 @@ OnTalk -- 대화를 하느냐, 퀘스트를 완료했는가를 체크해서 리�
 OnSelectMenuItem - 다음 대화를 보여주느냐, 어떤 상태값을 체크하느냐, 퀘스트를 받느냐를 체크
 잠깐만. 선택지를 주고 마구 꼬으면 만들기가 힘들다. 만들기가 쉬워야 하니까
 대화창을 주고 선택지 없이 퀘스트를 받거나 안받거나 완료하거나 안하거나 간단하게 한다.
+
+# 이거면 충분함. 이걸로 다 구현할 수 있다능!
+# 이걸로 가져오기 퀘스트(배달퀘스트도 버릴수없는 아이템을 주고 가져오기로 구현), 몹죽이기 퀘스트, 대화퀘스트 등을 다 구현 가능
+# 특정한 기계를 작동해야 하는 경우 기계에 npcid를 부여하고 플래그를 셋
+quests = [
+   {
+    "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+    "CheckQuestDone": args, # args = [(questText, QUEST_KILLMOB, number, mobid), (questText, QUEST_GATHER, number, itemid, itemtype), (questText, QUEST_REQUIREDQUEST, questid, npcname)]
+    "OnRequestQuest": [text, givequestfunc], # questText는 퀘스트의 내용이 퀘스트로그에 표시되는 텍스트
+    "OnQuestDone": [donetext, donequestfunc]},
+   {
+    "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+    "CheckQuestDone": args, # args = [(QUEST_KILLMOB, number, mobid)]
+    "OnRequestQuest": [text, givequestfunc],
+    "OnQuestDone": [donetext, donequestfunc]},
+   {
+    "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+    "CheckQuestDone": args, # args = [(QUEST_KILLMOB, number, mobid)]
+    "OnRequestQuest": [text, givequestfunc],
+    "OnQuestDone": [donetext, donequestfunc]},
+   {
+    "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+    "CheckQuestDone": args, # args = [(QUEST_KILLMOB, number, mobid)]
+    "OnRequestQuest": [text, givequestfunc],
+    "OnQuestDone": [donetext, donequestfunc]},
+   {
+    "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+    "CheckQuestDone": args, # args = [(QUEST_KILLMOB, number, mobid)]
+    "OnRequestQuest": [text, givequestfunc],
+    "OnQuestDone": [donetext, donequestfunc]},
+]
+questIdx = 0
+quests[questIdx]
+
+SpawnNPC("name", "SpawnerName", quests)
+
+메시지창을 띄우기 전에 퀘스트 완료를 검사해서
+퀘스트가 관료되면 띄우는OnQuestDone을 쓴다.
+즉... 루트는 항상 2가지를 가지고 있고 OnQuestNotDone, QuestDone을 가지고 있다.
+한 NPC가 두가지 이상의 퀘스트를 가지고 있다면
+루트를 리스트로 만들어서 1번이 다되면 idx+=1하고 2번을 출력, 2번이 다되면 3번을 출력 이런다.
+
+이 텍스트들은 모두 다시 읽을 수 있도록 기능을 만들어 둔다.
+
+메인퀘스트의 숫자가 몇 이상이 되어야 나오는 사이드퀘스트들도 있다?
+
+NPC의 머리 위에 느낌표가 있으면 새로운 퀘스트
+물음표가 있으면 퀘스트를 다 했냐고 물어보는 것
+머리위에 상점아이콘이라던가 그런 걸 놓는다.
+
+AppSt.gui.msgBox.Clear()
+AppSt.gui.msgBox.AddText()
+AppSt.gui.msgBox.AddSelection(bind)
+def bind():
+    AppSt.gui.msgBox.Clear()
+    AppSt.gui.msgBox.AddText()
+    AppSt.gui.msgBox.AddSelection(nextbind)
+
+---------------
+광산을 만들고 오어를 캐는 순간 리젠되게 하면 울온처럼 할 수 있다.
+땅을 팔 수는 없고, 자기가 구입한 땅 영역 안에만 블럭을 사서 쌓을 수 있도록 하면 땡
+그럼 아파트처럼도 할 수 있고 뭐....
 """
