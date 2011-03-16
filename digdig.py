@@ -4732,16 +4732,18 @@ class MobGL(object):
         self.attackDelay = 3000
         self.prevAtk = 0
         self.prevWalk = 0
-        self.entity.BindHit(self.OnHit)
-        self.entity.BindDead(self.OnDead)
+        if self.type_ == MOB_SKELETON:
+            self.entity.BindHit(self.OnHit)
+            self.entity.BindDead(self.OnDead)
         self.prevHit = 0
         self.hitRecovery = 250
 
 
 
     def OnDead(self, attacker):
-        AppSt.mobs.remove(self)
-        AppSt.gui.msgBox.AddText("Mob is dead.", (68,248,93), (8,29,1))
+        if self.type_ == MOB_SKELETON:
+            AppSt.mobs.remove(self)
+            AppSt.gui.msgBox.AddText("Mob is dead.", (68,248,93), (8,29,1))
     def OnHit(self, attacker):
         self.animstate = ANIM_HIT
         self.prevHit = pygame.time.get_ticks()
@@ -4768,7 +4770,6 @@ class MobGL(object):
                 self.animIdx = -self.animMax
                 self.flip = False
                 self.animstate = ANIM_IDLE
-        print self.type_
         if self.type_ == MOB_SKELETON:
             if t - self.prevHit > self.hitRecovery:
                 AIAttacker()
@@ -5991,15 +5992,15 @@ class DigDigApp(object):
             mob = self.GetMob()
             if mob:
                 self.OnMobRHit(mob, t)
-                self.OnNPCRHit(mob, t)
                 self.chColor = self.BLUE_CH
                 return
         if not self.gui.invShown:
-            mob = self.GetNPC()
-            if mob:
-                self.OnNPCRHit(mob, t)
+            npc = self.GetNPC()
+            if npc:
+                self.OnNPCRHit(npc, t)
                 self.chColor = self.BLUE_CH
                 return
+
         item = self.gui.qbar[self.gui.selectedItem]
         if item and item.name == "Skill":
             if t - self.prevAttack > self.attackDelay:
@@ -7590,7 +7591,7 @@ class DigDigApp(object):
 
 
         p = self.cam1.pos+(self.cam1.GetDirV().MultScalar(2.0))
-        self.npcs = [MobGL((p.x,p.y,-p.z), self.bound, skin, MOB_NPC, (200,200,200,255), entity) for i in range(1)]
+        self.npcs = [MobGL((p.x,p.y,-p.z), self.bound, skin, MOB_NPC, (200,200,200,255), None) for i in range(1)]
 
 
         #self.chunks.SaveRegion("test", (64,0,64), (127+64,127,127+64))
