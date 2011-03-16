@@ -1144,7 +1144,7 @@ class DigDigGUI(object):
         self.makes[58] = MakeTool(u"Gold Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_GENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[59] = MakeTool(u"Diamond\nEnchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_DENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.recipeTextID = self.textRenderer.NewTextObject(u"Recipe:", (0,0,0))
-        self.enchantTextID = self.textRenderer.NewTextObject(u"Enchant Count / Max Enchant Count", (0,0,0))
+        self.enchantTextID = self.textRendererSmall.NewTextObject(u"Enchant Count", (0,0,0))
         self.enchantSlashTextID = self.textRenderer.NewTextObject(u"/", (0,0,0))
         self.charTabID = self.textRendererSmall.NewTextObject(u"Char", (0,0,0))
         self.strID = self.textRendererSmall.NewTextObject(u"Str:", (0,0,0))
@@ -1290,6 +1290,7 @@ class DigDigGUI(object):
         # 아이템 들고있던거 제자리에 못넣을 경우 빈자리에 넣거나 빈공간에 합치기
         if show == False:
             pygame.mouse.set_visible(False)
+            pygame.mouse.set_pos(SW/2, SH/2)
         else:
             pygame.mouse.set_visible(True)
         if show == False and self.dragging:
@@ -1783,24 +1784,24 @@ class DigDigGUI(object):
             elif type_ in [ITEM_SWORD, ITEM_SPEAR, ITEM_MACE, ITEM_KNUCKLE]:
                 returneditem = Item(type_, 1, color=tool.color, stats=stats)
                 if type_ == ITEM_SPEAR:
-                    returneditem.element = FightingElements("Weapon", (0,0,0), {"atk":20})
+                    returneditem.element = FightingElements("Weapon", (0,0,0), {"Melee Damage":20})
                 else:
-                    returneditem.element = FightingElements("Weapon", (0,0,0), {"atk":10})
+                    returneditem.element = FightingElements("Weapon", (0,0,0), {"Melee Damage":10})
             elif type_ in [ITEM_SHIELD]:
                 returneditem = Item(type_, 1, color=tool.color, stats=stats)
-                returneditem.element = FightingElements("Shield", (0,0,0), {"dfn":10})
+                returneditem.element = FightingElements("Shield", (0,0,0), {"Defense":10})
             elif type_ in [ITEM_HELM]:
                 returneditem = Item(type_, 1, color=tool.color, stats=stats)
-                returneditem.element = FightingElements("Helm", (0,0,0), {"dfn":5})
+                returneditem.element = FightingElements("Helm", (0,0,0), {"Defense":5})
             elif type_ in [ITEM_ARMOR]:
                 returneditem = Item(type_, 1, color=tool.color, stats=stats)
-                returneditem.element = FightingElements("Armor", (0,0,0), {"dfn":10})
+                returneditem.element = FightingElements("Armor", (0,0,0), {"Defense":10})
             elif type_ in [ITEM_BOOTS]:
                 returneditem = Item(type_, 1, color=tool.color, stats=stats)
-                returneditem.element = FightingElements("Boots", (0,0,0), {"dfn":5})
+                returneditem.element = FightingElements("Boots", (0,0,0), {"Defense":5})
             elif type_ in [ITEM_GLOVES]:
                 returneditem = Item(type_, 1, color=tool.color, stats=stats)
-                returneditem.element = FightingElements("Gloves", (0,0,0), {"dfn":5})
+                returneditem.element = FightingElements("Gloves", (0,0,0), {"Defense":5})
 
             # 무기나 방어구에 알맞는 기본 atk, dfn등을 넣어야 한다.
             # 이용자의 스킬에 따라 더 높은 속성을 넣을 수도 있다?
@@ -2731,11 +2732,11 @@ class DigDigGUI(object):
                 except:
                     pass
                 y += 10
-                self.textRenderer.RenderText(self.enchantTextID, (10, 25+y))
+                self.textRendererSmall.RenderText(self.enchantTextID, (10, 25+y))
                 y += 10
                 self.RenderNumber(item.enchantCount, 10, 25+y)
-                self.textRenderer.RenderText(self.enchantSlashTextID, (30, 25+y))
-                self.RenderNumber(item.maxEnchant, 35, 25+y)
+                self.textRenderer.RenderText(self.enchantSlashTextID, (25, 25+y))
+                self.RenderNumber(item.maxEnchant, 40, 25+y)
 
 
             def RenderSkillDesc(skill):
@@ -6540,9 +6541,11 @@ class DigDigApp(object):
         mpos = Vector(*mob[0].pos)
         mob[0].UpdateDirection()
         if (mpos-pos).Length() < 3:
+            # 퀘스트 받을 수 있는 조건이 맞으면 퀘스트를 여기서 주고
+            # 퀘스트를 이미 받았고 퀘스트를 완료했다면 퀘스트 완료를 하고 idx += 1을 하고 리워드를 준다.
             self.gui.talkBox.Clear()
-            for text in self.quests[mob[0].name][self.questIdxes[mob[0].name]]["OnRequestQuest"]:
-                self.gui.talkBox.AddText(text, (200,200,200), (8,29,1))
+            oktext, notoktext = self.quests[mob[0].name][self.questIdxes[mob[0].name]]["OnRequestQuest"]
+            self.gui.talkBox.AddText(oktext, (200,200,200), (8,29,1))
             def Close():
                 self.guiMode = False
                 self.gui.ShowInventory(self.guiMode)
@@ -7475,7 +7478,7 @@ class DigDigApp(object):
 
         entity = FightingEntity("Mob1", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":10,"Defense":5,"Poison Damage":5,"Poison Resist":5,"Electric Damage":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
         self.mobs = []
-        #self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
+        self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
 
         try:
             self.stairs = pickle.load(open("./map/stairs.pkl", "r"))
@@ -7567,16 +7570,18 @@ class DigDigApp(object):
         """
 
 
-        args = ()
-        text = "test"
-        donetext = "test"
-        rewards = ()
+        checkargs = ()
+        doneargs = ()
+        oktext = "I need 10 Cobblestone blocks... Would you bring me 10 Cobblestone blocks?"
+        notoktext = "Hi"
+        donetext = "Thank you sir! Here's your reward."
+        rewards = ((ITEM_SILVER, 1, "Item"))# 아이템이 한가지인경우 그냥생성, 아이템이 인챈트스크롤인 경우 함수로 생성
 
         quests = [
         {
-            "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
-            "CheckQuestDone": args, # args = [(questText, QUEST_KILLMOB, number, mobid), (questText, QUEST_GATHER, number, itemid, itemtype), (questText, QUEST_REQUIREDQUEST, questid, npcname)]
-            "OnRequestQuest": [text], # questText는 퀘스트의 내용이 퀘스트로그에 표시되는 텍스트
+            "CheckOKToGiveQuest": checkargs, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+            "CheckQuestDone": doneargs, # args = [(questText, QUEST_KILLMOB, number, mobid), (questText, QUEST_GATHER, number, itemid, itemtype), (questText, QUEST_REQUIREDQUEST, questid, npcname)]
+            "OnRequestQuest": [oktext, notoktext], # questText는 퀘스트의 내용이 퀘스트로그에 표시되는 텍스트
             "OnQuestDone": [donetext, rewards]},
         ]
 
