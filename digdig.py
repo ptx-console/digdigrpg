@@ -4345,6 +4345,7 @@ def DrawCubeArm(pos,bound, color, tex1,tex2,tex3,tex4,tex5,tex6, texid, flipX = 
         glTexCoord2f(*texc[3])
         glVertex( v[v4] )            
         glEnd()
+        """
         glDisable(GL_TEXTURE_2D)
         glLineWidth(2.0)
         glBegin(GL_LINES)
@@ -4359,6 +4360,7 @@ def DrawCubeArm(pos,bound, color, tex1,tex2,tex3,tex4,tex5,tex6, texid, flipX = 
         glVertex( v[v1] )
         glEnd()
         glEnable(GL_TEXTURE_2D)
+        """
 def DrawCubeStair(pos,bound, color, tex1,tex2,tex3,tex4,tex5,tex6, texid, flipX = False, offset=32.0): # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
     x,y,z = pos
     w,h,j = bound
@@ -4563,6 +4565,7 @@ def DrawCube(pos,bound, color, tex1,tex2,tex3,tex4,tex5,tex6, texid, flipX = Fal
         glTexCoord2f(*texc[3])
         glVertex( v[v4] )            
         glEnd()
+        """
         glLineWidth(2.0)
         glBegin(GL_LINES)
         glColor4f(0.0, 0.0, 0.0, 1.0)
@@ -4575,6 +4578,7 @@ def DrawCube(pos,bound, color, tex1,tex2,tex3,tex4,tex5,tex6, texid, flipX = Fal
         glVertex( v[v4] )            
         glVertex( v[v1] )
         glEnd()
+        """
 
 g_id = 0
 ANIM_IDLE = GenId()
@@ -7470,7 +7474,7 @@ class DigDigApp(object):
 
         entity = FightingEntity("Mob1", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":10,"Defense":5,"Poison Damage":5,"Poison Resist":5,"Electric Damage":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
         self.mobs = []
-        self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
+        #self.mobs = [MobGL((0.0,0.0,0.0), self.bound, skin, MOB_SKELETON, (200,200,200,255), entity) for i in range(1)]
 
         try:
             self.stairs = pickle.load(open("./map/stairs.pkl", "r"))
