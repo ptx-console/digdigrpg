@@ -470,15 +470,7 @@ class TalkBox(object):
             self.renderedLines += [self.textRendererArea.NewTextObject(text, color, (0, 0), border=True, borderColor = bcolor)]
     def AddSelection(self, text, bind, color, bcolor):
         lenn = len(self.lines2)
-        if self.lineCut:
-            leng = 0
-            offset = self.rect[2]/self.letterW
-            while leng < len(text):
-                newtext = text[leng:leng+offset]
-                self.lines2 += newtext.split("\n")
-                leng += offset
-        else:
-            self.lines2 += text.split("\n")
+        self.lines2 += [text]
 
         
         for text in self.lines2[lenn:]:
@@ -490,7 +482,7 @@ class TalkBox(object):
         self.lines = []
         self.lines2 = []
         self.renderedLines = []
-        self.renderesLines2 = []
+        self.renderedLines2 = []
         self.textRendererArea.Clear()
         self.binds = {}
 
@@ -4694,10 +4686,11 @@ class MobRenderer(object):
                 animstate += 1
 
 class MobGL(object):
-    def __init__(self, pos, bound, skin, type_, color, entity):
+    def __init__(self, pos, bound, skin, type_, color, entity, name=None):
         self.pos = pos
         self.bound = bound
         self.skin = skin
+        self.name = name
 
 
         self.type_ = type_
@@ -6547,6 +6540,14 @@ class DigDigApp(object):
         mpos = Vector(*mob[0].pos)
         mob[0].UpdateDirection()
         if (mpos-pos).Length() < 3:
+            self.gui.talkBox.Clear()
+            for text in self.quests[mob[0].name][self.questIdxes[mob[0].name]]["OnRequestQuest"]:
+                self.gui.talkBox.AddText(text, (200,200,200), (8,29,1))
+            def Close():
+                self.guiMode = False
+                self.gui.ShowInventory(self.guiMode)
+            self.gui.talkBox.AddSelection("OK", Close, (68,248,93), (8,29,1))
+
             self.guiMode = True
             self.gui.toolMode = TM_TALK
             self.gui.ShowInventory(self.guiMode)
@@ -7559,33 +7560,6 @@ class DigDigApp(object):
             idx += 1
         
         """
-        quests = [
-        {
-            "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
-            "CheckQuestDone": args, # args = [(questText, QUEST_KILLMOB, number, mobid), (questText, QUEST_GATHER, number, itemid, itemtype), (questText, QUEST_REQUIREDQUEST, questid, npcname)]
-            "OnRequestQuest": [text, givequestfunc], # questText는 퀘스트의 내용이 퀘스트로그에 표시되는 텍스트
-            "OnQuestDone": [donetext, donequestfunc]},
-        {
-            "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
-            "CheckQuestDone": args, # args = [(QUEST_KILLMOB, number, mobid)]
-            "OnRequestQuest": [text, givequestfunc],
-            "OnQuestDone": [donetext, donequestfunc]},
-        {
-            "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
-            "CheckQuestDone": args, # args = [(QUEST_KILLMOB, number, mobid)]
-            "OnRequestQuest": [text, givequestfunc],
-            "OnQuestDone": [donetext, donequestfunc]},
-        {
-            "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
-            "CheckQuestDone": args, # args = [(QUEST_KILLMOB, number, mobid)]
-            "OnRequestQuest": [text, givequestfunc],
-            "OnQuestDone": [donetext, donequestfunc]},
-        {
-            "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
-            "CheckQuestDone": args, # args = [(QUEST_KILLMOB, number, mobid)]
-            "OnRequestQuest": [text, givequestfunc],
-            "OnQuestDone": [donetext, donequestfunc]},
-        ]
         questIdx = 0
         quests[questIdx]
 
@@ -7593,9 +7567,23 @@ class DigDigApp(object):
         """
 
 
+        args = ()
+        text = "test"
+        donetext = "test"
+        rewards = ()
+
+        quests = [
+        {
+            "CheckOKToGiveQuest": args, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+            "CheckQuestDone": args, # args = [(questText, QUEST_KILLMOB, number, mobid), (questText, QUEST_GATHER, number, itemid, itemtype), (questText, QUEST_REQUIREDQUEST, questid, npcname)]
+            "OnRequestQuest": [text], # questText는 퀘스트의 내용이 퀘스트로그에 표시되는 텍스트
+            "OnQuestDone": [donetext, rewards]},
+        ]
 
         p = self.cam1.pos+(self.cam1.GetDirV().MultScalar(2.0))
-        self.npcs = [MobGL((p.x,p.y,-p.z), self.bound, skin, MOB_NPC, (200,200,200,255), None) for i in range(1)]
+        self.npcs = [MobGL((p.x,p.y,-p.z), self.bound, skin, MOB_NPC, (200,200,200,255), None, "Test") for i in range(1)]
+        self.quests = {"Test": quests}
+        self.questIdxes = {"Test": 0}
 
 
         #self.chunks.SaveRegion("test", (64,0,64), (127+64,127,127+64))
