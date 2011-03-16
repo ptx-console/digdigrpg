@@ -6560,9 +6560,37 @@ class DigDigApp(object):
         if (mpos-pos).Length() < 3:
             # 퀘스트 받을 수 있는 조건이 맞으면 퀘스트를 여기서 주고
             # 퀘스트를 이미 받았고 퀘스트를 완료했다면 퀘스트 완료를 하고 idx += 1을 하고 리워드를 준다.
+
             self.gui.talkBox.Clear()
-            oktext, notoktext = self.quests[mob[0].name][self.questIdxes[mob[0].name]]["OnRequestQuest"]
-            self.gui.talkBox.AddText(oktext, (30,30,30), (8,29,1))
+            curQuest = self.quests[mob[0].name][self.questIdxes[mob[0].name]]
+            checkOK = curQuest["CheckOKToGiveQuest"]
+            questDone = curQuest["CheckQuestDone"]
+            requestQ = curQuest["OnRequestQuest"]
+            qDone = curQuest["OnQuestDone"]
+            
+            oktext, notoktext = requestQ
+            notfound = False
+            for check in checkOK:
+                if check not in self.questLog[mob[0].name]:
+                    notfound = True
+
+            if notfound:
+                self.gui.talkBox.AddText(notoktext, (30,30,30), (8,29,1))
+            else:
+                # 인벤토리를 체크, 몹 킬 로그를 체크
+                self.curQuests[mob[0].name] = questDone
+                def CheckQuestDone():
+                    self.gui.inventory
+                    self.gui.qbar1
+                    self.gui.qbar2
+                    self.mobKillLog
+                def GenReward():
+                    qDone[1]
+                if CheckQuestDone():
+                    self.gui.talkBox.AddText(qDone[0], (30,30,30), (8,29,1))
+                    GenReward()
+                else:
+                    self.gui.talkBox.AddText(oktext, (30,30,30), (8,29,1))
             def Close():
                 self.guiMode = False
                 self.gui.ShowInventory(self.guiMode)
@@ -7608,6 +7636,8 @@ class DigDigApp(object):
         self.npcs = [MobGL((p.x,p.y,-p.z), self.bound, skin, MOB_NPC, (200,200,200,255), None, "Test") for i in range(1)]
         self.quests = {"Test": quests}
         self.questIdxes = {"Test": 0}
+        self.questLog = {"Test": []}
+        self.curQuests = {"Text": []}
 
 
         #self.chunks.SaveRegion("test", (64,0,64), (127+64,127,127+64))
