@@ -4763,6 +4763,9 @@ class MobGL(object):
         if self.type_ == MOB_SKELETON:
             AppSt.mobs.remove(self)
             AppSt.gui.msgBox.AddText("Mob is dead.", (68,248,93), (8,29,1))
+            if not self.type_ in AppSt.mobKillLog:
+                AppSt.mobKillLog[self.type_] = 0
+            AppSt.mobKillLog[self.type_] += 1
     def OnHit(self, attacker):
         self.animstate = ANIM_HIT
         self.prevHit = pygame.time.get_ticks()
@@ -7757,6 +7760,10 @@ class DigDigApp(object):
             "CheckQuestDone": doneargs, # args = [(questText, QUEST_KILLMOB, number, mobid), (questText, QUEST_GATHER, number, itemid, itemtype), (questText, QUEST_REQUIREDQUEST, questid, npcname)]
             "OnRequestQuest": [oktext, notoktext], # questText는 퀘스트의 내용이 퀘스트로그에 표시되는 텍스트
             "OnQuestDone": [donetext, rewards]},
+           {"CheckOKToGiveQuest": [], # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+            "CheckQuestDone": [("Bring 10 Dirt blocks", QUEST_GATHER, 10, BLOCK_DIRT, "Block")], # args = [(questText, QUEST_KILLMOB, number, mobid), (questText, QUEST_GATHER, number, itemid, itemtype), (questText, QUEST_REQUIREDQUEST, questid, npcname)]
+            "OnRequestQuest": ["I need 10 Dirt blocks...\nWould you bring me 10 Dirt blocks?", notoktext], # questText는 퀘스트의 내용이 퀘스트로그에 표시되는 텍스트
+            "OnQuestDone": [donetext, [(ITEM_TORCH, 5, "Item")]]},
         ]
 
         p = self.cam1.pos+(self.cam1.GetDirV().MultScalar(2.0))
