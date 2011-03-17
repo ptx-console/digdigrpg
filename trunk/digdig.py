@@ -1241,6 +1241,7 @@ class DigDigGUI(object):
         self.PutItemInInventory(Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True))
         """
         self.PutItemInInventory(Block(BLOCK_COBBLESTONE, 64))
+        self.PutItemInInventory(Block(BLOCK_DIRT, 64))
 
 
         # 여기서 텍스쳐를 생성한다.
@@ -6618,7 +6619,7 @@ class DigDigApp(object):
                             if curCount < quest[2]:
                                 return False
                             else:
-                                curCounts += [(quest[3], quest[4], curCount)]
+                                curCounts += [(quest[3], quest[4], quest[2])]
 
                         elif quest[1] == QUEST_KILLMOB:
                             if not(self.mobKillLog[quest[3]] >= quest[2]):
@@ -7763,7 +7764,7 @@ class DigDigApp(object):
            {"CheckOKToGiveQuest": [], # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
             "CheckQuestDone": [("Bring 10 Dirt blocks", QUEST_GATHER, 10, BLOCK_DIRT, "Block")], # args = [(questText, QUEST_KILLMOB, number, mobid), (questText, QUEST_GATHER, number, itemid, itemtype), (questText, QUEST_REQUIREDQUEST, questid, npcname)]
             "OnRequestQuest": ["I need 10 Dirt blocks...\nWould you bring me 10 Dirt blocks?", notoktext], # questText는 퀘스트의 내용이 퀘스트로그에 표시되는 텍스트
-            "OnQuestDone": [donetext, [(ITEM_TORCH, 5, "Item")]]},
+            "OnQuestDone": [donetext, [(ITEM_COAL, 5, "Item"), (BLOCK_WOOD, 5, "Block")]]},
         ]
 
         p = self.cam1.pos+(self.cam1.GetDirV().MultScalar(2.0))
