@@ -1547,8 +1547,8 @@ class DigDigGUI(object):
                     [ITEM_SWORD, ITEM_SPEAR, ITEM_MACE, ITEM_KNUCKLE, ITEM_SHIELD],
                     [ITEM_HELM],
                     [ITEM_ARMOR],
-                    [ITEM_BOOTS],
                     [ITEM_GLOVES],
+                    [ITEM_BOOTS],
                     [ITEM_SILVERNECLACE, ITEM_GOLDNECLACE, ITEM_DIAMONDNECLACE],
                     [ITEM_SILVERRING, ITEM_GOLDRING, ITEM_DIAMONDRING]
                     ]
@@ -1562,10 +1562,10 @@ class DigDigGUI(object):
                         elif not self.eqs[0] and self.eqs[1] and idx2 == 0 and self.eqs[1].type_ == ITEM_SPEAR:
                             self.draggingItem, self.eqs[idx2] = self.eqs[1], self.draggingItem
                             self.eqs[1] = ITEM_NONE
-                        elif not self.eqs[1] and self.eqs[0] and idx2 == 1 and self.draggingItem.type_ != self.eqs[0].type_:
+                        elif not self.eqs[1] and self.eqs[0] and idx2 == 1 and self.draggingItem.type_ != self.eqs[0].type_ and not ((self.eqs[0].type_ != ITEM_SHIELD and self.draggingItem.type_ == ITEM_SHIELD) or (self.eqs[0].type_ == ITEM_SHIELD and self.draggingItem.type_ != ITEM_SHIELD)):
                             self.draggingItem, self.eqs[idx2] = self.eqs[0], self.draggingItem
                             self.eqs[0] = ITEM_NONE
-                        elif not self.eqs[0] and self.eqs[1] and idx2 == 0 and self.draggingItem.type_ != self.eqs[1].type_:
+                        elif not self.eqs[0] and self.eqs[1] and idx2 == 0 and self.draggingItem.type_ != self.eqs[1].type_ and not ((self.eqs[1].type_ != ITEM_SHIELD and self.draggingItem.type_ == ITEM_SHIELD) or (self.eqs[1].type_ == ITEM_SHIELD and self.draggingItem.type_ != ITEM_SHIELD)):
                             self.draggingItem, self.eqs[idx2] = self.eqs[1], self.draggingItem
                             self.eqs[1] = ITEM_NONE
                         elif self.eqs[idx]:
@@ -5374,6 +5374,8 @@ class RawSkill(object):
 
             dmg *= (magicBonus+user.magic)**1.2/(magicBonus+user.magic)
             target.curhp -= dmg
+            if target.curhp > target.CalcMaxHP()
+                target.curhp = target.CalcMaxHP()
             target.onhit(user)
             if target.curhp < 0:
                 target.ondead(user)
@@ -5603,6 +5605,8 @@ class FightingEntity(object):
             AppSt.gui.msgBox.AddText("You attack mob: %d" % dmg, (68,248,93), (8,29,1))
 
         other.curhp -= dmg
+        if other.curhp > other.CalcMaxHP()
+            other.curhp = other.CalcMaxHP()
         other.onhit(self)
         if other.IsDead():
             other.ondead(self)
@@ -7512,7 +7516,7 @@ class DigDigApp(object):
                 }
         for sound in self.sounds.itervalues():
             sound.set_volume(0.8)
-        isFullScreen = 0#FULLSCREEN
+        isFullScreen = FULLSCREEN
         screen = pygame.display.set_mode((SW,SH), HWSURFACE|OPENGL|DOUBLEBUF|isFullScreen)#|FULLSCREEN)
         pygame.mouse.set_cursor(*pygame.cursors.load_xbm("./images/digdig/cursor.xbm", "./images/digdig/cursor-mask.xbm"))
         
@@ -7768,7 +7772,15 @@ class DigDigApp(object):
            {"CheckOKToGiveQuest": [], # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
             "CheckQuestDone": [("Bring 10 Dirt blocks", QUEST_GATHER, 10, BLOCK_DIRT, "Block")], # args = [(questText, QUEST_KILLMOB, number, mobid), (questText, QUEST_GATHER, number, itemid, itemtype), (questText, QUEST_REQUIREDQUEST, questid, npcname)]
             "OnRequestQuest": ["I need 10 Dirt blocks...\nWould you bring me 10 Dirt blocks?", notoktext], # questText는 퀘스트의 내용이 퀘스트로그에 표시되는 텍스트
-            "OnQuestDone": [donetext, [(ITEM_COAL, 5, "Item"), (BLOCK_WOOD, 5, "Block")]]},
+            "OnQuestDone": [donetext, [(ITEM_COAL, 64, "Item"), (BLOCK_LOG, 64, "Block")]]},
+           {"CheckOKToGiveQuest": [], # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+            "CheckQuestDone": [("Bring 15 Cobblestone blocks", QUEST_GATHER, 15, BLOCK_COBBLESTONE, "Block")], # args = [(questText, QUEST_KILLMOB, number, mobid), (questText, QUEST_GATHER, number, itemid, itemtype), (questText, QUEST_REQUIREDQUEST, questid, npcname)]
+            "OnRequestQuest": ["I need 15 Cobblestone blocks...\nWould you bring me 15 Cobblestone blocks?", notoktext], # questText는 퀘스트의 내용이 퀘스트로그에 표시되는 텍스트
+            "OnQuestDone": [donetext, [(ITEM_SILVER, 10, "Item"), (ITEM_GOLD, 10, "Item"), (ITEM_DIAMOND, 10, "Item"), (ITEM_IRON, 64, "Item")]]},
+           {"CheckOKToGiveQuest": [], # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+            "CheckQuestDone": [("Bring 15 Dirt blocks", QUEST_GATHER, 15, BLOCK_DIRT, "Block")], # args = [(questText, QUEST_KILLMOB, number, mobid), (questText, QUEST_GATHER, number, itemid, itemtype), (questText, QUEST_REQUIREDQUEST, questid, npcname)]
+            "OnRequestQuest": ["I need 15 Dirt blocks...\nWould you bring me 15 Dirt blocks?", notoktext], # questText는 퀘스트의 내용이 퀘스트로그에 표시되는 텍스트
+            "OnQuestDone": [donetext, [(ITEM_GENCHANTSCROLL, 5, "Item"), (ITEM_DENCHANTSCROLL, 5, "Item")]]},
         ]
 
         p = self.cam1.pos+(self.cam1.GetDirV().MultScalar(2.0))
@@ -8448,4 +8460,21 @@ RPG모드에서는 땅파기가 안되도록 한다. 땅은 내가 파서 맵을
 아이템의 종류가 많다면 아이템을 주면서 뭔가 하면 좋겠지만 인챈트스크롤 만들 수도 있고 뭐.....
 땅파기는 Dirt는 절대로 파지 못하게 하고 나무는 파게되면 나무가 사라지지 않도록 하자. Sand도 파지 못하게 할까?
 음.....땅파기는 자기가 구입한 땅만 팔 수 있도록 해보자.
+---------------------
+퀘스트와......마을과........상점과......몹스포너등을 실시간 생성?
+땅은 아무데나 파게하고 막 다 부셔도 멀리가면 마을 또있고 이런식으로?
+어떤 마을을 생성하고
+마을끼리 포탈로 연결할 수 있게 하고
+포탈을 마을의 중심에 생성하고
+실시간 생성이면 음....
+
+맵의 리젼을 좀 제한해서 모로윈드 수준으로만 만들어도 괜찮을 듯. 그렇게 생성된 마을 안에 메인 퀘스트를 이리저리 꼬아서? 음..
+---------------------
+자.......이제 멀티플레이어 기능을 만들자능....
+
+첫번째로 주변 32x32x32청크 수준으로 맵을 서버에서 다운받고
+다운로드가 안된 맵은 움직일 수가 없음
+
+블럭 파거나 쌓는걸 다운로드받고
+움직임을 다운로드받고 뭐 이런다. 나머지는 뭐....공격하는 명령을 다운받음? 뭐 그런식.
 """
