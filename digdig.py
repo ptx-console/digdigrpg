@@ -1240,6 +1240,7 @@ class DigDigGUI(object):
         self.PutItemInInventory(Item(ITEM_SILVER, 64, color = (201,201,201), stackable=True))
         self.PutItemInInventory(Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True))
         """
+        self.PutItemInInventory(Block(BLOCK_COBBLESTONE, 64))
 
 
         # 여기서 텍스쳐를 생성한다.
@@ -6562,6 +6563,17 @@ class DigDigApp(object):
             # 퀘스트를 이미 받았고 퀘스트를 완료했다면 퀘스트 완료를 하고 idx += 1을 하고 리워드를 준다.
 
             self.gui.talkBox.Clear()
+            if not(len(self.quests[mob[0].name])-1 >= self.questIdxes[mob[0].name]):
+                self.gui.talkBox.AddText("Hi", (30,30,30), (8,29,1))
+                def Close2():
+                    self.guiMode = False
+                    self.gui.ShowInventory(self.guiMode)
+                self.gui.talkBox.AddSelection("OK", Close2, (8,29,1), (8,29,1))
+
+                self.guiMode = True
+                self.gui.toolMode = TM_TALK
+                self.gui.ShowInventory(self.guiMode)
+                return
             curQuest = self.quests[mob[0].name][self.questIdxes[mob[0].name]]
             checkOK = curQuest["CheckOKToGiveQuest"]
             questDone = curQuest["CheckQuestDone"]
@@ -6578,18 +6590,127 @@ class DigDigApp(object):
                 self.gui.talkBox.AddText(notoktext, (30,30,30), (8,29,1))
             else:
                 # 인벤토리를 체크, 몹 킬 로그를 체크
-                self.curQuests[mob[0].name] = questDone
                 def CheckQuestDone():
-                    self.gui.inventory
-                    self.gui.qbar1
-                    self.gui.qbar2
-                    self.mobKillLog
+                    curCounts = []
+                    for quest in questDone:
+                        if quest[1] == QUEST_GATHER:
+                            curCount = 0
+                            for item in self.gui.inventory:
+                                if item and item.name == quest[4] and item.type_ == quest[3]:
+                                    curCount += item.count
+
+                            for item in self.gui.qbar1:
+                                if item and item.name == quest[4] and item.type_ == quest[3]:
+                                    curCount += item.count
+
+                            for item in self.gui.qbar2:
+                                if item and item.name == quest[4] and item.type_ == quest[3]:
+                                    curCount += item.count
+
+                            if curCount < quest[2]:
+                                return False
+                            else:
+                                curCounts += [(quest[3], quest[4], curCount)]
+
+                        elif quest[1] == QUEST_KILLMOB:
+                            if not(self.mobKillLog[quest[3]] >= quest[2]):
+                                return False
+                        elif quest[1] == QUEST_REQUIREDQUEST:
+                            if quest[2] not in self.questLog[quest[3]]:
+                                return False
+
+                    if curCounts:
+                        for count in curCounts:
+                            curCount = count[2]
+                            idx = 0
+                            for item in self.gui.inventory[:]:
+                                if item and item.name == count[1] and item.type_ == count[0]:
+                                    if item.count < curCount:
+                                        curCount -= item.count
+                                        self.gui.inventory[idx] = ITEM_NONE
+                                    elif item.count == curCount:
+                                        curCount = 0
+                                        self.gui.inventory[idx] = ITEM_NONE
+                                        break
+                                    else:
+                                        item.count -= curCount
+                                        curCount = 0
+                                        break
+                                idx += 1
+                            idx = 0
+                            for item in self.gui.qbar1[:]:
+                                if item and item.name == count[1] and item.type_ == count[0]:
+                                    if item.count < curCount:
+                                        curCount -= item.count
+                                        self.gui.qbar1[idx] = ITEM_NONE
+                                    elif item.count == curCount:
+                                        curCount = 0
+                                        self.gui.qbar1[idx] = ITEM_NONE
+                                        break
+                                    else:
+                                        item.count -= curCount
+                                        curCount = 0
+                                        break
+                                idx += 1
+                            idx = 0
+                            for item in self.gui.qbar2[:]:
+                                if item and item.name == count[1] and item.type_ == count[0]:
+                                    if item.count < curCount:
+                                        curCount -= item.count
+                                        self.gui.qbar2[idx] = ITEM_NONE
+                                    elif item.count == curCount:
+                                        curCount = 0
+                                        self.gui.qbar2[idx] = ITEM_NONE
+                                        break
+                                    else:
+                                        item.count -= curCount
+                                        curCount = 0
+                                        break
+                                idx += 1
+                            # remove items from inventory
+
+                    return True
+                    #"CheckQuestDone": doneargs, # args = [(questText, QUEST_KILLMOB, number, mobid), (questText, QUEST_GATHER, number, itemid, itemtype), (questText, QUEST_REQUIREDQUEST, questid, npcname)]
                 def GenReward():
-                    qDone[1]
-                if CheckQuestDone():
+                    items = []
+                    for reward in qDone[1]:
+                        type_, count, name = reward
+                        # 여기다가 아이템 코드만으로 아이템을 생성하는 걸 넣는다.
+                        # 뭐 픽액스 이런건 리워드로 안주면 땡. 다이아 5개 주면 그게 그거지
+                        # 리워드로 주는 건 광물, 블럭, 인챈트스크롤 밖에 없다.
+                        if name == "Item":
+                            if type_ == ITEM_IRON:
+                                self.gui.PutItemInInventory(Item(ITEM_IRON, count, color=(107,107,107), stackable=True))
+                            elif type_ == ITEM_COAL:
+                                self.gui.PutItemInInventory(Item(ITEM_COAL, count, color=(60,60,60), stackable=True))
+                            elif type_ == ITEM_SILVER:
+                                self.gui.PutItemInInventory(Item(ITEM_SILVER, count, color=(201,201,201), stackable=True))
+                            elif type_ == ITEM_GOLD:
+                                self.gui.PutItemInInventory(Item(ITEM_GOLD, count, color=(207,207,101), stackable=True))
+                            elif type_ == ITEM_DIAMOND:
+                                self.gui.PutItemInInventory(Item(ITEM_DIAMOND, count, color=(80,212,217), stackable=True))
+                            elif type_ in [ITEM_SENCHANTSCROLL, ITEM_GENCHANTSCROLL, ITEM_DENCHANTSCROLL]:
+                                element = self.gui.GenElement(type_)
+                                if type_ == ITEM_SENCHANTSCROLL:
+                                    color = (255,255,255)
+                                elif type_ == ITEM_GENCHANTSCROLL:
+                                    color = (207,207,101)
+                                elif type_ == ITEM_DENCHANTSCROLL:
+                                    color = (80,212,217)
+                                returneditem = Item(type_, 1, color=color, element=element)
+                                self.gui.PutItemInInventory(returneditem)
+                        elif name == "Block":
+                            self.gui.PutItemInInventory(Block(type_, count))
+
+
+                if self.curQuests[mob[0].name] == questDone and CheckQuestDone():
                     self.gui.talkBox.AddText(qDone[0], (30,30,30), (8,29,1))
                     GenReward()
+                    self.questLog[mob[0].name] += [self.questIdxes[mob[0].name]]
+                    self.questIdxes[mob[0].name] += 1
+                    self.curQuests[mob[0].name] = []
                 else:
+                    self.curQuests[mob[0].name] = questDone
                     self.gui.talkBox.AddText(oktext, (30,30,30), (8,29,1))
             def Close():
                 self.guiMode = False
@@ -7637,7 +7758,8 @@ class DigDigApp(object):
         self.quests = {"Test": quests}
         self.questIdxes = {"Test": 0}
         self.questLog = {"Test": []}
-        self.curQuests = {"Text": []}
+        self.curQuests = {"Test": []}
+        self.mobKillLog = {}
 
 
         #self.chunks.SaveRegion("test", (64,0,64), (127+64,127,127+64))
