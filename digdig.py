@@ -1789,6 +1789,7 @@ class DigDigGUI(object):
                 #인챈트 스크롤 복사하는 아이템이 고급 몬스터에게서 떨어진다. XXX:
                 element = self.GenElement(type_)
                 returneditem = Item(type_, 1, color=tool.color, element=element)
+                returneditem.maxEnchant = 0
             elif type_ in [ITEM_GOLDRING, ITEM_GOLDNECLACE, ITEM_HELM, ITEM_ARMOR, ITEM_SILVERRING, ITEM_SILVERNECLACE, ITEM_DIAMONDRING, ITEM_DIAMONDNECLACE]:
                 returneditem = Item(type_, 1, color=tool.color, stats=stats)
                 if type_ in [ITEM_SILVERNECLACE, ITEM_SILVERRING]:
@@ -1824,10 +1825,13 @@ class DigDigGUI(object):
             else:
                 if count == 0:
                     returneditem = Item(type_, 999, color=tool.color, stats=stats)
+                    returneditem.maxEnchant = 0
                 elif count == -1:
                     returneditem = Item(type_, 1, color=tool.color, stats=stats)
+                    returneditem.maxEnchant = 0
                 else:
                     returneditem = Item(type_, count, color=tool.color, stackable=True, stats=stats)
+                    returneditem.maxEnchant = 0
         if not self.CanPutItemInInventory(returneditem):
             return
 
@@ -2748,11 +2752,12 @@ class DigDigGUI(object):
                 except:
                     pass
                 y += 10
-                self.textRendererSmall.RenderText(self.enchantTextID, (10, 25+y))
-                y += 10
-                self.RenderNumber(item.enchantCount, 10, 25+y)
-                self.textRenderer.RenderText(self.enchantSlashTextID, (25, 25+y))
-                self.RenderNumber(item.maxEnchant, 40, 25+y)
+                if item.maxEnchant:
+                    self.textRendererSmall.RenderText(self.enchantTextID, (10, 25+y))
+                    y += 10
+                    self.RenderNumber(item.enchantCount, 10, 25+y)
+                    self.textRenderer.RenderText(self.enchantSlashTextID, (25, 25+y))
+                    self.RenderNumber(item.maxEnchant, 40, 25+y)
 
 
             def RenderSkillDesc(skill):
@@ -6690,15 +6695,17 @@ class DigDigApp(object):
                             elif type_ == ITEM_DIAMOND:
                                 self.gui.PutItemInInventory(Item(ITEM_DIAMOND, count, color=(80,212,217), stackable=True))
                             elif type_ in [ITEM_SENCHANTSCROLL, ITEM_GENCHANTSCROLL, ITEM_DENCHANTSCROLL]:
-                                element = self.gui.GenElement(type_)
                                 if type_ == ITEM_SENCHANTSCROLL:
                                     color = (255,255,255)
                                 elif type_ == ITEM_GENCHANTSCROLL:
                                     color = (207,207,101)
                                 elif type_ == ITEM_DENCHANTSCROLL:
                                     color = (80,212,217)
-                                returneditem = Item(type_, 1, color=color, element=element)
-                                self.gui.PutItemInInventory(returneditem)
+                                for i in range(count):
+                                    element = self.gui.GenElement(type_)
+                                    returneditem = Item(type_, 1, color=color, element=element)
+                                    returneditem.maxEnchant = 0
+                                    self.gui.PutItemInInventory(returneditem)
                         elif name == "Block":
                             self.gui.PutItemInInventory(Block(type_, count))
 
@@ -7746,8 +7753,7 @@ class DigDigApp(object):
         rewards = [(ITEM_SENCHANTSCROLL, 5, "Item"), (ITEM_SILVER, 1, "Item")] # 아이템이 한가지인경우 그냥생성, 아이템이 인챈트스크롤인 경우 함수로 생성
 
         quests = [
-        {
-            "CheckOKToGiveQuest": checkargs, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
+           {"CheckOKToGiveQuest": checkargs, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
             "CheckQuestDone": doneargs, # args = [(questText, QUEST_KILLMOB, number, mobid), (questText, QUEST_GATHER, number, itemid, itemtype), (questText, QUEST_REQUIREDQUEST, questid, npcname)]
             "OnRequestQuest": [oktext, notoktext], # questText는 퀘스트의 내용이 퀘스트로그에 표시되는 텍스트
             "OnQuestDone": [donetext, rewards]},
@@ -8411,4 +8417,6 @@ def bind():
 잉여 인챈트 스크롤은 어따쓰게할까.
 
 링류나 목걸이류는 인챈트 횟수가 10번 15번(골드) 20번(다이아)
+--------------
+이제 퀘스트로그를 만들어서 현재 퀘스트 진행 상황을 알려준다.
 """
