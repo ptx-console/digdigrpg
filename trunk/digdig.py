@@ -1127,6 +1127,10 @@ class DigDigGUI(object):
         # returns: 아이템, 체력깎는 정도, 못파는 광물목록
         self.makes[33] = MakeTool(u"Diamond axe", u"Used to cut trees", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_AXE, [100,1], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[34] = MakeTool(u"Diamond shovel", u"Digs up dirts or sands", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217))], (ITEM_SHOVEL, [100,1], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[35] = MakeTool(u"Silver Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (255,255,255), [(ITEM_SENCHANTSCROLL, 2, TYPE_ITEM, (255,255,255))], (ITEM_SENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[36] = MakeTool(u"Gold Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (207,207,101), [(ITEM_GENCHANTSCROLL, 2, TYPE_ITEM, (207,207,101))], (ITEM_GENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[37] = MakeTool(u"Diamond\nEnchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (80,212,217), [(ITEM_DENCHANTSCROLL, 2, TYPE_ITEM, (80,212,217))], (ITEM_DENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+
         self.makes[10] = MakeTool(u"Torch(Charcoal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_CHARCOAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[11] = MakeTool(u"Torch(Coal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[12] = MakeTool(u"Chest", u"Can hold items and blocks", (255,255,255), [(BLOCK_WOOD, 8, TYPE_BLOCK)], (ITEM_CHEST, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
@@ -1148,9 +1152,9 @@ class DigDigGUI(object):
         self.makes[54] = MakeTool(u"Diamond Ring", u"A diamond ring\n- Ring -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217))], (ITEM_DIAMONDRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[55] = MakeTool(u"Diamond Necklace", u"A diamond necklace\n- Necklace -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217))], (ITEM_DIAMONDNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[56] = MakeTool(u"Blank Scroll", u"Used to make enchant scrolls", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_SCROLL, [], [], 64, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[57] = MakeTool(u"Silver Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (255,255,255), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_SENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[58] = MakeTool(u"Gold Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_GENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[59] = MakeTool(u"Diamond\nEnchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_DENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[57] = MakeTool(u"Silver Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (255,255,255), [(ITEM_SILVER, 5, TYPE_ITEM, (201,201,201)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_SENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[58] = MakeTool(u"Gold Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (207,207,101), [(ITEM_GOLD, 5, TYPE_ITEM, (207,207,101)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_GENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[59] = MakeTool(u"Diamond\nEnchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_DENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.recipeTextID = self.textRenderer.NewTextObject(u"Recipe:", (0,0,0))
         self.enchantTextID = self.textRendererSmall.NewTextObject(u"Enchant Count", (0,0,0))
         self.enchantSlashTextID = self.textRenderer.NewTextObject(u"/", (0,0,0))
@@ -6714,7 +6718,7 @@ class DigDigApp(object):
                             self.gui.PutItemInInventory(Block(type_, count))
 
 
-                if self.curQuests[mob[0].name] == questDone and CheckQuestDone():
+                if self.curQuests[mob[0].name] == questDone and CheckQuestDone() and questDone:
                     self.gui.talkBox.AddText(qDone[0], (30,30,30), (8,29,1))
                     GenReward()
                     self.questLog[mob[0].name] += [self.questIdxes[mob[0].name]]
@@ -7754,7 +7758,7 @@ class DigDigApp(object):
         oktext = "I need 10 Cobblestone blocks...\nWould you bring me 10 Cobblestone blocks?"
         notoktext = "Hi"
         donetext = "Thank you sir! Here's your reward."
-        rewards = [(ITEM_SENCHANTSCROLL, 5, "Item"), (ITEM_SILVER, 1, "Item")] # 아이템이 한가지인경우 그냥생성, 아이템이 인챈트스크롤인 경우 함수로 생성
+        rewards = [(ITEM_SENCHANTSCROLL, 5, "Item"), (ITEM_SILVER, 5, "Item")] # 아이템이 한가지인경우 그냥생성, 아이템이 인챈트스크롤인 경우 함수로 생성
 
         quests = [
            {"CheckOKToGiveQuest": checkargs, # args = [(QUEST_REQUIREDQUEST, 1, npcname)]
@@ -8427,4 +8431,21 @@ def bind():
 링류나 목걸이류는 인챈트 횟수가 10번 15번(골드) 20번(다이아)
 --------------
 이제 퀘스트로그를 만들어서 현재 퀘스트 진행 상황을 알려준다.
+스포닝을 스포너에서 할 수 있게 하고 땅속에 묻은 코드블럭에게 가까이 가면 실행되게 하는 그런것도 넣는다.
+코드블럭을 다른종류를 만들어서 가까이 가면 트리거되게? 아 옵션으로 LaunchOn Hit, Nearby등으로 넣는다. 체크박스....
+------
+틱에서 현재 좌표와 가까운곳에 코드블럭이 있는지 보고 있으면 레인지 안이면 코드실행을 계속 딜레이 줘서 한다.
+-----------------------
+잉여 인챈트 스크롤 같은종류 2개로 인챈트 스크롤 1개를 만들도록 하면 되려나?
+-------------------
+몹 스포너도 땅속에 묻고 최대 1마리가 리스폰되도록 한다.
+RPG모드에서는 땅파기가 안되도록 한다. 땅은 내가 파서 맵을 다 만듬. ㅇㅇ..
+-------------------------
+음..... 퀘스트가 끝나면 다른 NPC의 퀘스트 리스트를 +1 하는 기능도 만들어야 하겠네.
+음.... 퀘스트에서 다른 NPC의 퀘스트 리스트를+1하는게 빠를까 아니면 각각의 NPC에서 다른 NPC의 퀘스트Done을 체크하는게 빠를까.
+첫번째는 까다롭고 두번째는 편리한데....
+그냥 이 기능을 넣지 말자. (....) 각각의 NPC가 그냥 각각의 퀘스트를 줌. 다른 NPC와의 연계는 없음;;
+아이템의 종류가 많다면 아이템을 주면서 뭔가 하면 좋겠지만 인챈트스크롤 만들 수도 있고 뭐.....
+땅파기는 Dirt는 절대로 파지 못하게 하고 나무는 파게되면 나무가 사라지지 않도록 하자. Sand도 파지 못하게 할까?
+음.....땅파기는 자기가 구입한 땅만 팔 수 있도록 해보자.
 """
