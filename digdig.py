@@ -1693,6 +1693,35 @@ class DigDigGUI(object):
         # 아 여러 지역을 두고 그 지역에는 어떤 특정한 몹이 나오도록 뭐 그렇게 해볼까.
         # 무한 맵이라고 해서 맵을 넓게 쓸 필요가 없음;
         # 미니맵이나 전체지도 만들어야함 XXX:
+
+
+        # 나머지는 +1~3
+        # 1/10확률로 +5
+        # 1/100 확률로 +10
+        # 1/1000 확률로 +20
+        # 1/10000 확률로 +30
+        # 1/100000 확률로 +50
+        # randint로 0~100000
+        # 90001~90010 -> +30
+        # 80001~80100 -> +20
+        # 70001~71000 -> +10
+        # 60000~70000 -> +5
+        # 50000 -> +50
+        # 나머지 -> +1~3
+        def GenPlus():
+            rand = random.randint(0,100000)
+            if rand == 50000:
+                return 50
+            elif 60000 <= rand <= 70000:
+                return 5
+            elif 70001 <= rand <= 71000:
+                return 10
+            elif 80001 <= rand <= 80100:
+                return 20
+            elif 90001 <= rand <= 90010:
+                return 30
+            else:
+                return random.randint(1,3)
         if gentype == ITEM_SENCHANTSCROLL:
             skills = [skill.skill for skill in AppSt.entity.magics.itervalues()]
             skills += [skill.skill for skill in AppSt.entity.swordSkills.itervalues()]
@@ -1701,7 +1730,7 @@ class DigDigGUI(object):
             skills += [skill.skill for skill in AppSt.entity.knuckleSkills.itervalues()]
             bonusSkills = {}
             for skill in skills:
-                bonusSkills[skill.name] = random.randint(1, int(skill.skillPoint))
+                bonusSkills[skill.name] = GenPlus()
 
             selected = [bonusSkills.keys()[random.randint(0, len(bonusSkills.values())-1)] for i in range(3)]
             params = {}
@@ -1712,21 +1741,21 @@ class DigDigGUI(object):
                     params[selectedKey] = bonusSkills[selectedKey]
             element = FightingElements("Silver", (0,0,0), params) # 여기서 아이템을 제작하는 코드가 다있다. XXX:
         if gentype == ITEM_GENCHANTSCROLL:
-            basehp = random.randint(1, int(AppSt.entity.basehp))
-            basemp = random.randint(1, int(AppSt.entity.basemp))
-            str = random.randint(1, int(AppSt.entity.str))
-            dex = random.randint(1, int(AppSt.entity.dex))
-            int_ = random.randint(1, int(AppSt.entity.int))
-            atk = random.randint(1, int(AppSt.entity.atk))
-            dfn = random.randint(1, int(AppSt.entity.dfn))
-            fatk = random.randint(1, int(AppSt.entity.fatk))
-            eatk = random.randint(1, int(AppSt.entity.eatk))
-            iatk = random.randint(1, int(AppSt.entity.iatk))
-            patk = random.randint(1, int(AppSt.entity.patk))
-            fres = random.randint(1, int(AppSt.entity.fres))
-            eres = random.randint(1, int(AppSt.entity.eres))
-            ires = random.randint(1, int(AppSt.entity.ires))
-            pres = random.randint(1, int(AppSt.entity.pres))
+            basehp = GenPlus()
+            basemp = GenPlus()
+            str = GenPlus()
+            dex = GenPlus()
+            int_ = GenPlus()
+            atk = GenPlus()
+            dfn = GenPlus()
+            fatk = GenPlus()
+            eatk = GenPlus()
+            iatk = GenPlus()
+            patk = GenPlus()
+            fres = GenPlus()
+            eres = GenPlus()
+            ires = GenPlus()
+            pres = GenPlus()
             stats = {
                     "HP": basehp,
                     "MP": basemp,
@@ -1754,12 +1783,12 @@ class DigDigGUI(object):
             element = FightingElements("Gold", (0,0,0), params)
 
         if gentype == ITEM_DENCHANTSCROLL:
-            sword = random.randint(1, int(AppSt.entity.sword))
-            mace = random.randint(1, int(AppSt.entity.mace))
-            spear = random.randint(1, int(AppSt.entity.spear))
-            knuckle = random.randint(1, int(AppSt.entity.knuckle))
-            armor = random.randint(1, int(AppSt.entity.armor))
-            magic = random.randint(1, int(AppSt.entity.magic))
+            sword = GenPlus()
+            mace = GenPlus()
+            spear = GenPlus()
+            knuckle = GenPlus()
+            armor = GenPlus()
+            magic = GenPlus()
             skills = {"Sword Skill": sword, "Mace Skill": mace, "Spear Skill": spear, "Knuckle Skill": knuckle, "Armor Skill": armor, "Magic Skill": magic}
             selected = [skills.keys()[random.randint(0, len(skills.values())-1)] for i in range(3)]
             params = {}
@@ -5374,7 +5403,7 @@ class RawSkill(object):
 
             dmg *= (magicBonus+user.magic)**1.2/(magicBonus+user.magic)
             target.curhp -= dmg
-            if target.curhp > target.CalcMaxHP()
+            if target.curhp > target.CalcMaxHP():
                 target.curhp = target.CalcMaxHP()
             target.onhit(user)
             if target.curhp < 0:
@@ -5605,7 +5634,7 @@ class FightingEntity(object):
             AppSt.gui.msgBox.AddText("You attack mob: %d" % dmg, (68,248,93), (8,29,1))
 
         other.curhp -= dmg
-        if other.curhp > other.CalcMaxHP()
+        if other.curhp > other.CalcMaxHP():
             other.curhp = other.CalcMaxHP()
         other.onhit(self)
         if other.IsDead():
@@ -8478,4 +8507,41 @@ RPG모드에서는 땅파기가 안되도록 한다. 땅은 내가 파서 맵을
 블럭 파거나 쌓는걸 다운로드받고
 움직임을 다운로드받고 뭐 이런다. 나머지는 뭐....공격하는 명령을 다운받음? 뭐 그런식.
 -------------------------------------------------------
+물흐르기, 라바흐르기, 라바에 닿으면 죽기, 라바영역을 구현하기
+동굴만들기, 빛 계산 고치기, 네트워킹, RPG게임의 구현과 스토리짜기
+-----------------------------------------------------------
+흠.. 뭔가 심시티 같은 그런 이익을 생산해내는 놔두기만 하면 이익을 주는 그런걸 만들어야 한다.
+블럭을 하나 만들어서 가만 놔두면 이익을 생산하도록 한다.
+업그레이드도 가능하고, 골드, 실버, 다이아를 투자해서 업그레이드를 할수록 시간이 갈수록 점점 생산량이 많아지는 그런 것.
+처음엔 광물을 캐지만 갈수록 이런걸로 돈을 번다.
+좋은데?
+
+
+코드블럭을 다른종류를 만들어서 가까이 가면 트리거되게? 아 옵션으로 LaunchOn Hit, Nearby등으로 넣는다. 체크박스....
+------
+캐피탈리즘2와 같은 개념을 넣고싶은데 어떻게 해볼까
+파산하면 금을 캐서 재기할 수 있도록. 이히히
+
+음....그러지 말고 그냥 아이템 뽑기를 힘들게 하자. 현재 스킬 기반으로 플러스 스킬이 나오는 게 아니라
++1될 때마다 기하급수적으로 어렵게 만드는 것.
+----------------------------
+흠...아이템 뽑기는 됐으니까 아이템 뽑을 재료인 금,은,다이아를 더 많이 벌 수 있는 방법을 캐피탈리즘과 같은 방식, 또는 땅파기 방식으로
+할 수 있게 한다.
+땅파기가 숙련되면 땅을 파서 좀 더 많은 광물을 같은 블럭에서 얻을 수 있게 하거나
+캐피탈리즘처럼 뭔가 잘 하면..... 돈을 크게 벌고 망하면 돈을 못벌고 이런식.
+재기는 언제나 땅파기로 할 수 있도록.
+
+Business Block으로 이게 팩토리인지 상점인지를 결정하게 하고서는....
+아 복잡하게 하지 말고 간단하게.
+Business Block으로 주식에 투자해서 오르면 성공 망하면 잃고 뭐 그런식
+아 아니면 GUI에 그냥 버튼을 넣는다.
+10개의 주식을 두고 그중에서 투자하게 한다. 결국 슬롯머신 대신인가?
+아...그냥 아예 슬롯머신을 넣자;;
+
+그리고는.....몹을 잡으면 땅파는 것보다 금은다이아를 더 많이 얻게 한다.
+아이템이 없으면 몹을 잡을 수가 없음 땅을 파야함
+-----------------
+아이템은 쓸곳이 있어야만 한다.
+몹을 잡으면 퀘스트를 깰 수 있다는 것! (..)
+
 """
