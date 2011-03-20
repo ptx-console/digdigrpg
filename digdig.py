@@ -3691,7 +3691,7 @@ def GUIDrawMode():
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
 
-G_FAR = 10.0
+G_FAR = 300.0
 def GameDrawMode():
     glEnable(GL_CULL_FACE)
     glEnable(GL_DEPTH_TEST)
