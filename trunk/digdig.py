@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# -*- coding: utf-8 -*-
 """
 DigDigRPG
 Copyright (C) 2011 Jin Ju Yu
@@ -1244,8 +1244,8 @@ class DigDigGUI(object):
         self.PutItemInInventory(Item(ITEM_SILVER, 64, color = (201,201,201), stackable=True))
         self.PutItemInInventory(Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True))
         """
-        self.PutItemInInventory(Block(BLOCK_COBBLESTONE, 64))
-        self.PutItemInInventory(Block(BLOCK_DIRT, 64))
+        #self.PutItemInInventory(Block(BLOCK_COBBLESTONE, 64))
+        #self.PutItemInInventory(Block(BLOCK_DIRT, 64))
 
 
         # 여기서 텍스쳐를 생성한다.
@@ -7591,6 +7591,7 @@ class DigDigApp(object):
             self.entity = pickle.load(open("./map/player.pkl", "r"))
         except:
             self.entity = FightingEntity("Player", {"HP": 100, "MP": 100, "Str": 5, "Dex": 5, "Int": 5, "Melee Damage":5,"Defense":5,"Poison Damage":5,"Poison Resist":5,"Electric Damage":5,"Electric Resist":5,"Ice Damage":5,"Ice Resist":5,"Fire Damage":5,"Fire Resist":5,"Sword Skill":5,"Mace Skill":5,"Spear Skill":5,"Knuckle Skill":5,"Armor Skill":5,"Magic Skill":5})
+            entity = self.entity
             entity.curhp = entity.CalcMaxHP()
             entity.curmp = entity.CalcMaxMP()
         self.entity.eqs = self.gui.eqs
@@ -8543,5 +8544,9 @@ Business Block으로 주식에 투자해서 오르면 성공 망하면 잃고 �
 -----------------
 아이템은 쓸곳이 있어야만 한다.
 몹을 잡으면 퀘스트를 깰 수 있다는 것! (..)
-
+-----------
+파이어볼은 빨간 큐브(크기는 작음)
+스노우볼은 하얀 큐브
+포이즌은 녹색 큐브
+라이트닝은 음....노란색으로 잘 만들어 보자
 """
