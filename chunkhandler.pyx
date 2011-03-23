@@ -185,6 +185,10 @@ cdef:
         BLOCK_INDESTRUCTABLE
         BLOCK_CHEST
         BLOCK_SPAWNER
+        BLOCK_SILVERSLOT
+        BLOCK_GOLDSLOT
+        BLOCK_DIAMONDSLOT
+
 
     struct Vertex:
         float x,y,z

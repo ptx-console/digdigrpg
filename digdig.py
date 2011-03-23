@@ -1111,6 +1111,7 @@ class DigDigGUI(object):
         self.makes[7] = MakeTool(u"TNT", u"Kaboom!\n- Machine -", (255,255,255), [(BLOCK_GRAVEL, 1, TYPE_BLOCK)], (BLOCK_TNT, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         self.makes[13] = MakeTool(u"Wooden stair", u"A wooden stair", (116,100,46), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_WOODENSTAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[14] = MakeTool(u"Stair", u"A stair", (30,30,30), [(BLOCK_COBBLESTONE, 1, TYPE_BLOCK)], (ITEM_STAIR, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[15] = MakeTool(u"Slotmachine", u"Select silver, gold, diamond\nin the quickbar and \nright click to opeate.\nIf you use silver\nit will yield 1x of result.\nGold 1.5x, diamond 2x.", (255,255,255), [(ITEM_DIAMOND, 9, TYPE_ITEM)], (BLOCK_DIAMONDSLOT, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         self.makes[20] = MakeTool(u"Wooden pickaxe", u"Used to pick stones, ores", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_PICKAXE, [15,20], (BLOCK_IRONORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE), 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         # returns: 아이템, 체력깎는 정도, 못파는 광물목록
         self.makes[21] = MakeTool(u"Wooden axe", u"Wood cutting wooden axe", (116,100,46), [(BLOCK_WOOD, 5, TYPE_BLOCK)], (ITEM_AXE, [15,20], [], 0, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
@@ -4201,6 +4202,10 @@ BLOCK_DIRT = GenId()
 BLOCK_INDESTRUCTABLE = GenId()
 BLOCK_CHEST = GenId()
 BLOCK_SPAWNER = GenId()
+BLOCK_SILVERSLOT = GenId()
+BLOCK_GOLDSLOT = GenId()
+BLOCK_DIAMONDSLOT = GenId()
+
 
 
 class Item(object):
@@ -4285,6 +4290,11 @@ BLOCK_TEX_COORDS = [0,0, 0,0, 0,0,
     2,7,2,7,2,7,
     11,0,11,0,11,0,
     8,4, 8,4, 8,4,
+
+    4,4, 4,4, 4,4,
+    5,4, 5,4, 5,4,
+    6,4, 6,4, 6,4,
+
     
     ]
 
@@ -6041,6 +6051,101 @@ class DigDigApp(object):
     def RUp(self,t,m,k):
         self.chColor = self.WHITE_CH
 
+    def DoSlot(self, b):
+        item = self.gui.qbar[self.gui.selectedItem]
+        if item and item.name == "Item" and item.type_ in [ITEM_SILVER, ITEM_GOLD, ITEM_DIAMOND]:
+            item.count -= 1
+            if item.count == 0:
+                self.gui.qbar[self.gui.selectedItem] = ITEM_NONE
+        else:
+            self.gui.msgBox.AddText("You need silver or gold or diamond to operate a slotmachine.", (68,248,93), (8,29,1))
+            return
+        self.gui.msgBox.AddText("Spinning...", (0,0,0), (8,29,1))
+        rand = random.randint(0,200000)
+        if 0 <= rand <= 50000:
+            if item.name == "Item" and item.type_ == ITEM_SILVER:
+                self.gui.msgBox.AddText("Result: You've earned %d silvers" % (2), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_SILVER, 2, color = (201,201,201), stackable=True))
+            elif item.name == "Item" and item.type_ == ITEM_GOLD:
+                self.gui.msgBox.AddText("Result: You've earned %d silvers" % (3), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_SILVER, 3, color = (201,201,201), stackable=True))
+            elif item.name == "Item" and item.type_ == ITEM_DIAMOND:
+                self.gui.msgBox.AddText("Result: You've earned %d silvers" % (4), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_SILVER, 4, color = (201,201,201), stackable=True))
+        elif 50001 <= rand <= 80000:
+            if item.name == "Item" and item.type_ == ITEM_SILVER:
+                self.gui.msgBox.AddText("Result: You've earned %d golds" % (2), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_GOLD, 2, color = (207,207,101), stackable=True))
+            elif item.name == "Item" and item.type_ == ITEM_GOLD:
+                self.gui.msgBox.AddText("Result: You've earned %d golds" % (3), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_GOLD, 3, color = (207,207,101), stackable=True))
+            elif item.name == "Item" and item.type_ == ITEM_DIAMOND:
+                self.gui.msgBox.AddText("Result: You've earned %d golds" % (4), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_GOLD, 4, color = (207,207,101), stackable=True))
+        elif 80001 <= rand <= 100000:
+            if item.name == "Item" and item.type_ == ITEM_SILVER:
+                self.gui.msgBox.AddText("Result: You've earned %d diamonds" % (2), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_DIAMOND, 2, color = (80,212,217), stackable=True))
+            elif item.name == "Item" and item.type_ == ITEM_GOLD:
+                self.gui.msgBox.AddText("Result: You've earned %d diamonds" % (3), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_DIAMOND, 3, color = (80,212,217), stackable=True))
+            elif item.name == "Item" and item.type_ == ITEM_DIAMOND:
+                self.gui.msgBox.AddText("Result: You've earned %d diamonds" % (4), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_DIAMOND, 4, color = (80,212,217), stackable=True))
+        elif 100001 <= rand <= 100666:
+            if item.name == "Item" and item.type_ == ITEM_SILVER:
+                self.gui.msgBox.AddText("Result: You've earned %d silvers" % (64), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_SILVER, 64, color = (201,201,201), stackable=True))
+            elif item.name == "Item" and item.type_ == ITEM_GOLD:
+                self.gui.msgBox.AddText("Result: You've earned %d silvers" % int(64*1.5), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_SILVER, 64, color = (201,201,201), stackable=True))
+                self.gui.PutItemInInventory(Item(ITEM_SILVER, 32, color = (201,201,201), stackable=True))
+            elif item.name == "Item" and item.type_ == ITEM_DIAMOND:
+                self.gui.msgBox.AddText("Result: You've earned %d silvers" % (64*2), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_SILVER, 64, color = (201,201,201), stackable=True))
+                self.gui.PutItemInInventory(Item(ITEM_SILVER, 64, color = (201,201,201), stackable=True))
+        elif 100667 <= rand <= 101332:
+            if item.name == "Item" and item.type_ == ITEM_SILVER:
+                self.gui.msgBox.AddText("Result: You've earned %d silvers" % (64), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_GOLD, 64, color = (207,207,101), stackable=True))
+            elif item.name == "Item" and item.type_ == ITEM_GOLD:
+                self.gui.msgBox.AddText("Result: You've earned %d silvers" % int(64*1.5), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_GOLD, 64, color = (207,207,101), stackable=True))
+                self.gui.PutItemInInventory(Item(ITEM_GOLD, 32, color = (207,207,101), stackable=True))
+            elif item.name == "Item" and item.type_ == ITEM_DIAMOND:
+                self.gui.msgBox.AddText("Result: You've earned %d silvers" % (64*2), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_GOLD, 64, color = (207,207,101), stackable=True))
+                self.gui.PutItemInInventory(Item(ITEM_GOLD, 64, color = (207,207,101), stackable=True))
+        elif 101333 <= rand <= 102000:
+            if item.name == "Item" and item.type_ == ITEM_SILVER:
+                self.gui.msgBox.AddText("Result: You've earned %d silvers" % (64), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True))
+            elif item.name == "Item" and item.type_ == ITEM_GOLD:
+                self.gui.msgBox.AddText("Result: You've earned %d silvers" % int(64*1.5), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True))
+                self.gui.PutItemInInventory(Item(ITEM_DIAMOND, 32, color = (80,212,217), stackable=True))
+            elif item.name == "Item" and item.type_ == ITEM_DIAMOND:
+                self.gui.msgBox.AddText("Result: You've earned %d silvers" % (64*2), (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True))
+                self.gui.PutItemInInventory(Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True))
+        elif rand == 102001:
+            # XXX: 여기에 엔딩을 넣고 인벤이 꽉찼을 경우 나중에 이 박스를 인벤 비우고 다시 얻을 수 있게 저장한다.
+            if item.name == "Item" and item.type_ == ITEM_SILVER:
+                self.gui.msgBox.AddText("Jackpot! You've earned a chest full of diamonds", (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_CHEST, 1, color=(255,255,255), stackable=False, inv=[Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True) for i in range(60)]))
+            elif item.name == "Item" and item.type_ == ITEM_GOLD:
+                self.gui.msgBox.AddText("Jackpot! You've earned two chests full of diamonds", (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_CHEST, 1, color=(255,255,255), stackable=False, inv=[Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True) for i in range(60)]))
+                self.gui.PutItemInInventory(Item(ITEM_CHEST, 1, color=(255,255,255), stackable=False, inv=[Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True) for i in range(60)]))
+            elif item.name == "Item" and item.type_ == ITEM_DIAMOND:
+                self.gui.msgBox.AddText("Jackpot! You've earned three chests full of diamonds", (68,248,93), (8,29,1))
+                self.gui.PutItemInInventory(Item(ITEM_CHEST, 1, color=(255,255,255), stackable=False, inv=[Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True) for i in range(60)]))
+                self.gui.PutItemInInventory(Item(ITEM_CHEST, 1, color=(255,255,255), stackable=False, inv=[Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True) for i in range(60)]))
+                self.gui.PutItemInInventory(Item(ITEM_CHEST, 1, color=(255,255,255), stackable=False, inv=[Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True) for i in range(60)]))
+        else:
+            self.gui.msgBox.AddText("Result: You've earned nothing", (0,0,0), (8,29,1))
+        
+
     def RDown(self, t, m, k):
         # 이제 여기서 가지고있는 블럭을 쌓도록 한다.
         # 아이템 스폰할 때 오어를 스폰하고 블럭은 스폰하지 않도록도 한다. XXX:
@@ -6050,6 +6155,7 @@ class DigDigApp(object):
 
         # 음....아이템을 넣으면 거기에 BLOCK_ITEM을 넣어서
         # 그 블럭을 해체하면 아이템도 해체할 수 있도록 해야겠다.
+        # 만약 오른클릭한게 슬롯머신이라면 슬롯머신 코드를 실행한다.
         if not self.gui.invShown:
             mob = self.GetMob()
             if mob:
@@ -6072,6 +6178,9 @@ class DigDigApp(object):
         if not self.lastBlock:
             return
         x,y,z,f,b = self.lastBlock
+        if b in [BLOCK_SILVERSLOT, BLOCK_GOLDSLOT, BLOCK_DIAMONDSLOT]:
+            self.DoSlot(b)
+            return
         pos = self.cam1.pos
         pos = Vector(pos.x, pos.y, -pos.z)
         dir_ = self.cam1.GetDirV()
@@ -8557,4 +8666,21 @@ Business Block으로 주식에 투자해서 오르면 성공 망하면 잃고 �
 
 게임의 목표는 슬롯머신에서 잭팟을 따는 것이다. 일반적으로는 잭팟이 거의 나오지 않지만 퀘스트상으로 잭팟이 나온다.
 만약 일반적으로 해서 잭팟이 나오면 보너스 엔딩!
+
+
+슬롯머신: 기본적으로 3개가 똑같이 나오면 그 오어 64개가 나온다.
+대각선 이런건 안쳐줌
+2개가 똑같으면 2개가 나오고, 다 다르면 아무것도 안나온다.
+실버 골드 다이아 중 1개를 넣으면 슬롯머신이 돌려진다. 다이아는 통상의 2배 골드는 1.5배 실버는 1배.
+걍 막 랜덤하게 하지 말고 2개 나올 확률이 50%인데, 그 50%중 실버2개 나올 확률 50% 골드나올 확률 30% 다이아 나올 확률 20% 이렇게 한다.
+3개가 똑같을 확률을 1%
+다이아 인챈트 스크롤이 3개 연속으로 나오면 잭팟인데, 그 잭팟이 터질 확률을 0.00001%로 한다.
+즉, 허접한 슬롯머신.
+아무것도 안뜨는 것을 랜덤한 조합으로 하게 하고, 나머지는 고정 확률
+일반적인 슬롯머신을 쓸 때 잭팟이 뜨면 엔딩이 빨리 나오게 해서 더 허무하게 한다.
+-------------------
+유져가 박스를 땅에 깔고 일정 거리 이상 멀어지면 박스가 인벤토리에 들어오도록 한다.
+인벤토리에 빈 공간이 없으면 인벤토리의 아이템 1개를 박스에 넣고 빈공간에....
+박스에도 인벤토리에도 빈 공간이 없으면 박스를 하나 생성해서 생성된 박스 안에 박스를 넣고 인벤토리 아이템 하나도 그안에 넣고 인벤에 넣는다.
+단, 집에 있는 박스는 그렇게 되지 않도록 한다.
 """
