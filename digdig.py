@@ -7654,7 +7654,7 @@ class DigDigApp(object):
                 }
         for sound in self.sounds.itervalues():
             sound.set_volume(0.8)
-        isFullScreen = FULLSCREEN
+        isFullScreen = 0#FULLSCREEN
         screen = pygame.display.set_mode((SW,SH), HWSURFACE|OPENGL|DOUBLEBUF|isFullScreen)#|FULLSCREEN)
         pygame.mouse.set_cursor(*pygame.cursors.load_xbm("./images/digdig/cursor.xbm", "./images/digdig/cursor-mask.xbm"))
         
@@ -8733,4 +8733,7 @@ Business Block으로 주식에 투자해서 오르면 성공 망하면 잃고 �
  -- 직접 코드를 짤 필요는 없으며 퀘스트가 끝나고 코드블럭을 설치한 후에 script내에 스크립트를 실행하면 바로 잭팟이 터진다. 스크립트 activated메시지가
     뜨도록 한다.
     퀘스트 완료 전에는 스크립트를 실행해도 언락이 안된다. Encryption key is missing이라고 한다.
+
+6:4:3으로
+실버 골드 다이아를 환전 가능하게 한다.
 """
