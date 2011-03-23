@@ -128,6 +128,9 @@ enum BlockFlags
     BLOCK_INDESTRUCTABLE,
     BLOCK_CHEST,
     BLOCK_SPAWNER,
+    BLOCK_SILVERSLOT,
+    BLOCK_GOLDSLOT,
+    BLOCK_DIAMONDSLOT,
     // 음 if else도 좋지만 뭐랄까.. synthmaker처럼 한다.
 };
 
