@@ -957,6 +957,7 @@ TM_CODE = GenId()
 TM_SPAWN = GenId()
 TM_CHAR = GenId()
 TM_TALK = GenId()
+TM_EXCHANGE = GenId()
 
 
 g_id = 0
@@ -1098,8 +1099,7 @@ class DigDigGUI(object):
             self.eqTexts += [self.textRendererSmall.NewTextObject(t, (0,0,0))]
         
 
-
-        self.makes = [ITEM_NONE for i in range(60)]
+        self.makes1 = self.makes = [ITEM_NONE for i in range(60)]
         self.makes[0] = MakeTool(u"Wood", u"A wood block.", (116,100,46), [(BLOCK_LOG, 1, TYPE_BLOCK)], (BLOCK_WOOD, [], [], 4, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         self.makes[1] = MakeTool(u"Stick", u"Multi purpose stick", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_STICK, [], [], 4, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[2] = MakeTool(u"Charcoal", u"A charcoal", (60,60,60), [(BLOCK_LOG, 1, TYPE_BLOCK)], (ITEM_COAL, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
@@ -1154,6 +1154,16 @@ class DigDigGUI(object):
         self.makes[57] = MakeTool(u"Silver Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (255,255,255), [(ITEM_SILVER, 5, TYPE_ITEM, (201,201,201)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_SENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[58] = MakeTool(u"Gold Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (207,207,101), [(ITEM_GOLD, 5, TYPE_ITEM, (207,207,101)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_GENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[59] = MakeTool(u"Diamond\nEnchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (80,212,217), [(ITEM_DIAMOND, 5, TYPE_ITEM, (80,212,217)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_DENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+
+        self.makes2 = [ITEM_NONE for i in range(60)] # 환전
+        self.makes3 = [ITEM_NONE for i in range(60)] # 컬러블럭. 128컬러만 지원. 인덱스를 가지고 있을 뿐이다. 그 중 60컬러
+        self.makes4 = [ITEM_NONE for i in range(60)] # 컬러블럭. 또다른 60컬러. 120컬러까지만 하자.
+        # 실제 구현은 음.....실제 컬러 버퍼 자체도 128컬러만 지원하도록 하자. 청크 버퍼와 똑같은 컬러버퍼를 둔다. 컬러의 인덱스만 저장하고 있다.
+        # 120개의 컬러를 어떻게 할까? 
+        # GIMP에서 가장 튀어보이는 컬러 11개를 골라 10단계로 나누고, 나머지 1개의 10단계를 그레이스케일.
+        # 컬러블럭은 렌더링도 다르게 해야한다.
+
+
         self.recipeTextID = self.textRenderer.NewTextObject(u"Recipe:", (0,0,0))
         self.enchantTextID = self.textRendererSmall.NewTextObject(u"Enchant Count", (0,0,0))
         self.enchantSlashTextID = self.textRenderer.NewTextObject(u"/", (0,0,0))
@@ -8749,4 +8759,9 @@ Business Block으로 주식에 투자해서 오르면 성공 망하면 잃고 �
 
 저걸 완료하면 일단 압축해서 저장해두고 조금씩 향상시킨다. 게임 만들기를 더 편하게 하고 뭐 이런다. 컴퓨터를 구입하게 되면 그래픽도 향상시켜서
 결국 완전한 게임 엔진 하나를 만든다. 모델같은것도 로드할 수 있게 한다.
+
+
+일단, 환전소 스크린을 만든다. 블럭 판매소 스크린도 만든다.
+
+음....이런 판매소를 inventory를 열면 "탭으로" 선택할 수 있게 한다.  일단 i 키로 사이클할 수 있게 한다.
 """
