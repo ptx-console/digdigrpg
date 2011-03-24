@@ -131,6 +131,7 @@ enum BlockFlags
     BLOCK_SILVERSLOT,
     BLOCK_GOLDSLOT,
     BLOCK_DIAMONDSLOT,
+    BLOCK_COLOR,
     // 음 if else도 좋지만 뭐랄까.. synthmaker처럼 한다.
 };
 
