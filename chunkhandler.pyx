@@ -188,6 +188,7 @@ cdef:
         BLOCK_SILVERSLOT
         BLOCK_GOLDSLOT
         BLOCK_DIAMONDSLOT
+        BLOCK_COLOR
 
 
     struct Vertex:
@@ -2410,7 +2411,7 @@ cdef class Chunks:
         cdef Octree * octrees[9]
         cdef Chunk * outchunks[9]
         self.GetOctreesByViewpoint(pos, octrees, outchunks, x,0,z)
-        block = self.ModifyBlock(pos, x, y, z, octrees, outchunks, BLOCK_EMPTY)
+        block = self.ModifyBlock(pos, x, y, z, octrees, outchunks, BLOCK_EMPTY, 0)
         items = []
         if block == BLOCK_CHEST:
             ITEM_CHEST = 7
@@ -2550,7 +2551,7 @@ cdef class Chunks:
             return None
     def CheckCollide(self, x,y,z,pos,bound):
         return CheckCollide(x,y,z, pos.x, pos.y, pos.z, bound[0], bound[1], bound[2], 0)
-    def ModBlock(self, vp, dirV, level, block, bound, ydiff, mat):
+    def ModBlock(self, vp, dirV, level, block, bound, ydiff, mat, color=0):
         # level은 3,5,7,9까지 가능하다. 3이면 1칸 이내에서만 가능, 5면 2칸 7이면 3칸 9면 4칸이내에서 파기/쌓기 가능
         cdef int pos[9][3]
         cdef Octree * octrees[9]
@@ -2607,10 +2608,10 @@ cdef class Chunks:
                 elif face == 5:
                     z += 1
                 if not CheckCollide(float(outCoords[0]+x), float(outCoords[1]+y+1), float(outCoords[2]+z), vp.x, vp.y, vp.z, bound[0], bound[1], bound[2], ydiff):
-                    result = self.ModifyBlock(pos, outCoords[0]+x, outCoords[1]+y, outCoords[2]+z, octrees, outchunks, block)
+                    result = self.ModifyBlock(pos, outCoords[0]+x, outCoords[1]+y, outCoords[2]+z, octrees, outchunks, block, color)
                     return result
             else:
-                result = self.ModifyBlock(pos, outCoords[0], outCoords[1], outCoords[2], octrees, outchunks, block)
+                result = self.ModifyBlock(pos, outCoords[0], outCoords[1], outCoords[2], octrees, outchunks, block, color)
                 return result
         return False
 
@@ -2809,7 +2810,7 @@ cdef class Chunks:
                     return True
         return False
 
-    cdef int ModifyBlock(self, int pos[9][3], int x, int y, int z, Octree *octrees[9], Chunk *chunks[9], unsigned char block):
+    cdef int ModifyBlock(self, int pos[9][3], int x, int y, int z, Octree *octrees[9], Chunk *chunks[9], unsigned char block, unsigned char color):
         # face -> 위 아래 왼쪽 오른쪽 앞 뒤 0 1 2 3 4 5
         # 즉... x,y,z에서 어느 좌표를 -1 +1 해줄것인가를 결정
         #

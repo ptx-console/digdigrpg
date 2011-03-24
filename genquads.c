@@ -1828,6 +1828,7 @@ void FillTex(float *quadBuffer, int place, unsigned char block)
         4,4, 4,4, 4,4,
         5,4, 5,4, 5,4,
         6,4, 6,4, 6,4,
+        0,4,0,4,0,4,
     };
     // 256블럭, x,y, 위면 옆면 아래면
     /*
