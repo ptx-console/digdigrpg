@@ -856,7 +856,6 @@ ITEM_PICKAXE = GenId()
 ITEM_AXE = GenId()
 ITEM_SHOVEL = GenId()
 ITEM_TORCH = GenId()
-ITEM_CHARCOAL = GenId()
 ITEM_COAL = GenId()
 ITEM_STICK = GenId()
 ITEM_CHEST = GenId()
@@ -1103,7 +1102,7 @@ class DigDigGUI(object):
         self.makes = [ITEM_NONE for i in range(60)]
         self.makes[0] = MakeTool(u"Wood", u"A wood block.", (116,100,46), [(BLOCK_LOG, 1, TYPE_BLOCK)], (BLOCK_WOOD, [], [], 4, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         self.makes[1] = MakeTool(u"Stick", u"Multi purpose stick", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_STICK, [], [], 4, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[2] = MakeTool(u"Charcoal", u"A charcoal", (60,60,60), [(BLOCK_LOG, 1, TYPE_BLOCK)], (ITEM_CHARCOAL, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[2] = MakeTool(u"Charcoal", u"A charcoal", (60,60,60), [(BLOCK_LOG, 1, TYPE_BLOCK)], (ITEM_COAL, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[3] = MakeTool(u"Glass", u"A glass", (255,255,255), [(BLOCK_SAND, 1, TYPE_BLOCK)], (BLOCK_GLASS, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         self.makes[4] = MakeTool(u"Stone", u"A stone block", (255,255,255), [(BLOCK_COBBLESTONE, 1, TYPE_BLOCK)], (BLOCK_STONE, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         self.makes[5] = MakeTool(u"Brick", u"A brick block", (255,255,255), [(BLOCK_COBBLESTONE, 1, TYPE_BLOCK)], (BLOCK_BRICK, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
@@ -1132,26 +1131,25 @@ class DigDigGUI(object):
         self.makes[36] = MakeTool(u"Gold Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (207,207,101), [(ITEM_GENCHANTSCROLL, 2, TYPE_ITEM, (207,207,101))], (ITEM_GENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[37] = MakeTool(u"Diamond\nEnchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (80,212,217), [(ITEM_DENCHANTSCROLL, 2, TYPE_ITEM, (80,212,217))], (ITEM_DENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
 
-        self.makes[10] = MakeTool(u"Torch(Charcoal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_CHARCOAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[11] = MakeTool(u"Torch(Coal)", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[11] = MakeTool(u"Torch", u"Lights up dark places", (255,255,255), [(ITEM_STICK, 1, TYPE_ITEM, (255,255,255)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_TORCH, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[12] = MakeTool(u"Chest", u"Can hold items and blocks", (255,255,255), [(BLOCK_WOOD, 8, TYPE_BLOCK)], (ITEM_CHEST, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[30] = MakeTool(u"Code", u"Runs python code.\nUsed to launch commands\nor spawn an object\n(Put scripts in scripts directory)", (255,255,255), [(ITEM_GOLD, 4, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 4, TYPE_ITEM, (201,201,201))], (BLOCK_CODE, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         self.makes[31] = MakeTool(u"Spawner", u"Spawning spot\n- Machine -", (255,255,255), [(ITEM_GOLD, 4, TYPE_ITEM, (207,207,101)), (ITEM_SILVER, 4, TYPE_ITEM, (201,201,201))], (BLOCK_SPAWNER, [], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
-        self.makes[40] = MakeTool(u"Sword", u"A sword\n- Weapon -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107))], (ITEM_SWORD, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[41] = MakeTool(u"Spear", u"A spear\n- Two Handed Weapon -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107))], (ITEM_SPEAR, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[42] = MakeTool(u"Mace", u"A mace\n- Weapon -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107))], (ITEM_MACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[43] = MakeTool(u"Brass Knuckle", u"A brass knuckle\n- Weapon -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107))], (ITEM_KNUCKLE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[44] = MakeTool(u"Shield", u"A shield\n- Shield -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107))], (ITEM_SHIELD, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[45] = MakeTool(u"Helm", u"A Helm\n- Helm -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107))], (ITEM_HELM, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[46] = MakeTool(u"Armor", u"A body armor\n- Armor -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107))], (ITEM_ARMOR, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[47] = MakeTool(u"Gloves", u"A pair of gloves\n- Gloves -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107))], (ITEM_GLOVES, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[48] = MakeTool(u"Boots", u"A pair of boots\n- Boots -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107))], (ITEM_BOOTS, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[50] = MakeTool(u"Silver Ring", u"A silver ring\n- Ring -", (201,201,201), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (ITEM_SILVERRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[51] = MakeTool(u"Silver Necklace", u"A silver necklace\n- Necklace -", (201,201,201), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (ITEM_SILVERNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[52] = MakeTool(u"Gold Ring", u"A gold ring\n- Ring -", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101))], (ITEM_GOLDRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[53] = MakeTool(u"Gold Necklace", u"A gold necklace\n- Necklace -", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101))], (ITEM_GOLDNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[54] = MakeTool(u"Diamond Ring", u"A diamond ring\n- Ring -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217))], (ITEM_DIAMONDRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
-        self.makes[55] = MakeTool(u"Diamond Necklace", u"A diamond necklace\n- Necklace -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217))], (ITEM_DIAMONDNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[40] = MakeTool(u"Sword", u"A sword\n- Weapon -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_SWORD, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[41] = MakeTool(u"Spear", u"A spear\n- Two Handed Weapon -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_SPEAR, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[42] = MakeTool(u"Mace", u"A mace\n- Weapon -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_MACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[43] = MakeTool(u"Brass Knuckle", u"A brass knuckle\n- Weapon -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_KNUCKLE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[44] = MakeTool(u"Shield", u"A shield\n- Shield -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_SHIELD, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[45] = MakeTool(u"Helm", u"A Helm\n- Helm -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_HELM, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[46] = MakeTool(u"Armor", u"A body armor\n- Armor -", (107,107,107), [(ITEM_IRON, 16, TYPE_ITEM, (107,107,107)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_ARMOR, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[47] = MakeTool(u"Gloves", u"A pair of gloves\n- Gloves -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_GLOVES, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[48] = MakeTool(u"Boots", u"A pair of boots\n- Boots -", (107,107,107), [(ITEM_IRON, 8, TYPE_ITEM, (107,107,107)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_BOOTS, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[50] = MakeTool(u"Silver Ring", u"A silver ring\n- Ring -", (201,201,201), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_SILVERRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[51] = MakeTool(u"Silver Necklace", u"A silver necklace\n- Necklace -", (201,201,201), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_SILVERNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[52] = MakeTool(u"Gold Ring", u"A gold ring\n- Ring -", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_GOLDRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[53] = MakeTool(u"Gold Necklace", u"A gold necklace\n- Necklace -", (207,207,101), [(ITEM_GOLD, 1, TYPE_ITEM, (207,207,101)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_GOLDNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[54] = MakeTool(u"Diamond Ring", u"A diamond ring\n- Ring -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_DIAMONDRING, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes[55] = MakeTool(u"Diamond Necklace", u"A diamond necklace\n- Necklace -", (80,212,217), [(ITEM_DIAMOND, 1, TYPE_ITEM, (80,212,217)), (ITEM_COAL, 1, TYPE_ITEM, (60,60,60))], (ITEM_DIAMONDNECLACE, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[56] = MakeTool(u"Blank Scroll", u"Used to make enchant scrolls", (255,255,255), [(BLOCK_WOOD, 1, TYPE_BLOCK)], (ITEM_SCROLL, [], [], 64, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[57] = MakeTool(u"Silver Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (255,255,255), [(ITEM_SILVER, 5, TYPE_ITEM, (201,201,201)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_SENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes[58] = MakeTool(u"Gold Enchant Scroll", u"Used to enchant an item\n(Right click on target item\nwhile holding it)", (207,207,101), [(ITEM_GOLD, 5, TYPE_ITEM, (207,207,101)), (ITEM_SCROLL, 1, TYPE_ITEM, (201,201,201))], (ITEM_GENCHANTSCROLL, [], [], -1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
@@ -8738,9 +8736,12 @@ Business Block으로 주식에 투자해서 오르면 성공 망하면 잃고 �
 실버 골드 다이아를 환전 가능하게 한다.
 상점에서 하게 한다.
 2:1실버로 철도 구입할 수 있도록 한다.
-4:1실버로 모래도 구입
+4:1실버로 모래나 DIRT도 구입 철이 아닌 모든 블럭은 4:1실버로 살 수 있다. LOG는 실버와 1:1임
+2:1실버로 석탄도 구입
+석탄을 쓸곳이 많으면 좋을텐데. 일단 대장간이 없더라도 무기장비 만들때 석탄을 쓰도록 한다.
 
 여러가지 dirt나 잎사귀 같은 것도 팔아서 실버를 모을 수 있도록 하거나 실버로 모든 블럭을 다 살 수 있게 한다.
 마지막으로 "컬러블럭"을 만든다. 2실버로 1블럭을 살 수 있는데, 구입시에 컬러를 정해서 일정수량을 구입할 수 있다.
 컬러를 바꾸고 싶다면 제값 다 받고 팔아서 다시 구입하면 된다.
+
 """
