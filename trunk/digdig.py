@@ -1162,6 +1162,7 @@ class DigDigGUI(object):
         # 120개의 컬러를 어떻게 할까? 
         # GIMP에서 가장 튀어보이는 컬러 11개를 골라 10단계로 나누고, 나머지 1개의 10단계를 그레이스케일.
         # 컬러블럭은 렌더링도 다르게 해야한다.
+        #
         # HSV로 S 3단계, V3단계를 하고
         # H 11단계
         # 나머지는 그레이스케일 10단계로 한다.
@@ -1175,8 +1176,27 @@ class DigDigGUI(object):
         # 51대신 153? 102를 빼도록 하자. 음....
         # 으 다 좋은데?;;; 51을 빼자. 아니. 255가 들어가는 게 제일 별로다. 255가 들어가는 걸 빼자.
 
-        colors = [
+        self.colors = [
                 ]
+        for b in range(5):
+            for g in range(5):
+                for r in range(5):
+                    if r == 0 and b == 0 and g == 0:
+                        colors += [[r*51, g*51, b*51]]
+                    elif r == 4 and b == 4 and g == 4:
+                        colors += [[r*51, g*51, b*51]]
+                    elif r in [4,0] and b in [4,0] and g in [4,0]:
+                        pass
+                    else:
+                        colors += [[r*51, g*51, b*51]]
+
+
+
+
+
+
+
+
         self.recipeTextID = self.textRenderer.NewTextObject(u"Recipe:", (0,0,0))
         self.enchantTextID = self.textRendererSmall.NewTextObject(u"Enchant Count", (0,0,0))
         self.enchantSlashTextID = self.textRenderer.NewTextObject(u"/", (0,0,0))
@@ -1198,6 +1218,15 @@ class DigDigGUI(object):
         self.fatkID = self.textRendererSmall.NewTextObject(u"Fire:", (0,0,0))
         self.eatkID = self.textRendererSmall.NewTextObject(u"Electric:", (0,0,0))
         self.resID = self.textRendererSmall.NewTextObject(u"- Resist -", (0,0,0))
+
+        
+        # 컬러를 저장해야한다.
+        # invModeIdx = 0
+        # modeIdx += 1
+        # if modeIdx >= 4
+            # modeIDx = 0
+        # makes3을 만들 때에는 컬러를 잘 넣고, toolStrength있는데다가 컬러 인덱스를 넣어 저장하게 한다.
+        # DoMake를 할 때에는 BLOCK_COLOR인지를 보고 컬러라는 속성을 아이템에 넣는다.
 
 
         self.invSlotPos = []

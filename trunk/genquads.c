@@ -3625,6 +3625,43 @@ void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64],
         if(depth == 7)
         {
             // 현재 옥트리 안에 다음의 좌표들이 존재한다.
+            int r,g,b, colorIdx;
+            unsigned char colors[120][3];
+            colorIdx = 0;
+            for(b=0;b<5;++b)
+            {
+                for(g=0;g<5;++g)
+                {
+                    for(r=0;r<5;++r)
+                    {
+                        if(r == 0 && b == 0 && g == 0)
+                        {
+                            colors[colorIdx][0] = r*51;
+                            colors[colorIdx][1] = g*51;
+                            colors[colorIdx][2] = b*51;
+                            colorIdx++;
+                        }
+                        else if(r == 4 && b == 4 && g == 4)
+                        {
+                            colors[colorIdx][0] = r*51;
+                            colors[colorIdx][1] = g*51;
+                            colors[colorIdx][2] = b*51;
+                            colorIdx++;
+                        }
+                        else if((r == 0 || r == 4) && (g == 4 || g == 0) && (b == 0 || b == 4))
+                        {
+                        }
+                        else
+                        {
+                            colors[colorIdx][0] = r*51;
+                            colors[colorIdx][1] = g*51;
+                            colors[colorIdx][2] = b*51;
+                            colorIdx++;
+                        }
+                    }
+                }
+            }
+
             Extra *extras[27];
             int strideTorch = 128;
             for(i=0; i<5-1;++i)
@@ -3777,8 +3814,6 @@ void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64],
                             // 훨씬 빠르고 뭐.... 훨씬 좋을 것.
                             // 기본적으로 빛이 안닿으면 컬러는 1 닿으면 0.6*255 태양 노멀과의 ABS(dot)이 1.0이면 컬러가 0.6*255, 점점 0에 가까워질수록 컬러는 1에
                             // 가까워진다. 태양광의 y값이 0보다 크면 완벽한 밤이 되고 게임상 시간에 따라서 Z축을 기준으로 360도를 돈다.
-                            if(chunk->colors[(zBz)*xzSize*3+(yBy)*128*3+(xBx*3)])
-                                ;
 
                             int ttt;
                             for(ttt=0; ttt<9;++ttt)
@@ -3935,7 +3970,21 @@ void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64],
                                     TestSunLit(xBx, yBy, zBz, chunk, chunks, pos, ox, oy, oz, j, &sunstrength[0]);
                                     GenQuad(&tV[drawIdx][tIdx[drawIdx]*12], j, (xBO), (yBO), (zBO));
                                     FillTex(&tT[drawIdx][tIdx[drawIdx]*8], j, chunk->chunk[(zBz)*xzSize+(yBy)*128+(xBx)]);
-                                    FillColor((xBO), (yBO), (zBO), j, &tC[drawIdx][tIdx[drawIdx]*12], sunstrength, extras);
+                                    if(curBlock == BLOCK_COLOR)
+                                    {
+                                        unsigned char *out1 = &tC[drawIdx][tIdx[drawIdx]*12];
+                                        int iout=0;
+                                        for(iout=0;iout<4;++iout)
+                                        {
+                                            out1[iout*3+0] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][0];
+                                            out1[iout*3+1] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][1];
+                                            out1[iout*3+2] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][2];
+                                        }
+                                    }
+                                    else
+                                    {
+                                        FillColor((xBO), (yBO), (zBO), j, &tC[drawIdx][tIdx[drawIdx]*12], sunstrength, extras);
+                                    }
                                     tIdx[drawIdx] += 1;
                                 }
                                 else
@@ -3960,7 +4009,21 @@ void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64],
                                     }
                                     GenQuad(&nsV[drawIdx][nsIdx[drawIdx]*12], j, (xBO), (yBO), (zBO));
                                     FillTex(&nsT[drawIdx][nsIdx[drawIdx]*8], j, chunk->chunk[(zBz)*xzSize+(yBy)*128+(xBx)]);
-                                    FillColor((xBO), (yBO), (zBO), j, &nsC[drawIdx][nsIdx[drawIdx]*12], sunstrength, extras);
+                                    if(curBlock == BLOCK_COLOR)
+                                    {
+                                        unsigned char *out1 = &nsC[drawIdx][nsIdx[drawIdx]*12];
+                                        int iout=0;
+                                        for(iout=0;iout<4;++iout)
+                                        {
+                                            out1[iout*3+0] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][0];
+                                            out1[iout*3+1] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][1];
+                                            out1[iout*3+2] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][2];
+                                        }
+                                    }
+                                    else
+                                    {
+                                        FillColor((xBO), (yBO), (zBO), j, &nsC[drawIdx][nsIdx[drawIdx]*12], sunstrength, extras);
+                                    }
                                     nsIdx[drawIdx] += 1;
                                 }
                             }

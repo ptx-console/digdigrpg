@@ -2835,6 +2835,7 @@ cdef class Chunks:
                 elif chunks[ii].chunk[c*128*128+b*128+a] == 0 and self.CheckIfAble(pos, chunks, x,y,z):
                     retBlock = -1
                     chunks[ii].chunk[c*128*128+b*128+a] = block
+                    chunks[ii].colors[c*128*128+b*128+a] = color
                     if chunks[ii].heights[c*128+a] < b:
                         chunks[ii].heights[c*128+a] = b
                     self.UpdateChunks(octrees[ii], chunks[ii], a,b,c)
