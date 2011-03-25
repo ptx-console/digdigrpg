@@ -7692,20 +7692,21 @@ class DigDigApp(object):
         self.show = not self.show
         self.housing.Show(self.show)
     def OpenInventory(self, t, m, k):
-        if k.pressedKey == K_c:
-            self.gui.charTab = not self.gui.charTab
-        elif k.pressedKey == K_i:
-            self.gui.invModeIdx += 1
-            if self.gui.invModeIdx >= 4:
-                self.gui.invModeIdx = 0
-            if self.gui.invModeIdx == 0:
-                self.gui.makes = self.gui.makes1
-            if self.gui.invModeIdx == 1:
-                self.gui.makes = self.gui.makes2
-            if self.gui.invModeIdx == 2:
-                self.gui.makes = self.gui.makes3
-            if self.gui.invModeIdx == 3:
-                self.gui.makes = self.gui.makes4
+        if self.guiMode:
+            if k.pressedKey == K_c:
+                self.gui.charTab = not self.gui.charTab
+            elif k.pressedKey == K_i:
+                self.gui.invModeIdx += 1
+                if self.gui.invModeIdx >= 4:
+                    self.gui.invModeIdx = 0
+                if self.gui.invModeIdx == 0:
+                    self.gui.makes = self.gui.makes1
+                if self.gui.invModeIdx == 1:
+                    self.gui.makes = self.gui.makes2
+                if self.gui.invModeIdx == 2:
+                    self.gui.makes = self.gui.makes3
+                if self.gui.invModeIdx == 3:
+                    self.gui.makes = self.gui.makes4
         if k.pressedKey == K_TAB:
             self.gui.qbMode2 = not self.gui.qbMode2
             if self.gui.qbMode2:
@@ -8865,4 +8866,7 @@ Business Block으로 주식에 투자해서 오르면 성공 망하면 잃고 �
 colors는 있으니까 인벤토리에 있는 블럭이 컬러블럭일 경우 ModBlock에다가 컬러를 넘겨준다.
 렌더링시에 블럭의 타입이 BLOCK_COLOR면 따로 렌더링한다.
 음...........컬러를 HSV로 하는게 나을뻔 했나 아니면 이것도 괜찮은가. 이건 TODO
+
+
+이제 환전소만 하면 된다.
 """
