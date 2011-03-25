@@ -1885,6 +1885,7 @@ class DigDigGUI(object):
             returneditem = Block(type_, count)
             if type_ == BLOCK_COLOR:
                 returneditem.colorIdx = stats[0]
+                returneditem.color = tool.color
         elif name == TYPE_ITEM:
             if type_ in [ITEM_SENCHANTSCROLL, ITEM_GENCHANTSCROLL, ITEM_DENCHANTSCROLL]:
 
@@ -2424,10 +2425,17 @@ class DigDigGUI(object):
                 glBindTexture(GL_TEXTURE_2D, AppSt.tex)
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-                glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE)
+                if item.type_ == BLOCK_COLOR:
+                    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
+                else:
+                    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE)
                 texupx = (BLOCK_TEX_COORDS[b*2*3 + 0]*32.0) / 512.0
                 texupy = (BLOCK_TEX_COORDS[b*2*3 + 1]*32.0) / 512.0
                 glBegin(GL_QUADS)
+                if item.type_ == BLOCK_COLOR:
+                    glColor4ub(*(item.color+(255,)))
+                else:
+                    pass
                 glTexCoord2f(texupx, texupy+float(32)/512.0)
                 glVertex3f(float(x), -float(y+30), 100.0)
 
@@ -6319,7 +6327,7 @@ class DigDigApp(object):
 
                 mat = ViewingMatrix()
                 if mat is not None:
-                    if self.chunks.ModBlock(pos, dir_, 9, item.type_, self.bound, 0, mat) == -1:
+                    if self.chunks.ModBlock(pos, dir_, 9, item.type_, self.bound, 0, mat, item.colorIdx) == -1:
                         if item.type_ == BLOCK_SPAWNER:
                             if f == 0:
                                 xyz = x,y-1,z
@@ -6386,7 +6394,7 @@ class DigDigApp(object):
                         xyz = x,y,z+1
                     mat = ViewingMatrix()
                     if mat is not None:
-                        if self.chunks.ModBlock(pos, dir_, 9, BLOCK_CHEST, self.bound, 0, mat) == -1:
+                        if self.chunks.ModBlock(pos, dir_, 9, BLOCK_CHEST, self.bound, 0, mat, item.colorIdx) == -1:
                             installed = self.chunks.AddChest(xyz[0],xyz[1],xyz[2],facing)
                             if installed:
                                 if item.optionalInventory:
