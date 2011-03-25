@@ -6280,7 +6280,7 @@ class DigDigApp(object):
                 def Delete():
                     block, items, color = self.chunks.DigBlock(x,y,z)
                     if block:
-                        self.SpawnBlockItems(x,y,z, block)
+                        self.SpawnBlockItems(x,y,z, block, color)
                     del self.gui.spawns[(x,y,z)]
 
                 def SetName(name):
@@ -6299,7 +6299,7 @@ class DigDigApp(object):
                 def Delete():
                     block, items, color = self.chunks.DigBlock(x,y,z)
                     if block:
-                        self.SpawnBlockItems(x,y,z, block)
+                        self.SpawnBlockItems(x,y,z, block, color)
                     del self.gui.codes[(x,y,z)]
                 def SetCode(fileN):
                     self.gui.codes[(x,y,z)] = fileN
@@ -6462,7 +6462,7 @@ class DigDigApp(object):
                     for xx in range(7):
                         block, items, color = self.chunks.DigBlock(int(x-3+xx), int(y-3+yy), int(z-3+zz))
                         if block:
-                            self.SpawnBlockItems(int(x-3+xx), int(y-3+yy), int(z-3+zz), block)
+                            self.SpawnBlockItems(int(x-3+xx), int(y-3+yy), int(z-3+zz), block, color)
                         if items:
                             for item in items:
                                 if item == ITEM_TORCH:
@@ -7151,7 +7151,7 @@ class DigDigApp(object):
                         if block == BLOCK_GRASS:
                             block = BLOCK_DIRT
                         if block not in [BLOCK_CHEST, BLOCK_IRONORE, BLOCK_COALORE, BLOCK_SILVERORE, BLOCK_GOLDORE, BLOCK_DIAMONDORE]:
-                            self.SpawnBlockItems(x,y,z, block)
+                            self.SpawnBlockItems(x,y,z, block, color)
                         else:
                             if block == BLOCK_IRONORE:
                                 self.gui.PutItemInInventory(Item(ITEM_IRON, 1, color=(107,107,107), stackable=True))
@@ -7176,8 +7176,8 @@ class DigDigApp(object):
                 self.prevDig = t
 
 
-    def SpawnBlockItems(self, x,y,z, block):
-        self.blockItems += [(x+0.5,y+0.5,z+0.5, block, pygame.time.get_ticks(), None)]
+    def SpawnBlockItems(self, x,y,z, block, color):
+        self.blockItems += [(x+0.5,y+0.5,z+0.5, block, color, pygame.time.get_ticks(), None)]
 
     def CheckJump(self, y):
         if self.prevY - 0.05 <= y <= self.prevY + 0.05:
@@ -7191,9 +7191,12 @@ class DigDigApp(object):
         pos = self.cam1.pos
         x,y,z = pos.x,pos.y,-pos.z
         for item in self.blockItems[:]:
-            xx,yy,zz,b,t,d = item
+            xx,yy,zz,b,c,t,d = item
             if (Vector(x,y,z) - Vector(xx,yy,zz)).Length() < self.bound[1]+0.3:
-                if self.gui.PutItemInInventory(Block(b, 1)):
+                block = Block(b, 1)
+                block.colorIdx = c
+                block.color = self.gui.colors[c]
+                if self.gui.PutItemInInventory(block):
                     self.sounds["EatItem"].play()
                     self.blockItems.remove(item)
 
@@ -7201,12 +7204,12 @@ class DigDigApp(object):
         idx = 0
         delIdx = []
         for item in self.blockItems[:]:
-            xx,yy,zz,b,prevTick,d = item
+            xx,yy,zz,b,c,prevTick,d = item
             if pygame.time.get_ticks() - prevTick > 5*60*1000:
                 delIdx += [idx]
             else:
                 x,y,z = self.chunks.FixPos(Vector(xx,yy,zz), Vector(xx,yy-0.11,zz), (0.33,0.33,0.33))
-                self.blockItems[idx] = x,y,z,b,prevTick,d
+                self.blockItems[idx] = x,y,z,b,c,prevTick,d
                 idx += 1
 
         delIdx.reverse()
@@ -7479,10 +7482,10 @@ class DigDigApp(object):
 
             idx = 0
             for block in self.blockItems[:]:
-                x,y,z,b,t,dList = block
+                x,y,z,b,c,t,dList = block
                 if not dList or self.regenTex:
                     dList = glGenLists(1)
-                    self.blockItems[idx] = x,y,z,b,t,dList
+                    self.blockItems[idx] = x,y,z,b,c,t,dList
                     glPushMatrix()
                     glTranslatef(x,y,z)
                     tex1 = 0.0, 0.0
@@ -7491,6 +7494,7 @@ class DigDigApp(object):
                     tex4 = 0.0, 0.0
                     tex5 = 0.0, 0.0
                     tex6 = 0.0, 0.0
+
                     if b < len(BLOCK_TEX_COORDS):
                         texupx = (BLOCK_TEX_COORDS[b*2*3 + 0]*32.0) / 512.0
                         texupy = (BLOCK_TEX_COORDS[b*2*3 + 1]*32.0) / 512.0
@@ -7505,7 +7509,7 @@ class DigDigApp(object):
                         tex5 = texmidx,texmidy
                         tex6 = texmidx,texmidy
                     glNewList(dList, GL_COMPILE)
-                    DrawCube((0,0,0), (0.33,0.33,0.33), (255,255,255,200), tex1,tex2,tex3,tex4,tex5,tex6, self.tex, False, 32.0) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+                    DrawCube((0,0,0), (0.33,0.33,0.33), tuple(self.gui.colors[c])+(255,), tex1,tex2,tex3,tex4,tex5,tex6, self.tex, False, 32.0) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
                     glEndList()
                     glPopMatrix()
 
