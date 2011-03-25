@@ -896,6 +896,7 @@ cdef class Chunks:
         for i in range(STREAM_BUFFER_LEN):
             if self.chunks[i] and self.octrees[i]:
                 self.SaveToDisk(self.chunks[i])
+                self.SaveToDiskColor(self.chunks[i])
                 self.SaveItems(self.octrees[i], self.chunks[i].x, self.chunks[i].z)
                 
     cdef void SaveItems(self, Octree *octree, int x,int z):
@@ -1376,6 +1377,25 @@ cdef class Chunks:
         print 'end'
         return chunkData
 
+    cdef unsigned char *LoadFromDiskColor(self, int x, int y, int z):
+        #f = open("%d_%d_%d", "rb")
+        cdef:
+            char buffer[256]
+            char *path = "./map/%d/%d.colors"
+            unsigned char *chunkData
+            stdio.FILE *fp
+        chunkData = <unsigned char*>malloc(sizeof(unsigned char)*SIZE_CHUNK)
+        if chunkData == NULL:
+            assert False, "Not enough memory"
+        stdio.sprintf(buffer, path, z, x)
+        fp = stdio.fopen(buffer, "rb")
+        if fp != NULL:
+            stdio.fread(chunkData, sizeof(unsigned char), SIZE_CHUNK, fp);
+            stdio.fclose(fp)
+        else:
+            return NULL
+        return chunkData
+
     cdef unsigned char *LoadFromDisk(self, int x, int y, int z):
         #f = open("%d_%d_%d", "rb")
         cdef:
@@ -1395,6 +1415,22 @@ cdef class Chunks:
             return NULL
         return chunkData
 
+    cdef void SaveToDiskColor(self, Chunk * chunk):
+        if not chunk:
+            assert False, "NULL chunk detected"
+        cdef:
+            char buffer[256]
+            char *path = "./map/%d/%d.colors"
+            stdio.FILE *fp
+        try:
+            os.mkdir("./map/%d" % chunk.z)
+        except:
+            pass
+        stdio.sprintf(buffer, path, chunk.z, chunk.x)
+        fp = stdio.fopen(buffer, "wb")
+        if fp != NULL:
+            stdio.fwrite(chunk.colors, sizeof(unsigned char), SIZE_CHUNK, fp)
+            stdio.fclose(fp)
     cdef void SaveToDisk(self, Chunk * chunk):
         if not chunk:
             assert False, "NULL chunk detected"
@@ -1459,18 +1495,22 @@ cdef class Chunks:
                 chunk = self.chunks[i]
                 if chunk.x <= vx-stride*128:
                     self.SaveToDisk(self.chunks[i])
+                    self.SaveToDiskColor(self.chunks[i])
                     self.SaveItems(self.octrees[i], self.chunks[i].x, self.chunks[i].z)
                     self.UnloadChunkOctree(chunk)
                 elif chunk.x >= vx+stride*128:
                     self.SaveToDisk(self.chunks[i])
+                    self.SaveToDiskColor(self.chunks[i])
                     self.SaveItems(self.octrees[i], self.chunks[i].x, self.chunks[i].z)
                     self.UnloadChunkOctree(chunk)
                 elif chunk.z <= vz-stride*128:
                     self.SaveToDisk(self.chunks[i])
+                    self.SaveToDiskColor(self.chunks[i])
                     self.SaveItems(self.octrees[i], self.chunks[i].x, self.chunks[i].z)
                     self.UnloadChunkOctree(chunk)
                 elif chunk.z >= vz+stride*128:
                     self.SaveToDisk(self.chunks[i])
+                    self.SaveToDiskColor(self.chunks[i])
                     self.SaveItems(self.octrees[i], self.chunks[i].x, self.chunks[i].z)
                     self.UnloadChunkOctree(chunk)
 
@@ -1487,7 +1527,9 @@ cdef class Chunks:
                     chunk = <Chunk *>malloc(sizeof(Chunk))
                     chunk.chunk = chunkData
                     chunk.heights = <char*>malloc(sizeof(char)*128*128)
-                    chunk.colors = <unsigned char*>malloc(sizeof(unsigned char)*128*128*128*3)
+                    chunk.colors = self.LoadFromDiskColor(pos[i][0], 0, pos[i][2])
+                    if chunk.colors == NULL:
+                        chunk.colors = <unsigned char*>malloc(sizeof(unsigned char)*128*128*128*3)
                     memset(chunk.colors, 0, sizeof(unsigned char)*128*128*128*3)
                     chunk.x = pos[i][0]
                     chunk.y = 0
@@ -2410,8 +2452,9 @@ cdef class Chunks:
         cdef int pos[9][3]
         cdef Octree * octrees[9]
         cdef Chunk * outchunks[9]
+        cdef unsigned char ocolor
         self.GetOctreesByViewpoint(pos, octrees, outchunks, x,0,z)
-        block = self.ModifyBlock(pos, x, y, z, octrees, outchunks, BLOCK_EMPTY, 0)
+        block = self.ModifyBlock(pos, x, y, z, octrees, outchunks, BLOCK_EMPTY, 0, &ocolor)
         items = []
         if block == BLOCK_CHEST:
             ITEM_CHEST = 7
@@ -2421,7 +2464,7 @@ cdef class Chunks:
             ITEM_TORCH = 3
             items += [ITEM_TORCH]
             self.RemoveTorch(x,y,z)
-        return block, items
+        return block, items, ocolor
     def RemoveChest(self, x,y,z):
         cdef int pos[9][3]
         cdef Octree * octrees[9]
@@ -2573,6 +2616,7 @@ cdef class Chunks:
         outCoords[0] = 0
         outCoords[1] = 0
         outCoords[2] = 0
+        cdef unsigned char ocolor
         cdef float viewmat[16]
         viewmat[0] = mat[0][0]
         viewmat[1] = mat[1][0]
@@ -2608,10 +2652,10 @@ cdef class Chunks:
                 elif face == 5:
                     z += 1
                 if not CheckCollide(float(outCoords[0]+x), float(outCoords[1]+y+1), float(outCoords[2]+z), vp.x, vp.y, vp.z, bound[0], bound[1], bound[2], ydiff):
-                    result = self.ModifyBlock(pos, outCoords[0]+x, outCoords[1]+y, outCoords[2]+z, octrees, outchunks, block, color)
+                    result = self.ModifyBlock(pos, outCoords[0]+x, outCoords[1]+y, outCoords[2]+z, octrees, outchunks, block, color, &ocolor)
                     return result
             else:
-                result = self.ModifyBlock(pos, outCoords[0], outCoords[1], outCoords[2], octrees, outchunks, block, color)
+                result = self.ModifyBlock(pos, outCoords[0], outCoords[1], outCoords[2], octrees, outchunks, block, color, &ocolor)
                 return result
         return False
 
@@ -2810,7 +2854,7 @@ cdef class Chunks:
                     return True
         return False
 
-    cdef int ModifyBlock(self, int pos[9][3], int x, int y, int z, Octree *octrees[9], Chunk *chunks[9], unsigned char block, unsigned char color):
+    cdef int ModifyBlock(self, int pos[9][3], int x, int y, int z, Octree *octrees[9], Chunk *chunks[9], unsigned char block, unsigned char color, unsigned char *outColor):
         # face -> 위 아래 왼쪽 오른쪽 앞 뒤 0 1 2 3 4 5
         # 즉... x,y,z에서 어느 좌표를 -1 +1 해줄것인가를 결정
         #
@@ -2827,6 +2871,7 @@ cdef class Chunks:
                 if block == 0 and self.CheckIfDestructable(chunks[ii].chunk[c*128*128+b*128+a]):
                     retBlock = chunks[ii].chunk[c*128*128+b*128+a]
                     chunks[ii].chunk[c*128*128+b*128+a] = block
+                    outColor[0] = chunks[ii].colors[c*128*128+b*128+a]
                     for i in range(127):
                         if chunks[ii].chunk[c*128*128+(127-i)*128+a] != 0:
                             chunks[ii].heights[c*128+a] = 127-i
