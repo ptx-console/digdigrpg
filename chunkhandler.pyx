@@ -1452,6 +1452,7 @@ cdef class Chunks:
         if not chunk:
             assert False, "NULL chunk detected"
         free(chunk.chunk) # char * buffer
+        free(chunk.colors) # char * buffer
         free(chunk.heights)
         for i in range(STREAM_BUFFER_LEN):
             if self.chunks[i] == chunk:
@@ -1527,8 +1528,8 @@ cdef class Chunks:
                     chunk = <Chunk *>malloc(sizeof(Chunk))
                     chunk.chunk = chunkData
                     chunk.heights = <char*>malloc(sizeof(char)*128*128)
-                    chunk.colors = <unsigned char*>malloc(sizeof(unsigned char)*128*128*128*3)
-                    memset(chunk.colors, 0, sizeof(unsigned char)*128*128*128*3)
+                    chunk.colors = <unsigned char*>malloc(sizeof(unsigned char)*128*128*128)
+                    memset(chunk.colors, 0, sizeof(unsigned char)*128*128*128)
                     chunk.x = pos[i][0]
                     chunk.y = 0
                     chunk.z = pos[i][2]
@@ -1546,8 +1547,8 @@ cdef class Chunks:
                     chunk.heights = <char*>malloc(sizeof(char)*128*128)
                     chunk.colors = self.LoadFromDiskColor(pos[i][0], 0, pos[i][2])
                     if chunk.colors == NULL:
-                        chunk.colors = <unsigned char*>malloc(sizeof(unsigned char)*128*128*128*3)
-                    memset(chunk.colors, 0, sizeof(unsigned char)*128*128*128*3)
+                        chunk.colors = <unsigned char*>malloc(sizeof(unsigned char)*128*128*128)
+                        memset(chunk.colors, 0, sizeof(unsigned char)*128*128*128)
                     chunk.x = pos[i][0]
                     chunk.y = 0
                     chunk.z = pos[i][2]
