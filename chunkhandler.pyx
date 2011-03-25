@@ -1527,9 +1527,7 @@ cdef class Chunks:
                     chunk = <Chunk *>malloc(sizeof(Chunk))
                     chunk.chunk = chunkData
                     chunk.heights = <char*>malloc(sizeof(char)*128*128)
-                    chunk.colors = self.LoadFromDiskColor(pos[i][0], 0, pos[i][2])
-                    if chunk.colors == NULL:
-                        chunk.colors = <unsigned char*>malloc(sizeof(unsigned char)*128*128*128*3)
+                    chunk.colors = <unsigned char*>malloc(sizeof(unsigned char)*128*128*128*3)
                     memset(chunk.colors, 0, sizeof(unsigned char)*128*128*128*3)
                     chunk.x = pos[i][0]
                     chunk.y = 0
@@ -1546,7 +1544,9 @@ cdef class Chunks:
                     chunk = <Chunk *>malloc(sizeof(Chunk))
                     chunk.chunk = chunkData
                     chunk.heights = <char*>malloc(sizeof(char)*128*128)
-                    chunk.colors = <unsigned char*>malloc(sizeof(unsigned char)*128*128*128*3)
+                    chunk.colors = self.LoadFromDiskColor(pos[i][0], 0, pos[i][2])
+                    if chunk.colors == NULL:
+                        chunk.colors = <unsigned char*>malloc(sizeof(unsigned char)*128*128*128*3)
                     memset(chunk.colors, 0, sizeof(unsigned char)*128*128*128*3)
                     chunk.x = pos[i][0]
                     chunk.y = 0
