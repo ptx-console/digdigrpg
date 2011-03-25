@@ -865,8 +865,8 @@ ITEM_PICKAXE = GenId()
 ITEM_AXE = GenId()
 ITEM_SHOVEL = GenId()
 ITEM_TORCH = GenId()
-ITEM_COAL = GenId()
 ITEM_CHARCOAL = GenId()
+ITEM_COAL = GenId()
 ITEM_STICK = GenId()
 ITEM_CHEST = GenId()
 ITEM_GOLD = GenId()
@@ -1243,6 +1243,14 @@ class DigDigGUI(object):
             self.makes3[i] = MakeTool(u"Color Block", u"A color block", tuple(self.colors[i]), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (BLOCK_COLOR, [i], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
         for i in range(59):
             self.makes4[i] = MakeTool(u"Color Block", u"A color block", tuple(self.colors[i+60]), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (BLOCK_COLOR, [i+60], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+
+
+        self.makes2[0] = MakeTool(u"Buy silvers", u"Buy 3 silvers with 2 golds", (201,201,201), [(ITEM_GOLD, 2, TYPE_ITEM, (207,207,101))], (ITEM_SILVER, [], [], 3, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes2[1] = MakeTool(u"Buy silvers", u"Buy 2 silvers with 1 diamond", (201,201,201), [(ITEM_DIAMOND, 1, TYPE_ITEM,  (80,212,217))], (ITEM_SILVER, [], [], 2, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes2[2] = MakeTool(u"Buy golds", u"Buy 2 golds with 3 silvers",(207,207,101), [(ITEM_SILVER, 3, TYPE_ITEM,  (201,201,201))], (ITEM_GOLD, [], [], 2, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes2[3] = MakeTool(u"Buy golds", u"Buy 4 golds with 3 diamonds",(207,207,101), [(ITEM_DIAMOND, 3, TYPE_ITEM,  (80,212,217))], (ITEM_GOLD, [], [], 4, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes2[4] = MakeTool(u"Buy diamonds", u"Buy 1 diamond with 2 silvers",(80,212,217), [(ITEM_SILVER, 2, TYPE_ITEM,  (201,201,201))], (ITEM_DIAMOND, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes2[5] = MakeTool(u"Buy diamonds", u"Buy 3 diamond with 4 golds",(80,212,217), [(ITEM_GOLD, 4, TYPE_ITEM,  (207,207,101))], (ITEM_DIAMOND, [], [], 3, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
 
         self.invSlotPos = []
         invX, invY = self.invRealPos
@@ -1879,6 +1887,8 @@ class DigDigGUI(object):
         # 몬스터도 인챈트 스크롤을 드랍한다. 아이템 대신!
     def DoMake(self, makeIdx):
         tool = self.makes[makeIdx]
+        if not tool:
+            return
 
         type_, stats, disallowed, count, name = tool.returns
         if name == TYPE_BLOCK:
