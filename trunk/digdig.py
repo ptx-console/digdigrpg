@@ -1251,6 +1251,11 @@ class DigDigGUI(object):
         self.makes2[3] = MakeTool(u"Buy golds", u"Buy 4 golds with 3 diamonds",(207,207,101), [(ITEM_DIAMOND, 3, TYPE_ITEM,  (80,212,217))], (ITEM_GOLD, [], [], 4, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes2[4] = MakeTool(u"Buy diamonds", u"Buy 1 diamond with 2 silvers",(80,212,217), [(ITEM_SILVER, 2, TYPE_ITEM,  (201,201,201))], (ITEM_DIAMOND, [], [], 1, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
         self.makes2[5] = MakeTool(u"Buy diamonds", u"Buy 3 diamond with 4 golds",(80,212,217), [(ITEM_GOLD, 4, TYPE_ITEM,  (207,207,101))], (ITEM_DIAMOND, [], [], 3, TYPE_ITEM), self.textRenderer, self.textRendererSmall)
+        self.makes2[6] = MakeTool(u"Buy cobblestones", u"Buy 64 cobblestones\nfor 16 silver",(80,212,217), [(ITEM_SILVER, 16, TYPE_ITEM,  (201,201,201))], (BLOCK_COBBLESTONE, [], [], 64, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes2[7] = MakeTool(u"Buy woods", u"Buy 64 woords\nfor 16 silver",(80,212,217), [(ITEM_SILVER, 16, TYPE_ITEM,  (201,201,201))], (BLOCK_WOOD, [], [], 64, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes2[8] = MakeTool(u"Buy glasses", u"Buy 64 glasses\nfor 32 silver",(80,212,217), [(ITEM_SILVER, 32, TYPE_ITEM,  (201,201,201))], (BLOCK_GLASS, [], [], 64, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes2[9] = MakeTool(u"Buy grasses", u"Buy 64 grasses\nfor 16 silver",(80,212,217), [(ITEM_SILVER, 16, TYPE_ITEM,  (201,201,201))], (BLOCK_GRASS, [], [], 64, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        self.makes2[10] = MakeTool(u"Buy dirts", u"Buy 64 dirts\nfor 16 silver",(80,212,217), [(ITEM_SILVER, 16, TYPE_ITEM,  (201,201,201))], (BLOCK_DIRT, [], [], 64, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
 
         self.invSlotPos = []
         invX, invY = self.invRealPos
@@ -1317,6 +1322,11 @@ class DigDigGUI(object):
         self.PutItemInInventory(Item(ITEM_GOLD, 64, color = (207,207,101), stackable=True))
         self.PutItemInInventory(Item(ITEM_SILVER, 64, color = (201,201,201), stackable=True))
         self.PutItemInInventory(Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True))
+        """
+        """
+        self.PutItemInInventory(Item(ITEM_CHEST, 1, color=(255,255,255), stackable=False, inv=[Item(ITEM_DIAMOND, 64, color = (80,212,217), stackable=True) for i in range(60)]))
+        self.PutItemInInventory(Item(ITEM_CHEST, 1, color=(255,255,255), stackable=False, inv=[Item(ITEM_GOLD, 64, color = (207,207,80), stackable=True) for i in range(60)]))
+        self.PutItemInInventory(Item(ITEM_CHEST, 1, color=(255,255,255), stackable=False, inv=[Item(ITEM_SILVER, 64, color = (201,201,201), stackable=True) for i in range(60)]))
         """
         #self.PutItemInInventory(Block(BLOCK_COBBLESTONE, 64))
         #self.PutItemInInventory(Block(BLOCK_DIRT, 64))
@@ -1898,7 +1908,6 @@ class DigDigGUI(object):
                 returneditem.color = tool.color
         elif name == TYPE_ITEM:
             if type_ in [ITEM_SENCHANTSCROLL, ITEM_GENCHANTSCROLL, ITEM_DENCHANTSCROLL]:
-
                 #인챈트 스크롤 복사하는 아이템이 고급 몬스터에게서 떨어진다. XXX:
                 element = self.GenElement(type_)
                 returneditem = Item(type_, 1, color=tool.color, element=element)
@@ -2443,7 +2452,7 @@ class DigDigGUI(object):
                 texupy = (BLOCK_TEX_COORDS[b*2*3 + 1]*32.0) / 512.0
                 glBegin(GL_QUADS)
                 if item.type_ == BLOCK_COLOR:
-                    glColor4ub(*(item.color+(255,)))
+                    glColor4ub(*(tuple(item.color)+(255,)))
                 else:
                     pass
                 glTexCoord2f(texupx, texupy+float(32)/512.0)
@@ -7519,7 +7528,10 @@ class DigDigApp(object):
                         tex5 = texmidx,texmidy
                         tex6 = texmidx,texmidy
                     glNewList(dList, GL_COMPILE)
-                    DrawCube((0,0,0), (0.33,0.33,0.33), tuple(self.gui.colors[c])+(255,), tex1,tex2,tex3,tex4,tex5,tex6, self.tex, False, 32.0) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+                    if b == BLOCK_COLOR:
+                        DrawCube((0,0,0), (0.33,0.33,0.33), tuple(self.gui.colors[c])+(255,), tex1,tex2,tex3,tex4,tex5,tex6, self.tex, False, 32.0) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
+                    else:
+                        DrawCube((0,0,0), (0.33,0.33,0.33), (255,255,255,255), tex1,tex2,tex3,tex4,tex5,tex6, self.tex, False, 32.0) # 텍스쳐는 아래 위 왼쪽 오른쪽 뒤 앞
                     glEndList()
                     glPopMatrix()
 
@@ -8879,4 +8891,10 @@ colors는 있으니까 인벤토리에 있는 블럭이 컬러블럭일 경우 M
 
 
 이제 환전소만 하면 된다.
+
+#인챈트 스크롤 복사하는 아이템이 고급 몬스터에게서 떨어진다. XXX:
+쩌는 인챈트 스크롤이 있으면 그걸 복사해서 쓸 수 있음!
+
+뭔가 멋진 성도 짓고 이래서 뭔가 멋진 게임을 만들 수 있을 거 같은데!
+
 """
