@@ -5048,24 +5048,16 @@ class MobGL(object):
                             plus = 0
                             if f == 2:
                                 x2 = x
-                                if x < 0:
-                                    x2 = 1.0 - abs(x)
-                                plus = abs(x2-int(x2))
+                                plus = (x2-math.floor(x2))
                             if f == 3:
                                 x2 = x
-                                if x < 0:
-                                    x2 = 1.0 - abs(x)
-                                plus = 1.0-abs(x2-int(x2))
+                                plus = 1.0-(x2-math.floor(x2))
                             if f == 4:
                                 z2 = z
-                                if z < 0:
-                                    z2 = 1.0 - abs(z)
-                                plus = abs(z2-int(z2))
+                                plus = (z2-math.floor(z2))
                             if f == 5:
                                 z2 = z
-                                if z < 0:
-                                    z2 = 1.0 - abs(z)
-                                plus = 1.0-abs(z2-int(z2))
+                                plus = 1.0-(z2-math.floor(z2))
                             plus *= 2
                             if plus > 1.0:
                                 plus = 1.0
@@ -6028,24 +6020,16 @@ class DigDigApp(object):
                             plus = 0
                             if f == 2:
                                 x2 = x
-                                if x < 0:
-                                    x2 = 1.0 - abs(x)
-                                plus = abs(x2-int(x2))
+                                plus = (x2-math.floor(x2))
                             if f == 3:
                                 x2 = x
-                                if x < 0:
-                                    x2 = 1.0 - abs(x)
-                                plus = 1.0-abs(x2-int(x2))
+                                plus = 1.0-(x2-math.floor(x2))
                             if f == 4:
                                 z2 = z
-                                if z < 0:
-                                    z2 = 1.0 - abs(z)
-                                plus = abs(z2-int(z2))
+                                plus = (z2-math.floor(z2))
                             if f == 5:
                                 z2 = z
-                                if z < 0:
-                                    z2 = 1.0 - abs(z)
-                                plus = 1.0-abs(z2-int(z2))
+                                plus = 1.0-(z2-math.floor(z2))
                             plus *= 2
                             if plus > 1.0:
                                 plus = 1.0
@@ -7771,7 +7755,7 @@ class DigDigApp(object):
                 }
         for sound in self.sounds.itervalues():
             sound.set_volume(0.8)
-        isFullScreen = 0#FULLSCREEN
+        isFullScreen = FULLSCREEN
         screen = pygame.display.set_mode((SW,SH), HWSURFACE|OPENGL|DOUBLEBUF|isFullScreen)#|FULLSCREEN)
         pygame.mouse.set_cursor(*pygame.cursors.load_xbm("./images/digdig/cursor.xbm", "./images/digdig/cursor-mask.xbm"))
         
@@ -8896,5 +8880,6 @@ colors는 있으니까 인벤토리에 있는 블럭이 컬러블럭일 경우 M
 쩌는 인챈트 스크롤이 있으면 그걸 복사해서 쓸 수 있음!
 
 뭔가 멋진 성도 짓고 이래서 뭔가 멋진 게임을 만들 수 있을 거 같은데!
-
+--------------
+마스터 맵이 있고 그걸 카피해서 다른 세이브파일을 만드는 그런 기능을 만들어야 한다.
 """
