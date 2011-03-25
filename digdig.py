@@ -647,13 +647,17 @@ class DynamicTextRenderer(object):
         availLen = 512-x
         needLen = w-availLen
         if needLen > 0:
-            needYNum = needLen/512
+            needYNum = (needLen/512)+2
             if y+needYNum*h >= 512:
                 self.surfIdx += 1
                 if self.surfIdx >= 4:
                     return
                 surf = self.surfs[self.surfIdx][0]
+                x,y = 0,0
                 surfid = self.surfIdx
+                availLen = 512
+                needLen = w-availLen
+
         self.surfs[self.surfIdx][2] = True
 
         newtextposList = []
@@ -755,6 +759,7 @@ class StaticTextRenderer(object):
             prevsurfid = 0
             prevsurf, texid, updated = self.surfs[0]
             prevtextposList = [[0,0,0,0]]
+
         textsurf = Text.GetSurf(self.font, text, (0, 0), color, border, borderColor)[0]
         if textsurf.get_height()*((textsurf.get_width()/512)+1) >= 512:
             return None
@@ -770,12 +775,15 @@ class StaticTextRenderer(object):
         availLen = 512-x
         needLen = w-availLen
         if needLen > 0:
-            needYNum = needLen/512
+            needYNum = (needLen/512)+2
             if y+needYNum*h >= 512:
                 texid = glGenTexturesDebug(1)
                 self.surfs += [[pygame.Surface((512,512), flags=SRCALPHA), texid, True]]
-                surf = self.surfs[-1]
+                surf = self.surfs[-1][0]
                 surfid = len(self.surfs)-1
+                x,y = 0,0
+                availLen = 512
+                needLen = w-availLen
             else:
                 self.surfs[prevsurfid][2] = True
 
@@ -807,6 +815,7 @@ class StaticTextRenderer(object):
                     x = 0
                     y += h
                     needLen -= 512
+
         self.texts += [[surfid, newtextposList]]
         return len(self.texts)-1
 
@@ -857,6 +866,7 @@ ITEM_AXE = GenId()
 ITEM_SHOVEL = GenId()
 ITEM_TORCH = GenId()
 ITEM_COAL = GenId()
+ITEM_CHARCOAL = GenId()
 ITEM_STICK = GenId()
 ITEM_CHEST = GenId()
 ITEM_GOLD = GenId()
@@ -1182,13 +1192,13 @@ class DigDigGUI(object):
             for g in range(5):
                 for r in range(5):
                     if r == 0 and b == 0 and g == 0:
-                        colors += [[r*51, g*51, b*51]]
+                        self.colors += [[r*51, g*51, b*51]]
                     elif r == 4 and b == 4 and g == 4:
-                        colors += [[r*51, g*51, b*51]]
+                        self.colors += [[r*51, g*51, b*51]]
                     elif r in [4,0] and b in [4,0] and g in [4,0]:
                         pass
                     else:
-                        colors += [[r*51, g*51, b*51]]
+                        self.colors += [[r*51, g*51, b*51]]
 
 
 
@@ -1220,14 +1230,19 @@ class DigDigGUI(object):
         self.resID = self.textRendererSmall.NewTextObject(u"- Resist -", (0,0,0))
 
         
-        # 컬러를 저장해야한다.
+        # 컬러를 저장해야한다. ok
         # invModeIdx = 0
         # modeIdx += 1
         # if modeIdx >= 4
             # modeIDx = 0
         # makes3을 만들 때에는 컬러를 잘 넣고, toolStrength있는데다가 컬러 인덱스를 넣어 저장하게 한다.
         # DoMake를 할 때에는 BLOCK_COLOR인지를 보고 컬러라는 속성을 아이템에 넣는다.
+        self.invModeIdx = 0
 
+        for i in range(60):
+            self.makes3[i] = MakeTool(u"Color Block", u"A color block", tuple(self.colors[i]), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (BLOCK_COLOR, [i], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
+        for i in range(59):
+            self.makes4[i] = MakeTool(u"Color Block", u"A color block", tuple(self.colors[i+60]), [(ITEM_SILVER, 1, TYPE_ITEM, (201,201,201))], (BLOCK_COLOR, [i+60], [], 1, TYPE_BLOCK), self.textRenderer, self.textRendererSmall)
 
         self.invSlotPos = []
         invX, invY = self.invRealPos
@@ -1326,7 +1341,7 @@ class DigDigGUI(object):
         for invItem in self.qbar+self.inventory:
             if invItem == ITEM_NONE:
                 continue
-            if invItem.type_ == item.type_ and invItem.count+item.count <= invItem.maxLen and invItem.name == item.name and invItem.stackable:
+            if invItem.type_ == item.type_ and invItem.count+item.count <= invItem.maxLen and invItem.name == item.name and invItem.stackable and invItem.colorIdx == item.colorIdx:
                 invItem.count += item.count
                 return True
 
@@ -1476,7 +1491,7 @@ class DigDigGUI(object):
                 self.dragPos = None
                 self.dragCont = None
             def Swap():
-                if self.draggingItem.type_ == cont[y*10+x].type_ and self.draggingItem.name == cont[y*10+x].name and self.draggingItem.stackable:
+                if self.draggingItem.type_ == cont[y*10+x].type_ and self.draggingItem.name == cont[y*10+x].name and self.draggingItem.stackable and self.draggingItem.colorIdx == cont[y*10+x].colorIdx:
                     if self.draggingItem.count+cont[y*10+x].count <= cont[y*10+x].maxLen:
                         cont[y*10+x].count += self.draggingItem.count 
                         self.dragging = False
@@ -1500,7 +1515,7 @@ class DigDigGUI(object):
                             self.draggingItem = None
                             self.dragPos = None
                             self.dragCont = None
-                    elif self.draggingItem.type_ == cont[y*10+x].type_ and self.draggingItem.name == cont[y*10+x].name and self.draggingItem.stackable:
+                    elif self.draggingItem.type_ == cont[y*10+x].type_ and self.draggingItem.name == cont[y*10+x].name and self.draggingItem.stackable and self.draggingItem.colorIdx == cont[y*10+x].colorIdx:
                         if self.draggingItem.count > 1:
                             half = self.draggingItem.count / 2
                             self.draggingItem.count -= half
@@ -1868,6 +1883,8 @@ class DigDigGUI(object):
         type_, stats, disallowed, count, name = tool.returns
         if name == TYPE_BLOCK:
             returneditem = Block(type_, count)
+            if type_ == BLOCK_COLOR:
+                returneditem.colorIdx = stats[0]
         elif name == TYPE_ITEM:
             if type_ in [ITEM_SENCHANTSCROLL, ITEM_GENCHANTSCROLL, ITEM_DENCHANTSCROLL]:
 
@@ -2579,7 +2596,10 @@ class DigDigGUI(object):
                         glBindTexture(GL_TEXTURE_2D, AppSt.tex)
                         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
                         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-                        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE)
+                        if item.returns[0] == BLOCK_COLOR:
+                            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
+                        else:
+                            glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE)
 
                         x = idx%10
                         y = (idx-x)/10
@@ -4205,7 +4225,6 @@ def InRect(x,y,w,h, x2, y2):
         return False
 
 g_id = 0
-
 BLOCK_EMPTY = GenId()
 BLOCK_WATER = GenId()
 BLOCK_GLASS = GenId()
@@ -4267,6 +4286,7 @@ class Item(object):
         self.name = name
         self.count = count
         self.color = color
+        self.colorIdx = 0
         self.optionalInventory = inv
         self.element = element
         self.stats = stats
@@ -4296,58 +4316,56 @@ class WorldObject(object):
         self.pos = pos
 
 BLOCK_TEX_COORDS = [0,0, 0,0, 0,0,
-    14,0, 14,0, 14,0,
-    1,3, 1,3, 1,3,
-    1,5, 1,5, 1,5,
-    1,0, 1,0, 1,0,
-    5,1, 4,1, 5,1,
-    3,5, 3,5, 3,5,
-    7,0, 7,0, 7,0,
-    9,0, 8,0, 10,0,
-    0,1, 0,1, 0,1,
+        14,0, 14,0, 14,0,
+        1,3, 1,3, 1,3,
+        1,5, 1,5, 1,5,
+        1,0, 1,0, 1,0,
+        5,1, 4,1, 5,1,
+        3,5, 3,5, 3,5,
+        7,0, 7,0, 7,0,
+        9,0, 8,0, 10,0,
+        0,1, 0,1, 0,1,
 
-    2,1, 2,1, 2,1,
-    3,1, 3,1, 3,1,
-    4,0, 4,0, 4,0,
-    6,1, 6,1, 6,1,
-    7,1, 7,2, 7,3,
-    8,1, 8,2, 8,3,
-    2,2, 2,2, 2,2,
-    0,2, 0,2, 0,2,
-    1,6, 1,6, 1,6,
-    0,0, 0,0, 0,0,
+        2,1, 2,1, 2,1,
+        3,1, 3,1, 3,1,
+        4,0, 4,0, 4,0,
+        6,1, 6,1, 6,1,
+        7,1, 7,2, 7,3,
+        8,1, 8,2, 8,3,
+        2,2, 2,2, 2,2,
+        0,2, 0,2, 0,2,
+        1,6, 1,6, 1,6,
+        0,0, 0,0, 0,0,
 
-    0,0, 0,0, 0,0,
-    9,4, 9,4, 9,4,
-    7,4, 7,4, 7,4,
-    10,4, 10,4, 10,4,
-    11,4, 11,4, 11,4,
-    0,0, 0,0, 0,0,
-    0,0, 0,0, 0,0,
-    0,0, 0,0, 0,0,
-    0,0, 0,0, 0,0,
-    0,0, 0,0, 0,0,
-    0,0, 0,0, 0,0,
+        0,0, 0,0, 0,0,
+        9,4, 9,4, 9,4,
+        7,4, 7,4, 7,4,
+        10,4, 10,4, 10,4,
+        11,4, 11,4, 11,4,
+        0,0, 0,0, 0,0,
+        0,0, 0,0, 0,0,
+        0,0, 0,0, 0,0,
+        0,0, 0,0, 0,0,
+        0,0, 0,0, 0,0,
+        0,0, 0,0, 0,0,
 
-    0,0, 0,0, 0,0,
-    0,0, 0,0, 0,0,
-    0,0, 0,0, 0,0,
-    0,0, 0,0, 0,0,
-    12,6, 12,6, 12,6,
-    13,6, 13,6, 13,6,
-    0,0, 0,0, 0,0,
-    0,0, 3,0, 2,0,
-    2,0, 2,0, 2,0,
-    2,7,2,7,2,7,
-    11,0,11,0,11,0,
-    8,4, 8,4, 8,4,
+        0,0, 0,0, 0,0,
+        0,0, 0,0, 0,0,
+        0,0, 0,0, 0,0,
+        0,0, 0,0, 0,0,
+        12,6, 12,6, 12,6,
+        13,6, 13,6, 13,6,
+        0,0, 0,0, 0,0,
+        0,0, 3,0, 2,0,
+        2,0, 2,0, 2,0,
+        2,7,2,7,2,7,
+        11,0,11,0,11,0,
+        8,4, 8,4, 8,4,
 
-    4,4, 4,4, 4,4,
-    5,4, 5,4, 5,4,
-    6,4, 6,4, 6,4,
-    0,4,0,4,0,4,
-
-    
+        4,4, 4,4, 4,4,
+        5,4, 5,4, 5,4,
+        6,4, 6,4, 6,4,
+        0,4,0,4,0,4,
     ]
 
 
@@ -6252,7 +6270,7 @@ class DigDigApp(object):
                 return
             if (x,y,z) in self.gui.spawns:
                 def Delete():
-                    block, items = self.chunks.DigBlock(x,y,z)
+                    block, items, color = self.chunks.DigBlock(x,y,z)
                     if block:
                         self.SpawnBlockItems(x,y,z, block)
                     del self.gui.spawns[(x,y,z)]
@@ -6271,7 +6289,7 @@ class DigDigApp(object):
 
             if (x,y,z) in self.gui.codes:
                 def Delete():
-                    block, items = self.chunks.DigBlock(x,y,z)
+                    block, items, color = self.chunks.DigBlock(x,y,z)
                     if block:
                         self.SpawnBlockItems(x,y,z, block)
                     del self.gui.codes[(x,y,z)]
@@ -6434,7 +6452,7 @@ class DigDigApp(object):
             for zz in range(7):
                 for yy in range(7):
                     for xx in range(7):
-                        block, items = self.chunks.DigBlock(int(x-3+xx), int(y-3+yy), int(z-3+zz))
+                        block, items, color = self.chunks.DigBlock(int(x-3+xx), int(y-3+yy), int(z-3+zz))
                         if block:
                             self.SpawnBlockItems(int(x-3+xx), int(y-3+yy), int(z-3+zz), block)
                         if items:
@@ -7109,7 +7127,7 @@ class DigDigApp(object):
                         self.maxBlockHP = hp
 
                     x,y,z,f,b = self.lastBlock
-                    block, items = self.chunks.DigBlock(x,y,z)
+                    block, items, color = self.chunks.DigBlock(x,y,z)
                     if block:
                         if b in [BLOCK_GRASS, BLOCK_DIRT, BLOCK_SAND, BLOCK_LEAVES, BLOCK_GRAVEL]:
                             self.sounds["ShovelDone"].play()
@@ -7664,6 +7682,18 @@ class DigDigApp(object):
     def OpenInventory(self, t, m, k):
         if k.pressedKey == K_c:
             self.gui.charTab = not self.gui.charTab
+        elif k.pressedKey == K_i:
+            self.gui.invModeIdx += 1
+            if self.gui.invModeIdx >= 4:
+                self.gui.invModeIdx = 0
+            if self.gui.invModeIdx == 0:
+                self.gui.makes = self.gui.makes1
+            if self.gui.invModeIdx == 1:
+                self.gui.makes = self.gui.makes2
+            if self.gui.invModeIdx == 2:
+                self.gui.makes = self.gui.makes3
+            if self.gui.invModeIdx == 3:
+                self.gui.makes = self.gui.makes4
         if k.pressedKey == K_TAB:
             self.gui.qbMode2 = not self.gui.qbMode2
             if self.gui.qbMode2:
