@@ -4165,7 +4165,7 @@ class Camera:
         if factor < 0.0:
             factor = 0.0
         if factor*AppSt.speed > 1.0:
-            factor = 1.0/AppSt.speed
+            factor = 1.0
         self.directionVector = self.directionVector.Normalized()
         if z and not x:
             factor *= 0.5
@@ -4173,15 +4173,10 @@ class Camera:
             leftVec = upVector.Cross(self.directionVector)
             leftVec = leftVec.MultScalar(-z).Normalized()
             forVector = upVector.Cross(leftVec)
-            while factor > 1.0:
-                forVector = upVector.Cross(leftVec).Normalized()
-                forVector = forVector.MultScalar(AppSt.speed)
-                forVector = self.directionVector.Normalized().MultScalar(z).MultScalar(AppSt.speed)+forVector
-                self.pos += forVector
-                factor -= 1.0
-            forVector = upVector.Cross(leftVec).Normalized()
-            forVector = forVector.MultScalar(AppSt.speed*factor)
-            forVector = self.directionVector.Normalized().MultScalar(z).MultScalar(AppSt.speed*factor)+forVector
+            if AppSt.chunks.InWater(self.pos.x, self.pos.y, -self.pos.z):
+                forVector = self.GetDirV().Normalized().MultScalar(AppSt.speed*factor)
+            else:
+                forVector = forVector.Normalized().MultScalar(AppSt.speed*factor)
             self.pos += forVector
 
         if x and not z:
@@ -4883,7 +4878,7 @@ class MobGL(object):
         self.prevJump = 0
         self.jumpDelay = 700
         self.prevJumpY = 0.0
-        self.speed = 0.1
+        self.speed = 0.15
         self.angle = 0.0
         # 방향이동, 점프등을 구현한다.
         # 이동하는 방향으로 dir벡터를 구하고
@@ -5932,7 +5927,7 @@ class DigDigApp(object):
         self.prevFactor = 0.0
         self.prevFall = -1
         self.prevJumpY = 0.0
-        self.speed = 0.18
+        self.speed = 0.23
         self.guiMode = False
         self.guiPrevTime = 0
         self.guiRenderDelay = 500
