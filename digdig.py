@@ -6326,11 +6326,11 @@ class DigDigApp(object):
                     return
 
             if item and item.name == "Block":
-                self.sounds["Put"].play()
 
                 mat = ViewingMatrix()
                 if mat is not None:
                     if self.chunks.ModBlock(pos, dir_, 9, item.type_, self.bound, 0, mat, item.colorIdx) == -1:
+                        self.sounds["Put"].play()
                         if item.type_ == BLOCK_SPAWNER:
                             if f == 0:
                                 xyz = x,y-1,z
@@ -7065,16 +7065,17 @@ class DigDigApp(object):
             if x==x2 and y==y2 and z==z2 and block == block2 and block != BLOCK_WATER:
                 self.digging = True
             if t-self.prevDig > self.digDelay:
-                if block in [BLOCK_GRASS, BLOCK_DIRT, BLOCK_SAND, BLOCK_LEAVES, BLOCK_GRAVEL]:
-                    self.sounds["Shovel"].play()
-                else:
-                    self.sounds["Dig"].play()
 
                 if block in [BLOCK_CODE, BLOCK_SPAWNER] and (block in self.gui.spawns or block in self.gui.codes):
                     return
                 x2,y2,z2,face2,block2 = self.prevBlock
                 if x==x2 and y==y2 and z==z2 and block == block2 and block != BLOCK_WATER:
                     tool = self.gui.qbar[self.gui.selectedItem]
+                    if block in [BLOCK_GRASS, BLOCK_DIRT, BLOCK_SAND, BLOCK_LEAVES, BLOCK_GRAVEL]:
+                        self.sounds["Shovel"].play()
+                    else:
+                        self.sounds["Dig"].play()
+
                     if tool and tool.name == TYPE_ITEM and tool.type_ == ITEM_PICKAXE and block not in [BLOCK_GRASS, BLOCK_DIRT, BLOCK_SAND, BLOCK_LEAVES, BLOCK_GRAVEL]+[BLOCK_LOG, BLOCK_WOOD]:
                         self.blockHP -= (float(t - self.prevDig)*tool.stats[0]/100.0)
                         tool.count -= int(float(t-self.prevDig)*tool.stats[1]/50.0)
@@ -8883,6 +8884,4 @@ colors는 있으니까 인벤토리에 있는 블럭이 컬러블럭일 경우 M
 --------------
 마스터 맵이 있고 그걸 카피해서 다른 세이브파일을 만드는 그런 기능을 만들어야 한다.
 ----------------------
-일단 여기 있는 인챈트, 카지노 기능을 땅파기 대신 클릭으로 시간당 얼마 버는거를 만들어서
-몹잡고 이러는걸 웹게임으로 스마트폰으로 되도록 만들어 보자.
 """
