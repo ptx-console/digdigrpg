@@ -2882,7 +2882,7 @@ cdef class Chunks:
                     retBlock = -1
                     chunks[ii].chunk[c*128*128+b*128+a] = block
                     chunks[ii].colors[c*128*128+b*128+a] = color
-                    if chunks[ii].heights[c*128+a] < b:
+                    if chunks[ii].heights[c*128+a] < b and b != BLOCK_COLOR and b != BLOCK_WATER and b != BLOCK_GLASS:
                         chunks[ii].heights[c*128+a] = b
                     self.UpdateChunks(octrees[ii], chunks[ii], a,b,c)
                 break

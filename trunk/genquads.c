@@ -1334,7 +1334,7 @@ int IsOpaque(unsigned char block_id)
 }
 int IsWaterGlass(unsigned char block_id)
 {
-    if(block_id == BLOCK_WATER || block_id == BLOCK_GLASS)
+    if(block_id == BLOCK_WATER || block_id == BLOCK_GLASS || block_id == BLOCK_COLOR)
         return true;
     else
         return false;
@@ -2300,7 +2300,7 @@ void FillHeights(Chunk *chunk)
             for(i=0;i < 128;++i)
             {
                 char b = chunk->chunk[k*zSize+j*128+i];
-                if(b != BLOCK_CHEST && b != BLOCK_WATER && b != BLOCK_GLASS && b != BLOCK_EMPTY && chunk->heights[k*128+i] < j) // XX: 물인지 아닌지를 보야
+                if(b != BLOCK_COLOR && b != BLOCK_CHEST && b != BLOCK_WATER && b != BLOCK_GLASS && b != BLOCK_EMPTY && chunk->heights[k*128+i] < j) // XX: 물인지 아닌지를 보야
                 {
                     chunk->heights[k*128+i] = j;
                 }
@@ -2731,7 +2731,7 @@ int Check6Side(int x, int y, int z, int ox, int oy, int oz, int pos[9][3], Chunk
         if(curChunk && dynb >= 0 && dynb < 128)
         {
             block = curChunk->chunk[(dznb)*xzSize+(dynb)*128+(dxnb)];
-            if(block != BLOCK_EMPTY && block != BLOCK_GLASS && block != BLOCK_LEAVES && block != BLOCK_WATER && block != BLOCK_CHEST)
+            if(block != BLOCK_COLOR && block != BLOCK_EMPTY && block != BLOCK_GLASS && block != BLOCK_LEAVES && block != BLOCK_WATER && block != BLOCK_CHEST)
                 foundCount++;
         }
 
@@ -3788,7 +3788,7 @@ void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64],
                             }
 
                         }
-                        if(block == BLOCK_EMPTY || block == BLOCK_LEAVES || block == BLOCK_CHEST || (block == BLOCK_WATER && curBlock != BLOCK_WATER) || (block == BLOCK_GLASS && curBlock != BLOCK_GLASS))// 만약 현재 옆블럭이 빈 블럭이거나 물/유리라면, 이거 왜 잘 안되지? 시야에따라서 잘 보이기도 하고 안보이기도 한다. OpenGL의 문제인가? 아 알파.
+                        if(block == BLOCK_EMPTY || block == BLOCK_LEAVES || block == BLOCK_CHEST || (block == BLOCK_WATER && curBlock != BLOCK_WATER) || (block == BLOCK_COLOR && curBlock != BLOCK_COLOR) || (block == BLOCK_GLASS && curBlock != BLOCK_GLASS))// 만약 현재 옆블럭이 빈 블럭이거나 물/유리라면, 이거 왜 잘 안되지? 시야에따라서 잘 보이기도 하고 안보이기도 한다. OpenGL의 문제인가? 아 알파.
                         // 아. 아무래도. 폭포와 물을 분리하고, 물은 가장 높은곳에 있는 물의 버퍼를 만들어서 가장 높은곳에 있는 물만
                         // 렌더링하게 하고, 폭포는 아무데나 렌더링하고
                         // 유리는 6면으로는 절대 겹쳐지지 않도록 만들고
@@ -3801,7 +3801,7 @@ void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64],
                         // 그렇다면 주변에 있는 블럭에 대한 6면 역시 검사해야 하나? 으아...느리겠구먼.
                         // 물이나 유리일때만 검사하면 된다.
                         {
-                            if((block == BLOCK_WATER && curBlock != BLOCK_WATER) || (block == BLOCK_LEAVES && curBlock != BLOCK_LEAVES) || (block == BLOCK_GLASS && curBlock != BLOCK_GLASS))
+                            if((block == BLOCK_WATER && curBlock != BLOCK_WATER) || (block == BLOCK_LEAVES && curBlock != BLOCK_LEAVES) || (block == BLOCK_GLASS && curBlock != BLOCK_GLASS) || (block == BLOCK_COLOR && curBlock != BLOCK_COLOR))
                             {
                                 if(Check6Side(xnb, ynb, znb, ox, oy, oz, pos, chunks))
                                     continue;
@@ -3892,7 +3892,7 @@ void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64],
                                 TestSunLit(a, b, c, curLitChunk, chunks, pos, A, B, C, 1, &sunstrength[8]);
                             }
 
-                            if(curBlock == BLOCK_WATER || curBlock == BLOCK_GLASS || curBlock == BLOCK_LEAVES || curBlock == BLOCK_CHEST)
+                            if(curBlock == BLOCK_WATER || curBlock == BLOCK_GLASS || curBlock == BLOCK_LEAVES || curBlock == BLOCK_CHEST || curBlock == BLOCK_COLOR)
                             {
                                 //if(IsPolyFront(j, (xBO), (yBO), (zBO),vx,vy,vz)) // Front검사도 더이상 하지 않는다.
                                     // 프러스텀컬링 front검사는 할 필요가 없다. 제대로 된OpenGL에서는 이런걸 알아서 한다.
@@ -3933,7 +3933,21 @@ void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64],
 
                                     GenQuad(&aV[drawIdx][aIdx[drawIdx]*12], j, (xBO), (yBO), (zBO));
                                     FillTex(&aT[drawIdx][aIdx[drawIdx]*8], j, chunk->chunk[(zBz)*xzSize+(yBy)*128+(xBx)]);
-                                    FillColor((xBO), (yBO), (zBO), j, &aC[drawIdx][aIdx[drawIdx]*12], sunstrength, extras);
+                                    if(curBlock == BLOCK_COLOR)
+                                    {
+                                        unsigned char *out1 = &aC[drawIdx][aIdx[drawIdx]*12];
+                                        int iout=0;
+                                        for(iout=0;iout<4;++iout)
+                                        {
+                                            out1[iout*3+0] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][0];
+                                            out1[iout*3+1] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][1];
+                                            out1[iout*3+2] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][2];
+                                        }
+                                    }
+                                    else
+                                    {
+                                        FillColor((xBO), (yBO), (zBO), j, &aC[drawIdx][aIdx[drawIdx]*12], sunstrength, extras);
+                                    }
                                     aIdx[drawIdx] += 1;
                                 }
                             }
@@ -3970,21 +3984,7 @@ void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64],
                                     TestSunLit(xBx, yBy, zBz, chunk, chunks, pos, ox, oy, oz, j, &sunstrength[0]);
                                     GenQuad(&tV[drawIdx][tIdx[drawIdx]*12], j, (xBO), (yBO), (zBO));
                                     FillTex(&tT[drawIdx][tIdx[drawIdx]*8], j, chunk->chunk[(zBz)*xzSize+(yBy)*128+(xBx)]);
-                                    if(curBlock == BLOCK_COLOR)
-                                    {
-                                        unsigned char *out1 = &tC[drawIdx][tIdx[drawIdx]*12];
-                                        int iout=0;
-                                        for(iout=0;iout<4;++iout)
-                                        {
-                                            out1[iout*3+0] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][0];
-                                            out1[iout*3+1] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][1];
-                                            out1[iout*3+2] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][2];
-                                        }
-                                    }
-                                    else
-                                    {
-                                        FillColor((xBO), (yBO), (zBO), j, &tC[drawIdx][tIdx[drawIdx]*12], sunstrength, extras);
-                                    }
+                                    FillColor((xBO), (yBO), (zBO), j, &tC[drawIdx][tIdx[drawIdx]*12], sunstrength, extras);
                                     tIdx[drawIdx] += 1;
                                 }
                                 else
@@ -4009,21 +4009,7 @@ void GenQuads(float *tV[64], float *tT[64], unsigned char *tC[64], int tIdx[64],
                                     }
                                     GenQuad(&nsV[drawIdx][nsIdx[drawIdx]*12], j, (xBO), (yBO), (zBO));
                                     FillTex(&nsT[drawIdx][nsIdx[drawIdx]*8], j, chunk->chunk[(zBz)*xzSize+(yBy)*128+(xBx)]);
-                                    if(curBlock == BLOCK_COLOR)
-                                    {
-                                        unsigned char *out1 = &nsC[drawIdx][nsIdx[drawIdx]*12];
-                                        int iout=0;
-                                        for(iout=0;iout<4;++iout)
-                                        {
-                                            out1[iout*3+0] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][0];
-                                            out1[iout*3+1] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][1];
-                                            out1[iout*3+2] = colors[chunk->colors[(zBz)*xzSize+(yBy)*128+(xBx)]][2];
-                                        }
-                                    }
-                                    else
-                                    {
-                                        FillColor((xBO), (yBO), (zBO), j, &nsC[drawIdx][nsIdx[drawIdx]*12], sunstrength, extras);
-                                    }
+                                    FillColor((xBO), (yBO), (zBO), j, &nsC[drawIdx][nsIdx[drawIdx]*12], sunstrength, extras);
                                     nsIdx[drawIdx] += 1;
                                 }
                             }
