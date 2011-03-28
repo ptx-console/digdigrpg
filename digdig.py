@@ -7833,7 +7833,7 @@ class DigDigApp(object):
             self.scripts[coord] = ScriptLauncher(coord)
         pygame.mixer.music.load("./sounds/digdigtheme.wav")
         pygame.mixer.music.set_volume(0.2)
-        pygame.mixer.music.play(-1)
+        #pygame.mixer.music.play(-1)
         def prr():
             print 'aa'
         """
@@ -8876,7 +8876,12 @@ colors는 있으니까 인벤토리에 있는 블럭이 컬러블럭일 경우 M
 쩌는 인챈트 스크롤이 있으면 그걸 복사해서 쓸 수 있음!
 
 뭔가 멋진 성도 짓고 이래서 뭔가 멋진 게임을 만들 수 있을 거 같은데!
+
+
+게임 스토리가 있어야 하는데 그걸 먼저 써야겠다. 한글로 쓰고 영어로 번역한다.
+설명체로 쓴다. 설명체로도 충분히 스토리가 가능함
 --------------
 마스터 맵이 있고 그걸 카피해서 다른 세이브파일을 만드는 그런 기능을 만들어야 한다.
 ----------------------
+이게 완성되면 웹게임으로 슬롯머신 인챈트 그걸 한다. 이걸 완성하고 한다.
 """
