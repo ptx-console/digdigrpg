@@ -3381,6 +3381,9 @@ cdef class Chunks:
             #GL.glDisable(GL.GL_DEPTH_TEST)
 
             GL.glEnable(GL.GL_BLEND)
+            #GL.glDisable(GL.GL_DEPTH_TEST) 이걸 해버리면 산 뒤에있는 transparent오브젝트까지 렌더링된다.
+            #폴리곤을... 현재 뷰포인트에서 X정렬, Y정렬, Z정렬을 하고 뷰포인트가 X의 -쪽이면 X의 -부터 그리고 Y의 -쪽이면 Y의 -부터 그리고
+            # 뭐 이런식으로 인덱스 버퍼를 정렬하면 될 것 같은데. XXX
 
             for i in range(64):
                 curx,cury,curz = self.curDrawnCoords[0][i]
