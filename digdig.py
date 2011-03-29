@@ -1779,33 +1779,26 @@ class DigDigGUI(object):
         # 미니맵이나 전체지도 만들어야함 XXX:
 
 
-        # 나머지는 +1~3
-        # 1/10확률로 +5
-        # 1/100 확률로 +10
-        # 1/1000 확률로 +20
-        # 1/10000 확률로 +30
-        # 1/100000 확률로 +50
-        # randint로 0~100000
-        # 90001~90010 -> +30
-        # 80001~80100 -> +20
-        # 70001~71000 -> +10
-        # 60000~70000 -> +5
-        # 50000 -> +50
-        # 나머지 -> +1~3
+        # 나머지는 +1~5
+        # 1/10확률로 +10
+        # 1/100 확률로 +20 -- 보통 이걸 뽑을 듯.
+        # 1/1000 확률로 +100 -- 대박, 보스급 몹이 나온다. 일정 확률로 +1000 스크롤을 드랍한다 - 한 100마리 잡으면 나오게 한다. 이 쯤 되면 뽑기가 더 쉬울 정도로 돈을 벌테니까. 실버 골드 다이아 5000개 정도는 껌으로 얻게 한다.
+        # 1/10000 확률로 +1000 -- 나오긴 하나. 특이한 몹이 나온다. 일정 확률로 +5000 스크롤을 드랍한다. 한 1000마리 잡으면 나오게 한다.
+        # 1/100000 확률로 +5000 -- 이게 나오면 진짜 대박.. 숨겨진 최종보스가 나온다.
         def GenPlus():
             rand = random.randint(0,100000)
             if rand == 50000:
-                return 50
+                return 5000
             elif 60000 <= rand <= 70000:
-                return 5
-            elif 70001 <= rand <= 71000:
                 return 10
-            elif 80001 <= rand <= 80100:
+            elif 70001 <= rand <= 71000:
                 return 20
+            elif 80001 <= rand <= 80100:
+                return 100
             elif 90001 <= rand <= 90010:
-                return 30
+                return 1000
             else:
-                return random.randint(1,3)
+                return random.randint(1,5)
         if gentype == ITEM_SENCHANTSCROLL:
             skills = [skill.skill for skill in AppSt.entity.magics.itervalues()]
             skills += [skill.skill for skill in AppSt.entity.swordSkills.itervalues()]
@@ -1813,8 +1806,9 @@ class DigDigGUI(object):
             skills += [skill.skill for skill in AppSt.entity.spearSkills.itervalues()]
             skills += [skill.skill for skill in AppSt.entity.knuckleSkills.itervalues()]
             bonusSkills = {}
+            plus = GenPlus()
             for skill in skills:
-                bonusSkills[skill.name] = GenPlus()
+                bonusSkills[skill.name] = plus
 
             selected = [bonusSkills.keys()[random.randint(0, len(bonusSkills.values())-1)] for i in range(3)]
             params = {}
@@ -1825,21 +1819,22 @@ class DigDigGUI(object):
                     params[selectedKey] = bonusSkills[selectedKey]
             element = FightingElements("Silver", (0,0,0), params) # 여기서 아이템을 제작하는 코드가 다있다. XXX:
         if gentype == ITEM_GENCHANTSCROLL:
-            basehp = GenPlus()
-            basemp = GenPlus()
-            str = GenPlus()
-            dex = GenPlus()
-            int_ = GenPlus()
-            atk = GenPlus()
-            dfn = GenPlus()
-            fatk = GenPlus()
-            eatk = GenPlus()
-            iatk = GenPlus()
-            patk = GenPlus()
-            fres = GenPlus()
-            eres = GenPlus()
-            ires = GenPlus()
-            pres = GenPlus()
+            plus = GenPlus()
+            basehp = plus
+            basemp = plus
+            str = plus
+            dex = plus
+            int_ = plus
+            atk = plus
+            dfn = plus
+            fatk = plus
+            eatk = plus
+            iatk = plus
+            patk = plus
+            fres = plus
+            eres = plus
+            ires = plus
+            pres = plus
             stats = {
                     "HP": basehp,
                     "MP": basemp,
@@ -1867,12 +1862,13 @@ class DigDigGUI(object):
             element = FightingElements("Gold", (0,0,0), params)
 
         if gentype == ITEM_DENCHANTSCROLL:
-            sword = GenPlus()
-            mace = GenPlus()
-            spear = GenPlus()
-            knuckle = GenPlus()
-            armor = GenPlus()
-            magic = GenPlus()
+            plus = GenPlus()
+            sword = plus
+            mace = plus
+            spear = plus
+            knuckle = plus
+            armor = plus
+            magic = plus
             skills = {"Sword Skill": sword, "Mace Skill": mace, "Spear Skill": spear, "Knuckle Skill": knuckle, "Armor Skill": armor, "Magic Skill": magic}
             selected = [skills.keys()[random.randint(0, len(skills.values())-1)] for i in range(3)]
             params = {}
@@ -8880,8 +8876,17 @@ colors는 있으니까 인벤토리에 있는 블럭이 컬러블럭일 경우 M
 
 게임 스토리가 있어야 하는데 그걸 먼저 써야겠다. 한글로 쓰고 영어로 번역한다.
 설명체로 쓴다. 설명체로도 충분히 스토리가 가능함
+
+
++수준이 높을수록 더 강한 몹도 나온다. 즉, +는 강한 몹을 나오게 하기 위한 것.
+아이템 제작 10만번을 채우면 +5000이 무조건 나오게 할까 말까
 --------------
 마스터 맵이 있고 그걸 카피해서 다른 세이브파일을 만드는 그런 기능을 만들어야 한다.
 ----------------------
 이게 완성되면 웹게임으로 슬롯머신 인챈트 그걸 한다. 이걸 완성하고 한다.
+---------------------
+스크롤 2개로 스크롤 만드는 게 문제가 있다. 좋은게 나왔는데 그걸 써버릴 가능성이 있음.
+스크롤을 실버로 바꾸게 할까...
+스크롤을 드래그 해서 드랍해야지만 팔리도록 특별하게 한다.
+컬러블럭도 그렇게 한다.
 """
