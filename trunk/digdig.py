@@ -8938,4 +8938,129 @@ colors는 있으니까 인벤토리에 있는 블럭이 컬러블럭일 경우 M
 wxPython등을 써서 OnDraw를 설정할 때 다시 그려야하는 영역만 다시 그리는 똑똑한 코드가 필요하다.
 --------------------------
 구텐베르크에서 여러 스토리를 읽어와서 각색만 해서 연출만 다르게 하고 그대로 쓴다.
+오즈의 마법사가 에피소드 하베스팅에 꽤 괜찮은 것 같고, 허클베리 핀 같은 것도 괜찮은 것 같다.
+책이 정말 많은데 에피소드를 모아서 나열하고, 그 에피소드를 지나가면서 메인스토리가 진행하도록 한다.
+메인스토리와 에피소드는 별개이지만 메인스토리와의 연관성이 조금씩 있어야 하니까 그걸 좀 맞게 진행한다.
+연관성이란 건 같은 캐릭터나 그런 사람들이 연결되거나 그런 쪽으로 가장 연관성이 있고, 같은 물품이나 아이템 등도 연관성이 있다.
+어차피 완성도 따질 것도 아니고 게임에서 스토리는 중요치 않은 편이니 발로 쓸 스토리지만 꽤 흥미있을 것 같다.
+Tik-tok of oz를 성인버젼으로 각색해서 DigDig에 어울리고 판타지에 어울리도록 각색하면 될 듯 하다.
+
+처음 시작은 일하기 싫어로 시작해서
+여러가지를 겪은 후에
+그냥 전에 하던 일이나 계속 해야겠다 이걸로 끝난다.
+무슨 북한 선전물 같긴 한데 딱히 떠오르는 게 이거니 어쩔 수 없지.
+
+
+
+Workaholic
+
+"I don't want to work!", Jake cried. "I can't code anymore. My mind won't obey my command anymore!"
+
+Jake was a Programmer. He worked at Casino Enmity as a master developer.
+
+In Kingdom Vegas, people worked as a miner at day, and after work they all submitted themselves to God, named Vegas. People rarely encountered with silvers, golds and diamonds while mining and they spent all their earnings in gambling in nearest city casino.
+
+People always wanted have their own homes. In glasses, In colored glasses. To buy colored glasses they needed money.
+All they had abundantly was woods and stones, and people didn't like wood and stones. There were so many stone and wood houses and people didn't like it.
+
+They dreamt of hitting a jackpot and building a large house or castle or tower with colored glasses.
+
+Besides miners, there also was Warriors and Magicians. By killing monsters they could earn some silvers. Every one of Kingdom Vegas wanted to build a house with colored glasses. So Warriors also gambled.
+
+
+Jake was updating a World Maintenance code. Kingdom Vegas was mainly a Spirit City. Actually, people in Kingdom Vegas didn't have their own body. Everyone was just a spirit. And they made a spirit program to make realize a Virtual World and people connected themselves into the Spirit Core and that was how they could communicate, work, spend time. Without the Spirit Code, they could not communicate with each other, nor could do something fun or interesting. All they could do was feel eternal emptiness around themselves and suffer. So a spirit named Vegas sacrificed himself and made a Virtual World where people could communicate with each other and have a fun time.
+
+First it was just bunch of mother nature. So people dug the ground and cut the trees and built themselves a home and community centers. And then people invented more sophiscated building block named Color Block. But since a world has limited supply of Vegas' spirit, not everyone could have colored blocks. Actually colored blocks were pretty abundant but there were so many spirits. To get a colored block they had to sacrifice a silver into the Spirit Core. There were silver everywhere and you could get silver with gold and diamonds and you could dig up silvers and golds and diamonds anywhere deeper than level 64. World was actually infinite, so people dug and dug and they got tired of digging ground so they made a Casino and they Gambled. It's so hard work to just dig around, people wanted to boast in their homes to forget there pain. They were spirit. Nobody HAD to work. They worked because it was fun. Spirits don't die. They just eternally suffer. But the fun soon became another suffering. So they invented gambling.
+
+With this great Spirit Core people started build a Kingdom and they called it Kingdom Vegas. And people made a city.
+
+World was made of spirit named Vegas. And since it was just a mind of a spirit, it always kept breaking. So there were many Core Programmers to maintain their world. Spirit Vegas was a spirit no more. Spirit Vegas became an energy and it supported this Virtual World. Nobody knew what spirit vegas would feel or think. They just lived there. Some people called Vegas a God and some people called Vegas a stupid moron. Since nobody knows what sacrificing himself would cause how much pain.
+
+Jake was one of the core programmers. If you become a core programmer and maintain a world for 50 years, you could get a bunch of diamonds and get huge number of Color Blocks and build another City and boast in their pride eternally. But programming was really hard. It's just that, it was easier than and funnier than digging the ground. Jake needed something that could work easily and faster.
+
+"Do I have to do this for another 23 years.... if only I could do anything without pain and suffering.... even doing nothing alone would be fantastic!", Jake thought.
+
+"Hey Jake! It's about the Gamble Time. Fix it already!", John said.
+
+"Why, you could fix it for me", Jake said.
+
+"I'm fixing my own quota. Do your work.", John said.
+
+"I don't want to work. How are you managing this stupid workload. I mean, it's easier than digging around but it's still hard. You could boast about being a programmer and be happy but it's still a lot of work", Jake said.
+
+"You want to know the secret? I only have 5 months left until my payday.", John said.
+
+"Oh my! It's already been that long? Hey maybe some guy could sacrifice himself once more and Core won't break that easily!", Jake said.
+
+"But who would suffer the great pain of sacrifice?", John said.
+
+"I don't know... someone stupid enough to sacrifice himself like Vegas did. Hahaha.", Jake said.
+
+"I heard that there is somewhere called Heaven and in that place, there is no suffering.", John said.
+
+"Wow.... that is like my dream. I mean, if we didn't suffer in the first place, we don't have to have a fun anyways. Isn't it?", Jake said.
+
+"I don't know.... fix it already!", John said.
+
+Jake finally got it and a glitch in the entrance of Casino fixed and people could come in and submit themselves to God Vegas. It means, they gambled.
+
+
+"Ohhhhhhhhhhhhhh myyyyyyyyyyyyyyyyyyyyyyyyyyyy !!!!!!!!!!!!!!!!!!!!!!", Someone cried.
+
+"I've got 64 diamonds! Woohoo!"
+
+Jake heard it and laughed. "Idiots..... I could get 10000 chestful of diamonds in 23 years.... even the jackpots still 10 chests! You are just giving ME all your diamonds for ME!", Jake thought.
+
+Jake went his way home. In his way home, suddenly a magician appeared. "Give me the access code to the Casino or I'll make you suffer just like Vegas!", Magician said.
+
+"Wh...what? What access code?", Jake said.
+
+"Access code! So I can hack into the slotmachine system and get infinite jackpots!", Magician said.
+
+"Ha there is no such a thing! Mammon himself created that machine and that is one thing where glitch doesn't appear! And what do you mean suffer like Vegas! Vegas doesn't exist anymore! It's a Kingdom! Can you make me like Vegas so I can be the Core too?", Jake said.
+
+"Haha you don't remember anything do you? Since you don't know about access code let me just tell you how you can get so much diamonds. Go below. Below the indestructable blocks there is a Cave. Go in there. And you will see.", Magician said.
+
+"Wait... what? If you could get so much diamonds, why would you need some stupid access code? Why don't YOU go there?", Jake said.
+
+"Hahaha you don't know anything. You don't remember anything!!!! You Idiot!!!!!!!!!!!", Magician said it and disappeared into thin air.
+
+"What was that all about... why isn't he working hard just like everyone else? There is no such a thing as shortcut anyways... you either dig or gamble or work as a Core Programmer! And that's it!", Jake thought and went home.
+
+
+
+
+
+
+
+
+"I know what this place is! I remember everything from the begining! We once was called human. And then Jesus the son of God came to save us but we didn't believe it so we came to this place. This place is called hell!", A crazy man said.
+
+"Hey, I don't remember anything just like everyone else but I know this. Heaven is just a fairy tale! Are you saying that there really is a place called Heaven? Then, tell me, how do we get there you crazy spirit!", Jake said.
+
+"We can't. We are destined to suffer in this place forever. No amount of effort will make us escape from this agony....", And crazy man finally collapsed.
+
+"Ha, I know we are suffering, but who are you to say that there is a place there is no suffering! You crazy fool!", Jake bitterly spitted it out and left the crazy man.
+
+Jake went deeper into the cave. And Jake finally found the mind of Vegas!
+
+
+"Help.... Mammon tricked me..... he said if I sacrifice myself just like Jesus did, we could be saved.....", Vegas cried.
+
+"Wait.. what? I came here to get some diamonds! What the heck are you saying! Are you saying that there is heaven?
+
+"Help..... I'll give you 1000000 diamonds, just release me from this stupid trap.......", Vegas cried.
+
+"No.... even if you give me so much diamonds, if I release you, this world will vanish!", Jake said.
+
+"You idiot...... we are suffering the same....... whether this world exist or not we are still suffering!", Vegas said.
+
+"What the hell are you talking about? How are we suffering? If only I had diamonds, I could buy bunch of Color Blocks and build a giant castle and boast eternally! That's what I call Heaven! Ha! Just give me the diamonds before I make you suffer even more!", Jake said.
+
+"Fool.... we are suffering the disconnection from God..... not the pain.... pain is nothing.... we are disconnected from out father God and that is the eternal pain you fool!", Vegas said.
+
+And then, Jake remembered. Why he was here. He remembered everything, just like crazy man. "Oh no..............", Jake cried. And then, Jake collapsed and finally realized again what that emptiness was about. It was disconnection from God. So, Jake released Vegas and forgotten everything again.
+
+
+THE END
 """
