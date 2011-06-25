@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="SoundPainter">
+      <UniqueIdentifier>{D69434AE-E957-DD2A-7C51-E1CC4080D3F2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SoundPainter\Source">
+      <UniqueIdentifier>{B8559DFD-C683-9950-6287-17161977AC8C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Juce Library Code">
+      <UniqueIdentifier>{F7048EA6-F4B2-F31B-E402-E05D678A1111}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\MainWindow.cpp">
+      <Filter>SoundPainter\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Main.cpp">
+      <Filter>SoundPainter\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\JuceLibraryCode\JuceLibraryCode.cpp">
+      <Filter>Juce Library Code</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\MainWindow.h">
+      <Filter>SoundPainter\Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\JuceLibraryCode\AppConfig.h">
+      <Filter>Juce Library Code</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\JuceLibraryCode\JuceHeader.h">
+      <Filter>Juce Library Code</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
