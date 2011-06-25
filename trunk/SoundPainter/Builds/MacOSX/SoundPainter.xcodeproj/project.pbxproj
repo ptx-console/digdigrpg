@@ -1,0 +1,162 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 44;
+	objects = {
+
+		11F4A078B2AE15E0EBC2BCA7 = { isa = PBXBuildFile; fileRef = AA74590F4C4982298CD993CD; };
+		5D188BCA45087000035B6C15 = { isa = PBXBuildFile; fileRef = E9CAD905F27BC3C45D085F51; };
+		A845ED43803C0622943CE8FD = { isa = PBXBuildFile; fileRef = BB36EC8854630467894FE19D; };
+		F8C99659C763CB8B0E7980C0 = { isa = PBXBuildFile; fileRef = 5981FC91DFAB0065F69DB621; };
+		6C76D93A3F4CD261C170B507 = { isa = PBXBuildFile; fileRef = 905C2B8864A89BF4E75E70DA; };
+		8C4CFC7D66AD8A399565127B = { isa = PBXBuildFile; fileRef = 1A2714E23E23ADF9DD140207; };
+		C25728B8499ADB134BAF9A23 = { isa = PBXBuildFile; fileRef = 4BB969D26F9D5FE80CEF7392; };
+		40901889F66468015A971827 = { isa = PBXBuildFile; fileRef = 0436FCFF5C17391E2AF077C7; };
+		71F8751C52F2BEA7F1328ED1 = { isa = PBXBuildFile; fileRef = C9E4114C9686F29C29D1C26E; };
+		39EEAB7A4744C5D3105F982B = { isa = PBXBuildFile; fileRef = CD7C995853C86EE65010D52E; };
+		C47DEEFB5C290DFB729EE475 = { isa = PBXBuildFile; fileRef = 7F00C1DB353F0C3B8DC27C9A; };
+		FD6152877F2073E1A4973632 = { isa = PBXBuildFile; fileRef = 27C2C16D17BE642A3F583883; };
+		A8DED69F4B8575700D135133 = { isa = PBXBuildFile; fileRef = C9A4F2C50E392E83DE6D2E98; };
+		0D74C58CD8800C0164F381E7 = { isa = PBXBuildFile; fileRef = B4F1495869814CF6F1D7498D; };
+		AA74590F4C4982298CD993CD = { isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		E9CAD905F27BC3C45D085F51 = { isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
+		BB36EC8854630467894FE19D = { isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		5981FC91DFAB0065F69DB621 = { isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		905C2B8864A89BF4E75E70DA = { isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
+		1A2714E23E23ADF9DD140207 = { isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		4BB969D26F9D5FE80CEF7392 = { isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DiscRecording.framework; path = System/Library/Frameworks/DiscRecording.framework; sourceTree = SDKROOT; };
+		0436FCFF5C17391E2AF077C7 = { isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		C9E4114C9686F29C29D1C26E = { isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		CD7C995853C86EE65010D52E = { isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = System/Library/Frameworks/QTKit.framework; sourceTree = SDKROOT; };
+		7F00C1DB353F0C3B8DC27C9A = { isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = System/Library/Frameworks/QuickTime.framework; sourceTree = SDKROOT; };
+		B80618A036F4794E88624C20 = { isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SoundPainter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9AEA76A2772CB34E58F00FAE = { isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = Info.plist; sourceTree = SOURCE_ROOT; };
+		27C2C16D17BE642A3F583883 = { isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MainWindow.cpp; path = ../../Source/MainWindow.cpp; sourceTree = SOURCE_ROOT; };
+		EF0D2EAB2C8848655444EA52 = { isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MainWindow.h; path = ../../Source/MainWindow.h; sourceTree = SOURCE_ROOT; };
+		C9A4F2C50E392E83DE6D2E98 = { isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Main.cpp; path = ../../Source/Main.cpp; sourceTree = SOURCE_ROOT; };
+		6E754C2C66FB8F576857FFEF = { isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppConfig.h; path = ../../JuceLibraryCode/AppConfig.h; sourceTree = SOURCE_ROOT; };
+		25F113D968B5B4B8DD63724F = { isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JuceHeader.h; path = ../../JuceLibraryCode/JuceHeader.h; sourceTree = SOURCE_ROOT; };
+		B4F1495869814CF6F1D7498D = { isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = JuceLibraryCode.mm; path = ../../JuceLibraryCode/JuceLibraryCode.mm; sourceTree = SOURCE_ROOT; };
+		6262BE685D0F5B604F52E7F3 = { isa = PBXGroup; children = (
+				27C2C16D17BE642A3F583883,
+				EF0D2EAB2C8848655444EA52,
+				C9A4F2C50E392E83DE6D2E98 ); name = Source; sourceTree = "<group>"; };
+		CC7BF08E2EFCA89282DC640F = { isa = PBXGroup; children = (
+				6E754C2C66FB8F576857FFEF,
+				25F113D968B5B4B8DD63724F,
+				B4F1495869814CF6F1D7498D ); name = "Juce Library Code"; sourceTree = "<group>"; };
+		80EA60638268EDD043D06921 = { isa = PBXGroup; children = (
+				9AEA76A2772CB34E58F00FAE ); name = Resources; sourceTree = "<group>"; };
+		A388263759D18FC8B33D1482 = { isa = PBXGroup; children = (
+				AA74590F4C4982298CD993CD,
+				E9CAD905F27BC3C45D085F51,
+				BB36EC8854630467894FE19D,
+				5981FC91DFAB0065F69DB621,
+				905C2B8864A89BF4E75E70DA,
+				1A2714E23E23ADF9DD140207,
+				4BB969D26F9D5FE80CEF7392,
+				0436FCFF5C17391E2AF077C7,
+				C9E4114C9686F29C29D1C26E,
+				CD7C995853C86EE65010D52E,
+				7F00C1DB353F0C3B8DC27C9A ); name = Frameworks; sourceTree = "<group>"; };
+		BE9EF3B3C811FA00AD3268EE = { isa = PBXGroup; children = (
+				B80618A036F4794E88624C20 ); name = Products; sourceTree = "<group>"; };
+		1AFB455D09754971E26E2EE3 = { isa = PBXGroup; children = (
+				6262BE685D0F5B604F52E7F3,
+				CC7BF08E2EFCA89282DC640F,
+				80EA60638268EDD043D06921,
+				A388263759D18FC8B33D1482,
+				BE9EF3B3C811FA00AD3268EE ); name = Source; sourceTree = "<group>"; };
+		73A8DACD4C736A9DB725F670 = { isa = XCBuildConfiguration; buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				PREBINDING = NO;
+				HEADER_SEARCH_PATHS = "~/SDKs/vstsdk2.4 $(inherited)";
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET_ppc = 10.4;
+				ONLY_ACTIVE_ARCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+				"_DEBUG=1",
+				"DEBUG=1",
+				"JUCER_XCODE_MAC_F6D2F4CF=1"); }; name = Debug; };
+		0D44533F66DBFF87CD817447 = { isa = XCBuildConfiguration; buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				PREBINDING = NO;
+				HEADER_SEARCH_PATHS = "~/SDKs/vstsdk2.4 $(inherited)";
+				GCC_OPTIMIZATION_LEVEL = s;
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET_ppc = 10.4;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+				"_NDEBUG=1",
+				"NDEBUG=1",
+				"JUCER_XCODE_MAC_F6D2F4CF=1"); }; name = Release; };
+		0EF712F92B766F87C610FA04 = { isa = XCBuildConfiguration; buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				WARNING_CFLAGS = -Wreorder;
+				GCC_MODEL_TUNING = G5;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				ZERO_LINK = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf";
+				PRODUCT_NAME = "SoundPainter"; }; name = Debug; };
+		E27DC565F42D710CEBFE0B17 = { isa = XCBuildConfiguration; buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GCC_WARN_MISSING_PARENTHESES = YES;
+				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				WARNING_CFLAGS = -Wreorder;
+				GCC_MODEL_TUNING = G5;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
+				ZERO_LINK = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf";
+				PRODUCT_NAME = "SoundPainter"; }; name = Release; };
+		AA7F7D1097419572388ED7E1 = { isa = XCConfigurationList; buildConfigurations = (
+				0EF712F92B766F87C610FA04,
+				E27DC565F42D710CEBFE0B17 ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
+		42B29A5A77A54EBAE78EFBD5 = { isa = XCConfigurationList; buildConfigurations = (
+				73A8DACD4C736A9DB725F670,
+				0D44533F66DBFF87CD817447 ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
+		2DE19B53E0EC626B45DF6099 = { isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (  ); runOnlyForDeploymentPostprocessing = 0; };
+		F98798B2AFD87CC8AFD1A446 = { isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (
+				FD6152877F2073E1A4973632,
+				A8DED69F4B8575700D135133,
+				0D74C58CD8800C0164F381E7 ); runOnlyForDeploymentPostprocessing = 0; };
+		AD9CC80B98C4B6E138B49347 = { isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (
+				11F4A078B2AE15E0EBC2BCA7,
+				5D188BCA45087000035B6C15,
+				A845ED43803C0622943CE8FD,
+				F8C99659C763CB8B0E7980C0,
+				6C76D93A3F4CD261C170B507,
+				8C4CFC7D66AD8A399565127B,
+				C25728B8499ADB134BAF9A23,
+				40901889F66468015A971827,
+				71F8751C52F2BEA7F1328ED1,
+				39EEAB7A4744C5D3105F982B,
+				C47DEEFB5C290DFB729EE475 ); runOnlyForDeploymentPostprocessing = 0; };
+		81B9121E3D57DB0E694E0F05 = { isa = PBXNativeTarget; buildConfigurationList = 42B29A5A77A54EBAE78EFBD5; buildPhases = (
+				2DE19B53E0EC626B45DF6099,
+				F98798B2AFD87CC8AFD1A446,
+				AD9CC80B98C4B6E138B49347 ); buildRules = ( ); dependencies = ( ); name = SoundPainter; productName = SoundPainter; productReference = B80618A036F4794E88624C20; productInstallPath = "$(HOME)/Applications"; productType = "com.apple.product-type.application"; };
+		7C52A4672E6DF9F0D434355C = { isa = PBXProject; buildConfigurationList = AA7F7D1097419572388ED7E1; compatibilityVersion = "Xcode 3.0"; hasScannedForEncodings = 0; mainGroup = 1AFB455D09754971E26E2EE3; projectDirPath = ""; projectRoot = ""; targets = ( 81B9121E3D57DB0E694E0F05 ); };
+	};
+	rootObject = 7C52A4672E6DF9F0D434355C;
+}
