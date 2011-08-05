@@ -7,6 +7,7 @@
 
   ==============================================================================
 */
+#include "C:/Documents and Settings/Jin/My Documents/Downloads/juce_1_52/juce/juce_amalgamated.h"
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainWindow.h"
@@ -41,6 +42,7 @@ public:
     //==============================================================================
     void systemRequestedQuit()
     {
+
         quit();
     }
 
@@ -72,3 +74,7 @@ private:
 //==============================================================================
 // This macro generates the main() routine that starts the app.
 START_JUCE_APPLICATION(SoundPainterApplication)
+/*
+ * 이제 일단 사인 웨이브를 제네레이트 해서 소리를 들어보자.
+ * 
+*/
