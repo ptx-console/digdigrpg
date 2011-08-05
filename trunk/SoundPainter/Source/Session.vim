@@ -131,13 +131,21 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +49 Main.cpp
-badd +1 MainWindow.cpp
-badd +1 MainWindow.h
-silent! argdel *
-set lines=50 columns=165
+badd +48 Main.cpp
+badd +51 MainWindow.cpp
+badd +36 MainWindow.h
+badd +585 ~\My\ Documents\Downloads\juce_1_52\juce\extras\juce\ demo\Source\MainDemoWindow.cpp
+badd +155 ~\My\ Documents\Downloads\juce_1_52\juce\extras\juce\ demo\Source\ApplicationStartup.cpp
+badd +50 ~\My\ Documents\Downloads\juce_1_52\juce\extras\juce\ demo\Source\MainDemoWindow.h
+badd +471 ~\My\ Documents\Downloads\juce_1_52\juce\extras\audio\ plugin\ host\Source\MainHostWindow.cpp
+badd +375 ~\My\ Documents\Downloads\juce_1_52\juce\extras\audio\ plugin\ host\Source\GraphEditorPanel.cpp
+badd +65 ~\My\ Documents\Downloads\juce_1_52\juce\extras\juce\ demo\Source\jucedemo_headers.h
+badd +28483 ~\My\ Documents\Downloads\juce_1_52\juce\juce_amalgamated.h
+badd +39775 ~\My\ Documents\Downloads\juce_1_52\juce\juce_amalgamated.cpp
+args ~\My\ Documents\Downloads\juce_1_52\juce\juce_amalgamated.cpp
+set lines=50 columns=167
 winpos -4 -4
-edit Main.cpp
+edit MainWindow.cpp
 set splitbelow splitright
 set nosplitbelow
 set nosplitright
@@ -196,7 +204,7 @@ setlocal formatexpr=
 setlocal formatoptions=croql
 setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
 setlocal grepprg=
-setlocal iminsert=2
+setlocal iminsert=0
 setlocal imsearch=0
 setlocal include=
 setlocal includeexpr=
@@ -249,12 +257,12 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 49 - ((24 * winheight(0) + 24) / 49)
+let s:l = 22 - ((21 * winheight(0) + 24) / 49)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-49
-normal! 04l
+22
+normal! 036l
 lcd E:\E\PythonOgre\demos\digdigrpg\SoundPainter\Source
 if exists('s:wipebuf')
   silent exe 'bwipe ' . s:wipebuf

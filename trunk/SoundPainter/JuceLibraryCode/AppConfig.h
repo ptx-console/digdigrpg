@@ -13,15 +13,15 @@
 
 //#define  JUCE_FORCE_DEBUG
 //#define  JUCE_LOG_ASSERTIONS
-#define    JUCE_ASIO 1
+//#define  JUCE_ASIO
 //#define  JUCE_WASAPI
-//#define  JUCE_DIRECTSOUND
+#define    JUCE_DIRECTSOUND 1
 //#define  JUCE_ALSA
 //#define  JUCE_QUICKTIME
-#define    JUCE_OPENGL 1
+//#define  JUCE_OPENGL
 //#define  JUCE_DIRECT2D
-#define    JUCE_USE_FLAC 1
-#define    JUCE_USE_OGGVORBIS 1
+//#define  JUCE_USE_FLAC
+//#define  JUCE_USE_OGGVORBIS
 //#define  JUCE_USE_CDBURNER
 //#define  JUCE_USE_CDREADER
 //#define  JUCE_USE_CAMERA

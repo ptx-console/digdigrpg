@@ -11,21 +11,65 @@
 #include "MainWindow.h"
 
 
+class ContentComp  : public Component//,
+ //                    public MenuBarModel,
+ //                    public ApplicationCommandTarget
+{
+public:
+    ContentComp (MainAppWindow* mainWindow_)
+        : mainWindow (mainWindow_)
+    {
+        label = new Label (T("asdsads"), T("asd"));
+        label->setBounds (500, 10, 280, 20);
+        addAndMakeVisible(label);
+
+
+        AudioDeviceSelectorComponent *sel = new AudioDeviceSelectorComponent(*mainWindow->mAudio, 0, 2, 0, 2, true, true, true, false);
+        sel->setBounds (0, 0, 500, 600);
+        addAndMakeVisible(sel);
+    }
+
+    ~ContentComp()
+    {
+        deleteAllChildren();
+    }
+private:
+    Label *label;
+    MainAppWindow *mainWindow;
+
+
+};
+
 //==============================================================================
 MainAppWindow::MainAppWindow()
     : DocumentWindow (JUCEApplication::getInstance()->getApplicationName(),
                       Colours::lightgrey,
                       DocumentWindow::allButtons)
 {
-    centreWithSize (500, 400);
+    mAudio = new AudioDeviceManager();
+
+
+    ContentComp* contentComp = new ContentComp (this);
+    setContentComponent (contentComp);
+
+    centreWithSize (1000, 650);
     setVisible (true);
+    //AudioDeviceSelectorComponent *sel = new AudioDeviceSelectorComponent(*mAudio, 1, 1, 2, 2, false, false, true, false);
+    //label = new Label (T("Label"), T("text here"));
+    //label->setBounds (10, 10, 280, 20);
+    //addAndMakeVisible(label);
+
+        //AudioDeviceManager &deviceManager, const int minAudioInputChannels, const int maxAudioInputChannels, const int minAudioOutputChannels, const int maxAudioOutputChannels, const bool showMidiInputOptions, const bool showMidiOutputSelector, const bool showChannelsAsStereoPairs, const bool hideAdvancedOptionsWithButton
 }
 
 MainAppWindow::~MainAppWindow()
 {
+    clearContentComponent();
+    delete mAudio;
 }
 
 void MainAppWindow::closeButtonPressed()
 {
+	Synthesiser::renderNextBlock
     JUCEApplication::getInstance()->systemRequestedQuit();
 }

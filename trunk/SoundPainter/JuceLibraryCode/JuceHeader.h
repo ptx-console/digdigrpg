@@ -10,11 +10,11 @@
 
 */
 
-#ifndef __APPHEADERFILE_89BA756E__
-#define __APPHEADERFILE_89BA756E__
+#ifndef __APPHEADERFILE_942EBDFF__
+#define __APPHEADERFILE_942EBDFF__
 
 #include "AppConfig.h"
-#include "C:/Documents and Settings/Jin/My Documents/Downloads/juce_1_52/juce/juce_amalgamated.h"
+//#include "C:/Documents and Settings/Jin/My Documents/Downloads/juce_1_52/juce/juce_amalgamated.h"
 
 namespace ProjectInfo
 {
@@ -23,4 +23,4 @@ namespace ProjectInfo
     const int          versionNumber  = 0x10000;
 }
 
-#endif   // __APPHEADERFILE_89BA756E__
+#endif   // __APPHEADERFILE_942EBDFF__

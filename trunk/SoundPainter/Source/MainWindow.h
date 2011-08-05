@@ -10,7 +10,7 @@
 
 #ifndef __MAINWINDOW_H_FECD710B__
 #define __MAINWINDOW_H_FECD710B__
-
+#include "C:/Documents and Settings/Jin/My Documents/Downloads/juce_1_52/juce/juce_amalgamated.h"
 #include "../JuceLibraryCode/JuceHeader.h"
 
 
@@ -21,6 +21,7 @@ public:
     //==============================================================================
     MainAppWindow();
     ~MainAppWindow();
+    
 
     void closeButtonPressed();
 
@@ -32,6 +33,7 @@ public:
        implementation calls the superclass's method.
     */
 
+    AudioDeviceManager *mAudio;
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainAppWindow)
