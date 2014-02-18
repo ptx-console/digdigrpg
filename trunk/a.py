@@ -111,6 +111,7 @@ class App:
 		string = self.GenSaveFile(objects)
 		f = open("saveFile.txt", "w")
 		f.write(string)
+
 		f.close()
 
 if __name__ == "__main__":
