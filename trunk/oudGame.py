@@ -32,7 +32,15 @@ class Char:
 		self.maxhp = 200
 		self.mp	= 200
 		self.maxmp = 200
-		self.skills = [Skill()]
+		heal = Skill()
+		heal.name = "Heal"
+		heal.ident = "heal"
+		heal.desc = "Heals you"
+		heal.point = 30
+		heal.tick = 3
+		heal.count = 0
+		heal.targetSelf = True
+		self.skills = {"heal": heal}
 		self.bufs = []
 		self.target = None
 
@@ -61,11 +69,22 @@ class App:
 		cmds = cmd.split(" ")
 		if cmds[0] == "quit":
 			return False
-
+		if cmds[0] == "heal":
+			self.char.bufs += [self.char.skills[cmds[0]].SpawnBuf()]
+			return True
+	def Tick(self):
+		for buf in self.char.bufs:
+			if buf.count == buf.tick:
+				continue
+			buf.count += 1
+			if buf.ident == "heal":
+				self.char.hp += buf.point
+			
 		
 
 	def Launch(self):
 		while True:
+			self.Tick()
 			cmd = self.Prompt("""[%d/%d %d/%d] """ % (self.char.hp, self.char.maxhp, self.char.mp, self.char.maxmp))
 			if self.ParseRegularCommand(cmd) == False:
 				break
