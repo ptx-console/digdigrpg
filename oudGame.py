@@ -32,6 +32,9 @@ class Char:
 		self.maxhp = 200
 		self.mp	= 200
 		self.maxmp = 200
+		self.name = ""
+		self.ident = ""
+		self.look = ""
 		heal = Skill()
 		heal.name = "Heal"
 		heal.ident = "heal"
@@ -54,15 +57,20 @@ class Char:
 class App:
 	def __init__(self):
 		self.char = Char()
+		mob1 = Char()
 		self.mobs = []
 		self.Initialize()
+		self.prevCmd = ""
 
 	def Print(self, msg):
 		print msg
+
 	def Prompt(self, msg):
 		return Input(msg)
+
 	def ParseRegularCommand(self, args):
 		cmd = copy.deepcopy(args)
+
 		while cmd.find("  ") != -1:
 			cmd = cmd.replace("  ", " ")
 
@@ -72,6 +80,7 @@ class App:
 		if cmds[0] == "heal":
 			self.char.bufs += [self.char.skills[cmds[0]].SpawnBuf()]
 			return True
+
 	def Tick(self):
 		for buf in self.char.bufs:
 			if buf.count == buf.tick:
@@ -80,14 +89,22 @@ class App:
 			if buf.ident == "heal":
 				self.char.hp += buf.point
 			
-		
-
 	def Launch(self):
 		while True:
 			self.Tick()
+			"""
+			upperCursor = chr(27)+chr(91)+chr(65)
+			belowCursor = chr(27)+chr(91)+chr(66)
+			if cmd == upperCursor:
+				print "\r"+self.prevCmd,
+			if cmd == belowCursor:
+				print "\r"+self.prevCmd,
+			"""
+
 			cmd = self.Prompt("""[%d/%d %d/%d] """ % (self.char.hp, self.char.maxhp, self.char.mp, self.char.maxmp))
 			if self.ParseRegularCommand(cmd) == False:
 				break
+
 
 	def GenSaveFile(self, objects):
 		obj = {
