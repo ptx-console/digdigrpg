@@ -120,6 +120,8 @@ a = False or True
 a = not True
 a = not 3
 a = None
+if a == None:
+	print "Yes it is None"
 a = 2 << 3
 a = 2 >> 2
 a = (1 << 3)-1
