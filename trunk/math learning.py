@@ -97,6 +97,23 @@ aaa = {}
 aaa["a"] = 42
 print a*b*c
 print 7*6*7*6*6
+class Es:
+	def __init__(self):
+		self.a = 0
+
+class Est(Es):
+	def __init__(self, a,b,c):
+		Es.__init__(self)
+	def Estos(self, asd):
+		print self.a+asd
+	def Estus(self):
+		self.Estos(3)
+		a = "%d %s\t\r\n " % (30,"asd")
+		print `3`
+
+estObj = Est(1,2,3)
+estObj.Estus()
+
 """
 help(math)
 dir(math)
