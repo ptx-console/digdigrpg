@@ -113,6 +113,19 @@ class Est(Es):
 
 estObj = Est(1,2,3)
 estObj.Estus()
+a = 1==1
+a = 1!=1
+a = True and False
+a = False or True
+a = not True
+a = not 3
+a = None
+a = 2 << 3
+a = 2 >> 2
+a = (1 << 3)-1
+print a
+a = 7 >> 2
+print a
 
 """
 help(math)
