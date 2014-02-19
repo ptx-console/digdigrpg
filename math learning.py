@@ -81,12 +81,72 @@ targetStr = ["<", "7", "*", "-", "<", "7", "-", "<", "7", "-", "<", "7", "-", "<
 def Do(a):
 	opens = 0
 	closes = 0
+	multis = 0
 	stack = []
-
+	
+	plus = "+"
+	minus = "-"
+	opener = "<"
+	closer = ">"
+	mult = "*"
+	
+	opened = []
+	openedPoses = []
+	closed = []
+	closedPoses = []
+	multSymPoses = []
+	openPosForMult = []
+	closePosForMult = []
+	
+	idx = 0
+	multDetected = False
+	waitingForClose = False
+	print "".join(a)
 	for ch in a:
+		"""
+		print ch, mult, ch == mult
+		"""
+		if ch == plus:
+			pass
+		elif ch == minus:
+			pass
+		elif ch == opener:
+			opens += 1
+			opened += [ch]
+			openedPoses += [idx]
+			if multDetected:
+				openPosForMult += [idx]
+				waitingForClose = True
+				multDetected = False
+
+		elif ch == closer:
+			closes += 1
+			closed += [ch]
+			closedPoses += [idx]
+			del openedPoses[-1]
+			if waitingForClose:
+				waitingForClose = False
+				print openedPoses, openPosForMult
+				if openedPoses[-1] == openPosForMult[-1]:
+					print "Found", multSymPoses, openedPoses, closedPoses
+					
+		elif ch == mult:
+			multDetected = True
+			multSymPoses += [idx]
+			
+			#print openedPoses
+			#print openedPoses[-1], closedPoses[-1]
+			#print stack
+
 		stack += [ch]
+		idx += 1
+		"""
+		if idx > 20:
+			break
+		"""
+	
 	popped = stack[-1]
 	del stack[-1]
-	print stack, popped
+	#print stack, popped
 
 Do(targetStr)
