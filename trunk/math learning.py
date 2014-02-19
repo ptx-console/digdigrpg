@@ -88,7 +88,8 @@ print 7*7*6
 print 7*7*(7-1)
 "0111*0111*(0111-01)"
 
-aaa = a=42,b=7,c=36
+a=42;b=7;c=36
+aaa = a,b,c
 aaa[0];aaa[1];aaa[2]
 aaa = [a,b,c]
 aaa[0];aaa[1];aaa[2]
