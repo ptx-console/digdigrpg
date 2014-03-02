@@ -219,3 +219,9 @@ def Do(a):
 
 Do(targetStr)
 '''
+a=42;b=7;c=36
+a*b+c
+# how to calculate it using only using dot product
+# result must be a form of x1/x2 resulting two outputs
+42*7+36 == 330
+
